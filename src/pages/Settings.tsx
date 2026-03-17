@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { User, Bell, Shield, Palette, Globe, Save, Loader2, Database, RefreshCw } from "lucide-react";
+import { User, Bell, Shield, Palette, Globe, Save, Loader2, Database, RefreshCw, Download, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { useUserProfile, useCategories, useAccounts } from "../lib/hooks/useFinanceData";
 import { doc, updateDoc, collection, addDoc } from "firebase/firestore";
@@ -8,12 +8,14 @@ import { db } from "../lib/firebase";
 import { useAuth } from "../components/AuthProvider";
 import { handleFirestoreError, OperationType } from "../lib/firestore-errors";
 import { DEFAULT_CATEGORIES, DEFAULT_ACCOUNTS } from "../lib/constants";
+import { useRegisterSW } from 'virtual:pwa-register/react';
 
 const TABS = [
   { id: "profile", label: "Profile", icon: User },
   { id: "preferences", label: "Preferences", icon: Palette },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "data", label: "Data Management", icon: Database },
+  { id: "pwa", label: "App Settings", icon: Smartphone },
   { id: "security", label: "Security", icon: Shield },
 ];
 
@@ -26,6 +28,39 @@ export default function Settings() {
   const [isSaving, setIsSaving] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   
+  const {
+    offlineReady: [offlineReady, setOfflineReady],
+    needUpdate: [needUpdate, setNeedUpdate],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegistered(r) {
+      console.log('SW Registered: ' + r);
+    },
+    onRegisterError(error) {
+      console.log('SW registration error', error);
+    },
+  });
+
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
+
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -400,6 +435,80 @@ export default function Settings() {
                       )}
                       Initialize Defaults
                     </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === "pwa" && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+                <div className="space-y-6">
+                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
+                        <Smartphone className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-white/90">App Installation</h4>
+                        <p className="text-sm text-white/50">Install ወይኔ ብሬ on your device for a better experience</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-white/40 mb-6">
+                      Installing the app allows you to access it directly from your home screen, use it offline, and receive push notifications more reliably.
+                    </p>
+                    <button 
+                      onClick={handleInstall}
+                      disabled={!deferredPrompt}
+                      className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors shadow-[0_0_20px_rgba(59,130,246,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Download className="w-4 h-4" />
+                      {deferredPrompt ? 'Install App' : 'App Already Installed'}
+                    </button>
+                  </div>
+
+                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                        <RefreshCw className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-white/90">Updates & Offline</h4>
+                        <p className="text-sm text-white/50">Manage app updates and offline status</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 bg-black/20 rounded-xl border border-white/5">
+                        <div className="text-sm">
+                          <p className="text-white/90 font-medium">Offline Status</p>
+                          <p className="text-white/40 text-xs">{offlineReady ? 'Ready for offline use' : 'Connecting...'}</p>
+                        </div>
+                        <div className={`w-2 h-2 rounded-full ${offlineReady ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-amber-500 animate-pulse'}`} />
+                      </div>
+
+                      {needUpdate && (
+                        <div className="flex items-center justify-between p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                          <div className="text-sm">
+                            <p className="text-emerald-400 font-medium">Update Available!</p>
+                            <p className="text-emerald-400/60 text-xs">A new version of the app is available.</p>
+                          </div>
+                          <button 
+                            onClick={() => updateServiceWorker(true)}
+                            className="px-4 py-2 rounded-lg bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider hover:bg-emerald-600 transition-colors"
+                          >
+                            Update Now
+                          </button>
+                        </div>
+                      )}
+
+                      <button 
+                        onClick={() => window.location.reload()}
+                        className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-white/90 text-sm font-medium hover:bg-white/10 transition-colors border border-white/10"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        Check for Updates
+                      </button>
+                    </div>
                   </div>
                 </div>
               </motion.div>

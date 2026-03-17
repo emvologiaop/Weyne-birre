@@ -6,6 +6,7 @@ import { db } from '../../lib/firebase';
 import { useAuth } from '../AuthProvider';
 import { handleFirestoreError, OperationType } from '../../lib/firestore-errors';
 import { toast } from 'sonner';
+import { useCategories, useAccounts } from '../../lib/hooks/useFinanceData';
 
 interface AddSubscriptionModalProps {
   isOpen: boolean;
@@ -14,6 +15,8 @@ interface AddSubscriptionModalProps {
 
 export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalProps) {
   const { user } = useAuth();
+  const { categories } = useCategories();
+  const { accounts } = useAccounts();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -22,7 +25,8 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
     amount: '',
     frequency: 'monthly',
     startDate: new Date().toISOString().split('T')[0],
-    category: 'Entertainment',
+    categoryId: '',
+    accountId: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,7 +42,8 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
         amount: parseFloat(formData.amount),
         frequency: formData.frequency,
         startDate: formData.startDate,
-        category: formData.category,
+        categoryId: formData.categoryId,
+        accountId: formData.accountId,
         status: 'active',
         createdAt: new Date().toISOString(),
       });
@@ -72,7 +77,7 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
               {error && (
                 <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-sm">
                   {error}
@@ -117,6 +122,37 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
                     <option value="monthly">Monthly</option>
                     <option value="yearly">Yearly</option>
                     <option value="weekly">Weekly</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-1.5">Category</label>
+                  <select
+                    required
+                    value={formData.categoryId}
+                    onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                    className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors appearance-none"
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-1.5">Account</label>
+                  <select
+                    required
+                    value={formData.accountId}
+                    onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
+                    className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors appearance-none"
+                  >
+                    <option value="">Select Account</option>
+                    {accounts.map(acc => (
+                      <option key={acc.id} value={acc.id}>{acc.name}</option>
+                    ))}
                   </select>
                 </div>
               </div>

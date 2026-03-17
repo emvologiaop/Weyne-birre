@@ -1,15 +1,19 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { LayoutDashboard, Receipt, Wallet, PieChart, Settings, LogOut, Tags, Scan, CreditCard, Trophy, Menu, X } from "lucide-react";
+import { LayoutDashboard, Receipt, Wallet, PieChart, Settings, LogOut, Tags, Scan, CreditCard, Trophy, Menu, X, Sparkles } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuth } from "../AuthProvider";
 import { useState } from "react";
 import { TelegramButton } from "../TelegramButton";
 import { motion, AnimatePresence } from "motion/react";
+import { useAchievementTracker } from "../../lib/hooks/useAchievementTracker";
+import { useSubscriptionChecker } from "../../lib/hooks/useSubscriptionChecker";
+import { AIAdvisor } from "../AIAdvisor";
 
 const navItems = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Transactions", href: "/transactions", icon: Receipt },
   { name: "Receipts", href: "/receipts", icon: Scan },
+  { name: "AI Advisor", href: "/ai-advisor", icon: Sparkles },
   { name: "Subscriptions", href: "/subscriptions", icon: CreditCard },
   { name: "Achievements", href: "/achievements", icon: Trophy },
   { name: "Accounts", href: "/accounts", icon: Wallet },
@@ -22,6 +26,10 @@ export default function DashboardLayout() {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Initialize trackers
+  useAchievementTracker();
+  useSubscriptionChecker();
 
   return (
     <div className="flex h-screen bg-bg-dark text-white font-sans">
@@ -118,6 +126,7 @@ export default function DashboardLayout() {
           </motion.div>
         </div>
         <TelegramButton />
+        <AIAdvisor />
       </main>
     </div>
   );

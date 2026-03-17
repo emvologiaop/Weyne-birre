@@ -17,6 +17,7 @@ import Subscriptions from "./pages/Subscriptions";
 import Achievements from "./pages/Achievements";
 import Settings from "./pages/Settings";
 import Categories from "./pages/Categories";
+import AIAdvisorPage from "./pages/AIAdvisorPage";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AuthProvider } from "./components/AuthProvider";
 import { requestNotificationPermission, showNotification } from "./lib/notificationService";
@@ -48,6 +49,7 @@ export default function App() {
                 <Route path="accounts" element={<Accounts />} />
                 <Route path="budgets" element={<Budgets />} />
                 <Route path="receipts" element={<Receipts />} />
+                <Route path="ai-advisor" element={<AIAdvisorPage />} />
                 <Route path="subscriptions" element={<Subscriptions />} />
                 <Route path="achievements" element={<Achievements />} />
                 <Route path="categories" element={<Categories />} />

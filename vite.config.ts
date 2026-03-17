@@ -12,15 +12,30 @@ export default defineConfig(({mode}) => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        includeAssets: ['vite.svg', 'robots.txt', 'apple-touch-icon.png'],
         manifest: {
           name: 'ወይኔ ብሬ',
           short_name: 'ወይኔ ብሬ',
+          description: 'Personal Finance Tracker',
           theme_color: '#10b981',
+          background_color: '#050505',
+          display: 'standalone',
           icons: [
             {
               src: '/vite.svg',
               sizes: 'any',
-              type: 'image/svg+xml'
+              type: 'image/svg+xml',
+              purpose: 'any maskable'
+            },
+            {
+              src: 'https://picsum.photos/seed/finance/192/192',
+              sizes: '192x192',
+              type: 'image/png'
+            },
+            {
+              src: 'https://picsum.photos/seed/finance/512/512',
+              sizes: '512x512',
+              type: 'image/png'
             }
           ]
         }
