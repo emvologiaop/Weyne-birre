@@ -32,7 +32,7 @@ export default function DashboardLayout() {
   useSubscriptionChecker();
 
   return (
-    <div className="flex h-screen bg-bg-dark text-white font-sans">
+    <div className="flex h-screen bg-bg-dark text-white font-sans selection:bg-brand/20">
       {/* Mobile Overlay */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -50,21 +50,22 @@ export default function DashboardLayout() {
       <motion.aside 
         initial={false}
         animate={{ x: isSidebarOpen ? 0 : "-100%" }}
-        className="fixed inset-y-0 left-0 z-50 w-72 bg-bg-sidebar border-r border-white/5 flex flex-col lg:static lg:transform-none shadow-2xl"
+        className="fixed inset-y-0 left-0 z-50 w-80 bg-[#080808] border-r border-white/[0.03] flex flex-col lg:static lg:transform-none shadow-[40px_0_80px_rgba(0,0,0,0.5)]"
       >
-        <div className="h-20 flex items-center justify-between px-8 border-b border-white/5">
-          <div className="flex items-center gap-3 text-brand font-bold tracking-tight text-lg">
-            <div className="w-10 h-10 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center overflow-hidden">
-              <img src="https://img.icons8.com/fluency/512/money-bag.png" alt="Logo" className="w-6 h-6 object-contain" />
+        <div className="h-28 flex items-center justify-between px-10">
+          <div className="flex items-center gap-4 text-white font-display font-bold tracking-tighter text-2xl uppercase">
+            <div className="w-12 h-12 rounded-[18px] bg-gradient-to-br from-brand/30 to-brand/5 border border-brand/20 flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.15)] group relative">
+              <div className="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <img src="https://img.icons8.com/fluency/512/money-bag.png" alt="Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform duration-700 relative z-10" />
             </div>
-            ወይኔ ብሬ
+            <span className="bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">ወይኔ ብሬ</span>
           </div>
-          <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-white/50 hover:text-white">
+          <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-white/20 hover:text-white transition-colors">
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        <nav className="flex-1 px-6 py-8 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-8 py-6 space-y-2 overflow-y-auto scrollbar-hide">
           {navItems.map((item) => {
             const isActive = location.pathname === item.href;
             return (
@@ -73,57 +74,85 @@ export default function DashboardLayout() {
                 to={item.href}
                 onClick={() => setIsSidebarOpen(false)}
                 className={cn(
-                  "flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200",
+                  "flex items-center gap-5 px-5 py-4 rounded-[20px] text-[12px] font-bold uppercase tracking-[0.2em] transition-all duration-700 group relative overflow-hidden",
                   isActive
-                    ? "bg-white/5 text-white shadow-sm ring-1 ring-white/10"
-                    : "text-white/40 hover:text-white hover:bg-white/5"
+                    ? "bg-white/[0.03] text-white shadow-inner ring-1 ring-white/10"
+                    : "text-white/20 hover:text-white/90 hover:bg-white/[0.01]"
                 )}
               >
-                <item.icon className={cn("w-5 h-5", isActive ? "text-brand" : "text-white/40")} />
+                {isActive && (
+                  <motion.div 
+                    layoutId="activeNav"
+                    className="absolute left-0 w-1 h-6 bg-brand rounded-full shadow-[0_0_15px_rgba(16,185,129,0.8)]"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <item.icon className={cn("w-5 h-5 transition-all duration-700", isActive ? "text-brand scale-110" : "text-white/10 group-hover:text-white/40 group-hover:scale-110")} />
                 {item.name}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-6 border-t border-white/5">
+        <div className="p-8 border-t border-white/[0.03]">
           <button 
             onClick={signOut}
-            className="flex items-center gap-4 px-4 py-3 w-full rounded-2xl text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 transition-all duration-200"
+            className="flex items-center gap-5 px-5 py-4 w-full rounded-[20px] text-[11px] font-bold uppercase tracking-[0.3em] text-white/10 hover:text-rose-400 hover:bg-rose-500/5 transition-all duration-700 group"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-5 h-5 text-white/5 group-hover:text-rose-400/60 transition-colors duration-700" />
             Sign Out
           </button>
         </div>
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="h-20 flex items-center justify-between px-6 lg:px-10 border-b border-white/5 bg-bg-dark/80 backdrop-blur-xl">
-          <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden text-white/50 hover:text-white">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.02] pointer-events-none" />
+        <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-brand/5 to-transparent pointer-events-none opacity-30" />
+        
+        <header className="h-28 flex items-center justify-between px-8 lg:px-16 border-b border-white/[0.03] bg-[#050505]/60 backdrop-blur-3xl z-20">
+          <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden text-white/20 hover:text-white transition-colors">
             <Menu className="w-6 h-6" />
           </button>
-          <h1 className="text-xl font-semibold text-white/90 tracking-tight">
-            {navItems.find((item) => item.href === location.pathname)?.name || "Overview"}
-          </h1>
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex flex-col items-end">
-              <span className="text-xs font-semibold text-brand uppercase tracking-widest">Premium</span>
-              <span className="text-[10px] text-white/30 uppercase font-bold">Member</span>
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-display font-bold text-white tracking-tighter uppercase">
+              {navItems.find((item) => item.href === location.pathname)?.name || "Overview"}
+            </h1>
+            <div className="flex items-center gap-3 mt-1">
+              <div className="w-1 h-1 rounded-full bg-brand/40" />
+              <p className="text-[10px] text-white/20 font-bold uppercase tracking-[0.3em]">
+                {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+              </p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand to-blue-600 border border-white/10 overflow-hidden shadow-lg">
-              {user?.photoURL && (
-                <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-              )}
+          </div>
+          <div className="flex items-center gap-10">
+            <div className="hidden md:flex flex-col items-end gap-1">
+              <div className="flex items-center gap-2.5">
+                <div className="w-2 h-2 rounded-full bg-brand animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                <span className="text-[11px] font-bold text-brand uppercase tracking-[0.4em]">Premium</span>
+              </div>
+              <span className="text-[9px] text-white/10 uppercase font-bold tracking-[0.2em]">Verified Member</span>
+            </div>
+            <div className="w-14 h-14 rounded-[22px] bg-gradient-to-tr from-brand/30 to-blue-600/30 border border-white/10 overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.4)] p-[1px] group cursor-pointer relative">
+              <div className="w-full h-full rounded-[21px] overflow-hidden bg-[#050505] relative">
+                {user?.photoURL ? (
+                  <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000" referrerPolicy="no-referrer" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-sm font-bold text-white/20">
+                    {user?.email?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              </div>
             </div>
           </div>
         </header>
         
-        <div className="flex-1 overflow-auto p-6 lg:p-10">
+        <div className="flex-1 overflow-auto p-8 lg:p-16 relative z-10">
           <motion.div 
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="max-w-7xl mx-auto"
           >
             <Outlet />

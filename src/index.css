@@ -1,22 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --color-brand: #10b981; /* Emerald */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-brand: #10b981;
+  --color-brand-dark: #059669;
   --color-bg-dark: #050505;
   --color-bg-sidebar: #0a0a0a;
+  --color-bg-card: #0f0f0f;
 }
 
 @layer base {
   body {
-    @apply bg-bg-dark text-white font-sans antialiased;
+    @apply bg-bg-dark text-white/90 antialiased selection:bg-brand/30 selection:text-white;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
   }
 }
 
 /* Markdown Styles */
 .markdown-body {
-  @apply text-white/90 leading-relaxed;
+  @apply text-white/90 leading-relaxed text-sm;
 }
 
 .markdown-body p {
@@ -28,25 +38,39 @@
 }
 
 .markdown-body ul, .markdown-body ol {
-  @apply mb-4 ml-6 list-disc;
+  @apply mb-4 ml-6 !list-disc;
 }
 
 .markdown-body li {
-  @apply mb-1;
+  @apply !mb-2;
 }
 
 .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-  @apply font-bold text-white mt-6 mb-3;
+  @apply font-bold text-white !mt-6 !mb-3 font-display;
 }
 
-.markdown-body h1 { @apply text-xl; }
-.markdown-body h2 { @apply text-lg; }
-.markdown-body h3 { @apply text-base; }
+.markdown-body h1 { @apply !text-xl; }
+.markdown-body h2 { @apply !text-lg; }
+.markdown-body h3 { @apply !text-base; }
 
 .markdown-body code {
-  @apply bg-white/10 px-1.5 py-0.5 rounded text-emerald-300 font-mono text-xs;
+  @apply bg-white/10 px-1.5 py-0.5 rounded text-emerald-300 font-mono text-[11px];
 }
 
 .markdown-body blockquote {
-  @apply border-l-4 border-emerald-500/50 pl-4 italic text-white/60 my-4;
+  @apply border-l-4 border-emerald-500/50 pl-4 italic text-white/60 my-4 bg-white/5 py-2 rounded-r-lg;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
 }

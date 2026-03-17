@@ -52,8 +52,11 @@ export function AIAdvisor() {
 
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
+        config: {
+          systemInstruction: "You are a professional financial advisor for an app called 'ወይኔ ብሬ'. Always provide structured, easy-to-read advice. Use bold text for key figures and important points. Use bullet points for lists. Be encouraging and professional.",
+        },
         contents: [
-          { role: 'user', parts: [{ text: `You are a professional financial advisor for an app called "ወይኔ ብሬ". Use the following context to help the user: ${context}. User question: ${userMessage}` }] }
+          { role: 'user', parts: [{ text: `Context: ${context}. Question: ${userMessage}` }] }
         ]
       });
 
@@ -118,7 +121,7 @@ export function AIAdvisor() {
                       ? 'bg-emerald-500 text-white rounded-tr-none' 
                       : 'bg-white/5 text-white/90 border border-white/10 rounded-tl-none'
                   }`}>
-                    <div className="markdown-body prose prose-invert prose-sm max-w-none">
+                    <div className="markdown-body">
                       <Markdown remarkPlugins={[remarkGfm]}>{msg.content}</Markdown>
                     </div>
                   </div>

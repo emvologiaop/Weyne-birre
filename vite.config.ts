@@ -20,6 +20,8 @@ export default defineConfig(({mode}) => {
           theme_color: '#10b981',
           background_color: '#050505',
           display: 'standalone',
+          start_url: '/',
+          scope: '/',
           icons: [
             {
               src: 'https://img.icons8.com/fluency/512/money-bag.png',
@@ -28,11 +30,15 @@ export default defineConfig(({mode}) => {
               purpose: 'any maskable'
             },
             {
-              src: 'https://img.icons8.com/fluency/512/money-bag.png',
+              src: 'https://img.icons8.com/fluency/192/money-bag.png',
               sizes: '192x192',
-              type: 'image/png'
+              type: 'image/png',
+              purpose: 'any maskable'
             }
           ]
+        },
+        workbox: {
+          maximumFileSizeToCacheInBytes: 4000000,
         }
       })
     ],

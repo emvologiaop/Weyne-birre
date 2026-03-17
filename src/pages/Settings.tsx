@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { User, Bell, Shield, Palette, Globe, Save, Loader2, Database, RefreshCw, Download, Smartphone } from "lucide-react";
+import { User, Bell, Shield, Palette, Globe, Save, Loader2, Database, RefreshCw, Download, Smartphone, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useUserProfile, useCategories, useAccounts } from "../lib/hooks/useFinanceData";
 import { doc, updateDoc, collection, addDoc } from "firebase/firestore";
@@ -9,6 +9,7 @@ import { useAuth } from "../components/AuthProvider";
 import { handleFirestoreError, OperationType } from "../lib/firestore-errors";
 import { DEFAULT_CATEGORIES, DEFAULT_ACCOUNTS } from "../lib/constants";
 import { useRegisterSW } from 'virtual:pwa-register/react';
+import { cn } from "../lib/utils";
 
 const TABS = [
   { id: "profile", label: "Profile", icon: User },
@@ -29,8 +30,8 @@ export default function Settings() {
   const [isInitializing, setIsInitializing] = useState(false);
   
   const {
-    offlineReady: [offlineReady, setOfflineReady],
-    needUpdate: [needUpdate, setNeedUpdate],
+    offlineReady,
+    needUpdate,
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
@@ -40,6 +41,9 @@ export default function Settings() {
       console.log('SW registration error', error);
     },
   });
+
+  const isOfflineReady = !!offlineReady;
+  const isNeedUpdate = !!needUpdate;
 
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
@@ -123,17 +127,12 @@ export default function Settings() {
 
     setIsInitializing(true);
     try {
-      // Create default categories if none exist or just add them
       const categoriesRef = collection(db, 'categories');
       const accountsRef = collection(db, 'accounts');
 
       const promises = [];
-
-      // Only add if they don't have them? Or just add all.
-      // To be safe, let's just add them.
       
       DEFAULT_CATEGORIES.forEach(cat => {
-        // Check if category already exists by name?
         const exists = categories.some(c => c.name === cat.name);
         if (!exists) {
           promises.push(addDoc(categoriesRef, { ...cat, userId: user.uid }));
@@ -160,406 +159,435 @@ export default function Settings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+        <Loader2 className="w-10 h-10 text-brand animate-spin" />
       </div>
     );
   }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-5xl mx-auto"
-    >
-      <div className="mb-8 flex justify-between items-end">
-        <div>
-          <h2 className="text-2xl font-semibold text-white/90">Settings</h2>
-          <p className="text-sm text-white/50 mt-1">Manage your account and preferences</p>
+    <div className="max-w-6xl mx-auto pb-12">
+      <div className="mb-12 flex flex-col sm:flex-row justify-between items-end gap-8">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="w-1.5 h-8 bg-brand rounded-full shadow-[0_0_15px_rgba(16,185,129,0.4)]" />
+            <h2 className="text-4xl font-display font-bold text-white tracking-tight">Settings</h2>
+          </div>
+          <p className="text-[10px] text-white/20 uppercase tracking-[0.4em] font-bold ml-4">System Configuration & Identity</p>
         </div>
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600 transition-colors shadow-[0_0_20px_rgba(16,185,129,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="group relative flex items-center justify-center gap-3 px-10 py-4.5 rounded-[24px] bg-white text-black text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-brand hover:text-white transition-all duration-500 shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 overflow-hidden"
         >
-          {isSaving ? (
-            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          ) : (
-            <Save className="w-4 h-4" />
-          )}
-          Save Changes
+          <div className="absolute inset-0 bg-gradient-to-r from-brand/20 to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative z-10 flex items-center gap-3">
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 group-hover:scale-110 transition-transform duration-500" />
+            )}
+            Save Changes
+          </div>
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-16">
         {/* Sidebar Tabs */}
-        <div className="w-full md:w-64 shrink-0 space-y-1">
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                  isActive 
-                    ? "bg-white/10 text-white" 
-                    : "text-white/50 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <tab.icon className={`w-5 h-5 ${isActive ? "text-emerald-400" : ""}`} />
-                {tab.label}
-              </button>
-            );
-          })}
+        <div className="w-full lg:w-80 shrink-0">
+          <div className="sticky top-8 space-y-1.5 p-2 rounded-[32px] bg-white/[0.02] border border-white/[0.05] backdrop-blur-xl shadow-2xl">
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "w-full flex items-center justify-between px-6 py-4.5 rounded-[22px] text-[10px] font-bold uppercase tracking-[0.25em] transition-all duration-500 group relative overflow-hidden",
+                    isActive 
+                      ? "text-brand" 
+                      : "text-white/20 hover:text-white/60"
+                  )}
+                >
+                  {isActive && (
+                    <motion.div 
+                      layoutId="activeTab"
+                      className="absolute inset-0 bg-white/[0.03] border border-white/[0.05] shadow-inner"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                  <div className="relative z-10 flex items-center gap-5">
+                    <tab.icon className={cn("w-5 h-5 transition-all duration-500", isActive ? "text-brand scale-110" : "text-white/10 group-hover:text-white/30")} />
+                    {tab.label}
+                  </div>
+                  {isActive && <ChevronRight className="relative z-10 w-4 h-4 opacity-50" />}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Content Area */}
         <div className="flex-1 min-w-0">
-          <div className="p-8 rounded-3xl bg-[#141414] border border-white/10">
-            {activeTab === "profile" && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-                <div className="flex items-center gap-6">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-emerald-500 to-blue-500 border-4 border-[#141414] shadow-xl relative group cursor-pointer">
-                    {user?.photoURL ? (
-                      <img src={user.photoURL} alt="Profile" className="w-full h-full rounded-full object-cover" referrerPolicy="no-referrer" />
-                    ) : (
-                      <div className="w-full h-full rounded-full bg-emerald-500 flex items-center justify-center text-2xl font-bold text-white">
-                        {formData.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-xs font-medium text-white">Change</span>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-white/90">Profile Picture</h3>
-                    <p className="text-sm text-white/50 mb-3">Managed by Google Account</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-white/70">Full Name</label>
-                    <input 
-                      type="text" 
-                      name="name"
-                      value={formData.name} 
-                      onChange={handleChange}
-                      className="w-full px-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors" 
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-white/70">Email Address</label>
-                    <input 
-                      type="email" 
-                      value={profile?.email || user?.email || ""} 
-                      className="w-full px-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white/50 cursor-not-allowed focus:outline-none" 
-                      disabled 
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-white/70">Username</label>
-                    <input 
-                      type="text" 
-                      name="username"
-                      value={formData.username} 
-                      onChange={handleChange}
-                      className="w-full px-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors" 
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-white/70">Gender</label>
-                    <select 
-                      name="gender"
-                      value={formData.gender} 
-                      onChange={handleChange}
-                      className="w-full px-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors" 
-                    >
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-white/70">Monthly Income Goal</label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">ETB</span>
-                      <input 
-                        type="number" 
-                        name="monthlyIncomeGoal"
-                        value={formData.monthlyIncomeGoal} 
-                        onChange={handleChange}
-                        className="w-full pl-12 pr-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors" 
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-white/70">Net Worth Target</label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">$</span>
-                      <input 
-                        type="number" 
-                        name="netWorthTarget"
-                        value={formData.netWorthTarget} 
-                        onChange={handleChange}
-                        className="w-full pl-8 pr-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors" 
-                      />
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {activeTab === "preferences" && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between pb-6 border-b border-white/10">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/50">
-                        <Globe className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-white/90">Currency & Region</h4>
-                        <p className="text-sm text-white/50">Your primary currency for all calculations</p>
-                      </div>
-                    </div>
-                    <select 
-                      name="currency"
-                      value={formData.currency}
-                      onChange={handleChange}
-                      className="px-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
-                    >
-                      <option value="USD">USD ($)</option>
-                      <option value="EUR">EUR (€)</option>
-                      <option value="GBP">GBP (£)</option>
-                      <option value="JPY">JPY (¥)</option>
-                    </select>
-                  </div>
-
-                  <div className="flex items-center justify-between pb-6 border-b border-white/10">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/50">
-                        <Palette className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-white/90">Theme</h4>
-                        <p className="text-sm text-white/50">Choose your preferred interface theme</p>
-                      </div>
-                    </div>
-                    <div className="flex bg-black/20 border border-white/10 rounded-xl p-1">
-                      <button 
-                        onClick={() => setFormData(prev => ({ ...prev, theme: 'dark' }))}
-                        className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${formData.theme === 'dark' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'}`}
-                      >
-                        Dark
-                      </button>
-                      <button 
-                        onClick={() => setFormData(prev => ({ ...prev, theme: 'light' }))}
-                        className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${formData.theme === 'light' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'}`}
-                      >
-                        Light
-                      </button>
-                      <button 
-                        onClick={() => setFormData(prev => ({ ...prev, theme: 'system' }))}
-                        className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${formData.theme === 'system' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'}`}
-                      >
-                        System
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {activeTab === "notifications" && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between pb-6 border-b border-white/10">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/50">
-                        <Bell className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-white/90">Email Notifications</h4>
-                        <p className="text-sm text-white/50">Receive monthly summaries and alerts</p>
-                      </div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between pb-6 border-b border-white/10">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/50">
-                        <Shield className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-white/90">Budget Alerts</h4>
-                        <p className="text-sm text-white/50">Get notified when you exceed 80% of a budget</p>
-                      </div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                    </label>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {activeTab === "data" && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-                <div className="space-y-6">
-                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-                        <RefreshCw className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-white/90">Initialize Default Data</h4>
-                        <p className="text-sm text-white/50">Add standard categories and accounts to your profile</p>
-                      </div>
-                    </div>
-                    <p className="text-sm text-white/40 mb-6">
-                      If you're missing categories or accounts in your dropdowns, use this to quickly set up standard options like "Food", "Transportation", "Cash", and "Bank Account".
-                    </p>
-                    <button 
-                      onClick={handleInitializeData}
-                      disabled={isInitializing}
-                      className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-white/90 text-sm font-medium hover:bg-white/10 transition-colors border border-white/10 disabled:opacity-50"
-                    >
-                      {isInitializing ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Database className="w-4 h-4" />
-                      )}
-                      Initialize Defaults
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {activeTab === "pwa" && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-                <div className="space-y-6">
-                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
-                        <Smartphone className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-white/90">App Installation</h4>
-                        <p className="text-sm text-white/50">Install ወይኔ ብሬ on your device for a better experience</p>
-                      </div>
-                    </div>
-                    <p className="text-sm text-white/40 mb-6">
-                      Installing the app allows you to access it directly from your home screen, use it offline, and receive push notifications more reliably.
-                    </p>
-                    <button 
-                      onClick={handleInstall}
-                      disabled={!deferredPrompt}
-                      className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors shadow-[0_0_20px_rgba(59,130,246,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Download className="w-4 h-4" />
-                      {deferredPrompt ? 'Install App' : 'App Already Installed'}
-                    </button>
-                  </div>
-
-                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-                        <RefreshCw className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-white/90">Updates & Offline</h4>
-                        <p className="text-sm text-white/50">Manage app updates and offline status</p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-black/20 rounded-xl border border-white/5">
-                        <div className="text-sm">
-                          <p className="text-white/90 font-medium">Offline Status</p>
-                          <p className="text-white/40 text-xs">{offlineReady ? 'Ready for offline use' : 'Connecting...'}</p>
+          <motion.div 
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="p-12 rounded-[48px] bg-gradient-to-br from-[#0f0f0f] to-[#050505] border border-white/[0.03] shadow-[0_40px_100px_rgba(0,0,0,0.4)] relative overflow-hidden"
+          >
+            <div className="absolute -top-24 -right-24 w-96 h-96 bg-brand/5 rounded-full blur-[120px] opacity-40 pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] opacity-40 pointer-events-none" />
+            
+            <div className="relative z-10">
+              {activeTab === "profile" && (
+                <div className="space-y-12">
+                  <div className="flex flex-col md:flex-row items-center md:items-start gap-10 pb-12 border-b border-white/[0.03]">
+                    <div className="relative group">
+                      <div className="w-36 h-36 rounded-[44px] bg-gradient-to-tr from-brand/20 to-emerald-400/20 p-1 relative shadow-2xl transition-transform duration-700 group-hover:scale-105 group-hover:rotate-3">
+                        <div className="w-full h-full rounded-[40px] bg-[#0a0a0a] flex items-center justify-center overflow-hidden border border-white/[0.05]">
+                          {user?.photoURL ? (
+                            <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" referrerPolicy="no-referrer" />
+                          ) : (
+                            <div className="text-4xl font-display font-bold text-brand">
+                              {formData.name.charAt(0).toUpperCase()}
+                            </div>
+                          )}
                         </div>
-                        <div className={`w-2 h-2 rounded-full ${offlineReady ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-amber-500 animate-pulse'}`} />
                       </div>
-
-                      {needUpdate && (
-                        <div className="flex items-center justify-between p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-                          <div className="text-sm">
-                            <p className="text-emerald-400 font-medium">Update Available!</p>
-                            <p className="text-emerald-400/60 text-xs">A new version of the app is available.</p>
-                          </div>
-                          <button 
-                            onClick={() => updateServiceWorker(true)}
-                            className="px-4 py-2 rounded-lg bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider hover:bg-emerald-600 transition-colors"
-                          >
-                            Update Now
-                          </button>
-                        </div>
-                      )}
-
-                      <button 
-                        onClick={() => window.location.reload()}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-white/90 text-sm font-medium hover:bg-white/10 transition-colors border border-white/10"
-                      >
+                      <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-2xl bg-brand text-black flex items-center justify-center shadow-2xl border-4 border-[#0a0a0a] group-hover:scale-110 transition-transform duration-500 cursor-pointer">
                         <RefreshCw className="w-4 h-4" />
-                        Check for Updates
+                      </div>
+                    </div>
+                    <div className="text-center md:text-left pt-4">
+                      <h3 className="text-3xl font-display font-bold text-white tracking-tight mb-2">Personal Identity</h3>
+                      <p className="text-sm text-white/30 leading-relaxed max-w-md">Your identity is securely managed through your Google Account. Update your display name and preferences below.</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                    <div className="space-y-4 group">
+                      <label className="text-[10px] font-bold text-white/10 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Full Name</label>
+                      <input 
+                        type="text" 
+                        name="name"
+                        value={formData.name} 
+                        onChange={handleChange}
+                        placeholder="Enter your full name"
+                        className="w-full px-8 py-5 bg-white/[0.01] border border-white/[0.05] rounded-[24px] text-white font-medium focus:outline-none focus:border-brand/40 focus:bg-white/[0.03] transition-all duration-500 shadow-inner placeholder:text-white/10" 
+                      />
+                    </div>
+                    <div className="space-y-4 group">
+                      <label className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em] ml-1">Email Address</label>
+                      <div className="relative">
+                        <input 
+                          type="email" 
+                          value={profile?.email || user?.email || ""} 
+                          className="w-full px-8 py-5 bg-white/[0.01] border border-white/[0.03] rounded-[24px] text-white/20 cursor-not-allowed focus:outline-none placeholder:text-white/10" 
+                          disabled 
+                        />
+                        <Shield className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/5" />
+                      </div>
+                    </div>
+                    <div className="space-y-4 group">
+                      <label className="text-[10px] font-bold text-white/10 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Username</label>
+                      <input 
+                        type="text" 
+                        name="username"
+                        value={formData.username} 
+                        onChange={handleChange}
+                        placeholder="@username"
+                        className="w-full px-8 py-5 bg-white/[0.01] border border-white/[0.05] rounded-[24px] text-white font-medium focus:outline-none focus:border-brand/40 focus:bg-white/[0.03] transition-all duration-500 shadow-inner placeholder:text-white/10" 
+                      />
+                    </div>
+                    <div className="space-y-4 group">
+                      <label className="text-[10px] font-bold text-white/10 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Gender Identity</label>
+                      <div className="relative">
+                        <select 
+                          name="gender"
+                          value={formData.gender} 
+                          onChange={handleChange}
+                          className="w-full px-8 py-5 bg-white/[0.01] border border-white/[0.05] rounded-[24px] text-white font-medium focus:outline-none focus:border-brand/40 focus:bg-white/[0.03] transition-all duration-500 shadow-inner appearance-none" 
+                        >
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                        <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 rotate-90 pointer-events-none" />
+                      </div>
+                    </div>
+                    <div className="space-y-4 group">
+                      <label className="text-[10px] font-bold text-white/10 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Monthly Income Goal</label>
+                      <div className="relative">
+                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-white/10 font-bold text-xs">ETB</span>
+                        <input 
+                          type="number" 
+                          name="monthlyIncomeGoal"
+                          value={formData.monthlyIncomeGoal} 
+                          onChange={handleChange}
+                          className="w-full pl-20 pr-8 py-5 bg-white/[0.01] border border-white/[0.05] rounded-[24px] text-white font-medium focus:outline-none focus:border-brand/40 focus:bg-white/[0.03] transition-all duration-500 shadow-inner" 
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-4 group">
+                      <label className="text-[10px] font-bold text-white/10 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Net Worth Target</label>
+                      <div className="relative">
+                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-white/10 font-bold text-xs">$</span>
+                        <input 
+                          type="number" 
+                          name="netWorthTarget"
+                          value={formData.netWorthTarget} 
+                          onChange={handleChange}
+                          className="w-full pl-14 pr-8 py-5 bg-white/[0.01] border border-white/[0.05] rounded-[24px] text-white font-medium focus:outline-none focus:border-brand/40 focus:bg-white/[0.03] transition-all duration-500 shadow-inner" 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "preferences" && (
+                <div className="space-y-12">
+                  <div className="space-y-10">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-10 border-b border-white/[0.03]">
+                      <div className="flex items-center gap-8">
+                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 shadow-xl">
+                          <Globe className="w-8 h-8" />
+                        </div>
+                        <div>
+                          <h4 className="text-2xl font-display font-bold text-white tracking-tight">Currency & Region</h4>
+                          <p className="text-sm text-white/30 mt-1">Primary currency for global calculations</p>
+                        </div>
+                      </div>
+                      <div className="relative w-full sm:w-auto">
+                        <select 
+                          name="currency"
+                          value={formData.currency}
+                          onChange={handleChange}
+                          className="w-full sm:w-48 px-8 py-4 bg-white/[0.02] border border-white/[0.05] rounded-[20px] text-white font-bold text-xs focus:outline-none focus:border-brand/40 transition-all shadow-2xl appearance-none"
+                        >
+                          <option value="ETB">ETB (Br)</option>
+                          <option value="USD">USD ($)</option>
+                          <option value="EUR">EUR (€)</option>
+                          <option value="GBP">GBP (£)</option>
+                        </select>
+                        <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 rotate-90 pointer-events-none" />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-10 border-b border-white/[0.03]">
+                      <div className="flex items-center gap-8">
+                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 shadow-xl">
+                          <Palette className="w-8 h-8" />
+                        </div>
+                        <div>
+                          <h4 className="text-2xl font-display font-bold text-white tracking-tight">Interface Theme</h4>
+                          <p className="text-sm text-white/30 mt-1">Visual aesthetic of the platform</p>
+                        </div>
+                      </div>
+                      <div className="flex bg-white/[0.01] border border-white/[0.05] rounded-[20px] p-1.5 shadow-inner w-full sm:w-auto">
+                        {['dark', 'light', 'system'].map((t) => (
+                          <button 
+                            key={t}
+                            onClick={() => setFormData(prev => ({ ...prev, theme: t as any }))}
+                            className={cn(
+                              "flex-1 sm:flex-none px-8 py-3 rounded-[16px] text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500",
+                              formData.theme === t 
+                                ? "bg-white/[0.05] text-white shadow-[0_10px_20px_rgba(0,0,0,0.2)]" 
+                                : "text-white/10 hover:text-white/30"
+                            )}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "notifications" && (
+                <div className="space-y-12">
+                  <div className="space-y-10">
+                    <div className="flex items-center justify-between pb-10 border-b border-white/[0.03]">
+                      <div className="flex items-center gap-8">
+                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 shadow-xl">
+                          <Bell className="w-8 h-8" />
+                        </div>
+                        <div>
+                          <h4 className="text-2xl font-display font-bold text-white tracking-tight">Email Summaries</h4>
+                          <p className="text-sm text-white/30 mt-1">Monthly financial performance reports</p>
+                        </div>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer group">
+                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                        <div className="w-16 h-8 bg-white/[0.03] border border-white/[0.05] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-8 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/10 after:rounded-full after:h-[24px] after:w-[24px] after:transition-all duration-500 peer-checked:bg-brand peer-checked:after:bg-black peer-checked:after:opacity-100 shadow-inner"></div>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between pb-10 border-b border-white/[0.03]">
+                      <div className="flex items-center gap-8">
+                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 shadow-xl">
+                          <Shield className="w-8 h-8" />
+                        </div>
+                        <div>
+                          <h4 className="text-2xl font-display font-bold text-white tracking-tight">Budget Thresholds</h4>
+                          <p className="text-sm text-white/30 mt-1">Alerts when spending exceeds 80%</p>
+                        </div>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer group">
+                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                        <div className="w-16 h-8 bg-white/[0.03] border border-white/[0.05] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-8 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/10 after:rounded-full after:h-[24px] after:w-[24px] after:transition-all duration-500 peer-checked:bg-brand peer-checked:after:bg-black peer-checked:after:opacity-100 shadow-inner"></div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "data" && (
+                <div className="space-y-12">
+                  <div className="p-12 rounded-[40px] bg-white/[0.01] border border-white/[0.03] shadow-inner relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    
+                    <div className="relative z-10">
+                      <div className="flex items-center gap-8 mb-10">
+                        <div className="w-20 h-20 rounded-[28px] bg-brand/10 flex items-center justify-center text-brand shadow-2xl border border-brand/10">
+                          <RefreshCw className="w-10 h-10" />
+                        </div>
+                        <div>
+                          <h4 className="text-3xl font-display font-bold text-white tracking-tight">Initialize Defaults</h4>
+                          <p className="text-sm text-white/30 mt-1">Populate account with standard categories</p>
+                        </div>
+                      </div>
+                      <p className="text-base text-white/40 mb-12 leading-relaxed max-w-2xl">
+                        Starting fresh? Use this to quickly set up standard financial categories like "Food", "Transportation", and "Housing". This process is additive and won't delete your existing records.
+                      </p>
+                      <button 
+                        onClick={handleInitializeData}
+                        disabled={isInitializing}
+                        className="flex items-center justify-center gap-4 px-12 py-5 rounded-[24px] bg-white/[0.03] border border-white/[0.05] text-[11px] font-bold uppercase tracking-[0.25em] text-white hover:bg-white/[0.08] hover:border-white/10 transition-all duration-500 active:scale-95 shadow-2xl"
+                      >
+                        {isInitializing ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Database className="w-4 h-4" />
+                        )}
+                        Initialize Data Ecosystem
                       </button>
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            )}
+              )}
 
-            {activeTab === "security" && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between pb-6 border-b border-white/10">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/50">
-                        <Shield className="w-5 h-5" />
+              {activeTab === "pwa" && (
+                <div className="space-y-12">
+                  <div className="p-12 rounded-[40px] bg-white/[0.01] border border-white/[0.03] shadow-inner relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    
+                    <div className="relative z-10">
+                      <div className="flex items-center gap-8 mb-10">
+                        <div className="w-20 h-20 rounded-[28px] bg-blue-500/10 flex items-center justify-center text-blue-400 shadow-2xl border border-blue-500/10">
+                          <Smartphone className="w-10 h-10" />
+                        </div>
+                        <div>
+                          <h4 className="text-3xl font-display font-bold text-white tracking-tight">Native Experience</h4>
+                          <p className="text-sm text-white/30 mt-1">Install ወይኔ ብሬ as a standalone application</p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-medium text-white/90">Two-Factor Authentication</h4>
-                        <p className="text-sm text-white/50">Add an extra layer of security to your account</p>
-                      </div>
+                      <p className="text-base text-white/40 mb-12 leading-relaxed max-w-2xl">
+                        Elevate your financial tracking by installing the application directly on your device. Experience full-screen immersion, instant offline access, and optimized performance.
+                      </p>
+                      <button 
+                        onClick={handleInstall}
+                        disabled={!deferredPrompt}
+                        className="flex items-center justify-center gap-4 px-12 py-5 rounded-[24px] bg-blue-500 text-white text-[11px] font-bold uppercase tracking-[0.25em] hover:bg-blue-600 transition-all duration-500 active:scale-95 shadow-[0_20px_50px_rgba(59,130,246,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Download className="w-4 h-4" />
+                        {deferredPrompt ? 'Install Application' : 'Already Installed'}
+                      </button>
                     </div>
-                    <button className="px-4 py-2 rounded-xl bg-white/5 text-white/90 text-sm font-medium hover:bg-white/10 transition-colors border border-white/10">
-                      Enable 2FA
-                    </button>
                   </div>
 
-                  <div className="flex items-center justify-between pb-6 border-b border-white/10">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/50">
-                        <User className="w-5 h-5" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="p-10 rounded-[40px] bg-white/[0.01] border border-white/[0.03] shadow-inner group">
+                      <div className="flex items-center justify-between mb-8">
+                        <h5 className="text-[10px] font-bold text-white/10 uppercase tracking-[0.4em]">Offline Status</h5>
+                        <div className={cn(
+                          "w-3 h-3 rounded-full transition-all duration-500",
+                          isOfflineReady ? "bg-brand shadow-[0_0_20px_rgba(16,185,129,0.6)]" : "bg-amber-500 animate-pulse shadow-[0_0_20px_rgba(245,158,11,0.4)]"
+                        )} />
                       </div>
-                      <div>
-                        <h4 className="font-medium text-white/90">Connected Accounts</h4>
-                        <p className="text-sm text-white/50">Manage third-party connections</p>
-                      </div>
+                      <p className="text-2xl font-display font-bold text-white mb-3">
+                        {isOfflineReady ? 'Ready for Offline' : 'Syncing Data...'}
+                      </p>
+                      <p className="text-sm text-white/30 leading-relaxed">
+                        Your financial records are cached locally for seamless access even without an active connection.
+                      </p>
                     </div>
-                    <button className="px-4 py-2 rounded-xl bg-white/5 text-white/90 text-sm font-medium hover:bg-white/10 transition-colors border border-white/10">
-                      Manage
-                    </button>
-                  </div>
 
-                  <div className="pt-4">
-                    <h4 className="font-medium text-rose-400 mb-2">Danger Zone</h4>
-                    <p className="text-sm text-white/50 mb-4">Once you delete your account, there is no going back. Please be certain.</p>
-                    <button className="px-4 py-2 rounded-xl bg-rose-500/10 text-rose-400 text-sm font-medium hover:bg-rose-500/20 transition-colors border border-rose-500/20">
-                      Delete Account
-                    </button>
+                    <div className="p-10 rounded-[40px] bg-white/[0.01] border border-white/[0.03] shadow-inner group">
+                      <div className="flex items-center justify-between mb-8">
+                        <h5 className="text-[10px] font-bold text-white/10 uppercase tracking-[0.4em]">App Version</h5>
+                        <RefreshCw className={cn("w-5 h-5 text-white/10 transition-all duration-500", isNeedUpdate && "text-brand animate-spin")} />
+                      </div>
+                      <p className="text-2xl font-display font-bold text-white mb-3">
+                        {isNeedUpdate ? 'Update Available' : 'Up to Date'}
+                      </p>
+                      {isNeedUpdate ? (
+                        <button 
+                          onClick={() => updateServiceWorker(true)}
+                          className="mt-4 text-[11px] font-bold text-brand uppercase tracking-[0.2em] hover:text-brand-dark transition-colors"
+                        >
+                          Install Update Now
+                        </button>
+                      ) : (
+                        <p className="text-sm text-white/30 leading-relaxed">
+                          You are currently running the latest version of the application ecosystem.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </motion.div>
-            )}
-          </div>
+              )}
+
+              {activeTab === "security" && (
+                <div className="space-y-12">
+                  <div className="space-y-10">
+                    <div className="flex items-center justify-between pb-10 border-b border-white/[0.03]">
+                      <div className="flex items-center gap-8">
+                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 shadow-xl">
+                          <Shield className="w-8 h-8" />
+                        </div>
+                        <div>
+                          <h4 className="text-2xl font-display font-bold text-white tracking-tight">Two-Factor Auth</h4>
+                          <p className="text-sm text-white/30 mt-1">Add an extra layer of protection</p>
+                        </div>
+                      </div>
+                      <button className="px-8 py-4 rounded-[18px] bg-white/[0.03] border border-white/[0.05] text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 hover:bg-white/[0.08] hover:text-white transition-all duration-500">
+                        Enable 2FA
+                      </button>
+                    </div>
+
+                    <div className="pt-10">
+                      <div className="p-12 rounded-[40px] bg-rose-500/[0.01] border border-rose-500/[0.05] shadow-inner relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/5 rounded-full blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        
+                        <h4 className="text-2xl font-display font-bold text-rose-400 tracking-tight mb-4">Danger Zone</h4>
+                        <p className="text-base text-rose-400/40 mb-10 leading-relaxed max-w-2xl">
+                          Permanently delete your account and all associated financial data. This action is irreversible and will purge all records from our secure servers.
+                        </p>
+                        <button className="px-10 py-5 rounded-[24px] bg-rose-500/10 text-rose-400 text-[11px] font-bold uppercase tracking-[0.25em] hover:bg-rose-500/20 transition-all duration-500 border border-rose-500/20 active:scale-95 shadow-2xl">
+                          Delete Account
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
