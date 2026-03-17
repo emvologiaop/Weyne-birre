@@ -1,0 +1,171 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile and preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "User ID" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "currency": { "type": "string", "enum": ["USD", "EUR", "GBP", "JPY"] },
+        "theme": { "type": "string", "enum": ["dark", "light", "system"] },
+        "monthlyIncomeGoal": { "type": "number" },
+        "netWorthTarget": { "type": "number" },
+        "role": { "type": "string", "enum": ["user", "admin"] }
+      },
+      "required": ["uid", "name", "email", "role"]
+    },
+    "Account": {
+      "title": "Account",
+      "description": "Financial account",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["checking", "savings", "credit", "cash", "investment", "debt"] },
+        "balance": { "type": "number" },
+        "currency": { "type": "string" },
+        "institution": { "type": "string" },
+        "isDefault": { "type": "boolean" }
+      },
+      "required": ["userId", "name", "type", "balance"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Income, expense, or transfer",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "accountId": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "amount": { "type": "number" },
+        "date": { "type": "string", "format": "date-time" },
+        "description": { "type": "string" },
+        "type": { "type": "string", "enum": ["income", "expense", "transfer"] },
+        "status": { "type": "string", "enum": ["pending", "cleared"] },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["userId", "accountId", "categoryId", "amount", "date", "description", "type"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Transaction category",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["income", "expense"] },
+        "color": { "type": "string" },
+        "icon": { "type": "string" }
+      },
+      "required": ["userId", "name", "type"]
+    },
+    "Budget": {
+      "title": "Budget",
+      "description": "Spending limit per category",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "amount": { "type": "number" },
+        "period": { "type": "string", "enum": ["weekly", "monthly", "yearly"] },
+        "startDate": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "categoryId", "amount"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "description": "Financial savings target",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "targetAmount": { "type": "number" },
+        "currentAmount": { "type": "number" },
+        "targetDate": { "type": "string", "format": "date-time" },
+        "color": { "type": "string" },
+        "icon": { "type": "string" }
+      },
+      "required": ["userId", "name", "targetAmount"]
+    },
+    "Receipt": {
+      "title": "Receipt",
+      "description": "Scanned receipt data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "merchant": { "type": "string" },
+        "amount": { "type": "number" },
+        "date": { "type": "string", "format": "date-time" },
+        "category": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "rawText": { "type": "string" }
+      },
+      "required": ["userId", "merchant", "amount", "date"]
+    },
+    "Subscription": {
+      "title": "Subscription",
+      "description": "Recurring subscription",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "amount": { "type": "number" },
+        "frequency": { "type": "string", "enum": ["monthly", "yearly"] },
+        "nextBillingDate": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "amount", "frequency", "nextBillingDate"]
+    },
+    "Achievement": {
+      "title": "Achievement",
+      "description": "User achievement",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "earnedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "earnedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profiles"
+    },
+    "/accounts/{accountId}": {
+      "schema": { "$ref": "#/entities/Account" },
+      "description": "User accounts"
+    },
+    "/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "User transactions"
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "User categories"
+    },
+    "/budgets/{budgetId}": {
+      "schema": { "$ref": "#/entities/Budget" },
+      "description": "User budgets"
+    },
+    "/goals/{goalId}": {
+      "schema": { "$ref": "#/entities/Goal" },
+      "description": "User goals"
+    },
+    "/receipts/{receiptId}": {
+      "schema": { "$ref": "#/entities/Receipt" },
+      "description": "User receipts"
+    },
+    "/subscriptions/{subscriptionId}": {
+      "schema": { "$ref": "#/entities/Subscription" },
+      "description": "User subscriptions"
+    },
+    "/achievements/{achievementId}": {
+      "schema": { "$ref": "#/entities/Achievement" },
+      "description": "User achievements"
+    }
+  }
+}

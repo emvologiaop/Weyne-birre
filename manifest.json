@@ -1,0 +1,15 @@
+{
+  "name": "ወይኔ ብሬ",
+  "short_name": "ወይኔ ብሬ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
