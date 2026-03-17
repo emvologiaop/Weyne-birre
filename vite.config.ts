@@ -22,19 +22,14 @@ export default defineConfig(({mode}) => {
           display: 'standalone',
           icons: [
             {
-              src: '/vite.svg',
-              sizes: 'any',
-              type: 'image/svg+xml',
+              src: 'https://img.icons8.com/fluency/512/money-bag.png',
+              sizes: '512x512',
+              type: 'image/png',
               purpose: 'any maskable'
             },
             {
-              src: 'https://picsum.photos/seed/finance/192/192',
+              src: 'https://img.icons8.com/fluency/512/money-bag.png',
               sizes: '192x192',
-              type: 'image/png'
-            },
-            {
-              src: 'https://picsum.photos/seed/finance/512/512',
-              sizes: '512x512',
               type: 'image/png'
             }
           ]

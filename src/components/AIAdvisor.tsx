@@ -4,6 +4,8 @@ import { MessageSquare, Send, X, Loader2, Sparkles, User, Bot } from 'lucide-rea
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions, useAccounts, useCategories, useBudgets } from '../lib/hooks/useFinanceData';
 import { formatCurrency } from '../lib/utils';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
@@ -116,7 +118,9 @@ export function AIAdvisor() {
                       ? 'bg-emerald-500 text-white rounded-tr-none' 
                       : 'bg-white/5 text-white/90 border border-white/10 rounded-tl-none'
                   }`}>
-                    {msg.content}
+                    <div className="markdown-body prose prose-invert prose-sm max-w-none">
+                      <Markdown remarkPlugins={[remarkGfm]}>{msg.content}</Markdown>
+                    </div>
                   </div>
                 </div>
               ))}

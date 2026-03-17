@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { useTransactions, useAccounts, useCategories, useBudgets } from '../lib/hooks/useFinanceData';
 import { formatCurrency } from '../lib/utils';
 import { Link } from 'react-router-dom';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
@@ -101,7 +103,9 @@ export default function AIAdvisorPage() {
                   ? 'bg-emerald-500 text-white rounded-tr-none' 
                   : 'bg-white/5 text-white/90 border border-white/10 rounded-tl-none'
               }`}>
-                {msg.content}
+                <div className="markdown-body prose prose-invert max-w-none">
+                  <Markdown remarkPlugins={[remarkGfm]}>{msg.content}</Markdown>
+                </div>
               </div>
             </div>
           </div>

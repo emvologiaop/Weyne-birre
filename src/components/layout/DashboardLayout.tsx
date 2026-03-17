@@ -54,8 +54,8 @@ export default function DashboardLayout() {
       >
         <div className="h-20 flex items-center justify-between px-8 border-b border-white/5">
           <div className="flex items-center gap-3 text-brand font-bold tracking-tight text-lg">
-            <div className="w-10 h-10 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center">
-              <Wallet className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center overflow-hidden">
+              <img src="https://img.icons8.com/fluency/512/money-bag.png" alt="Logo" className="w-6 h-6 object-contain" />
             </div>
             ወይኔ ብሬ
           </div>
@@ -107,6 +107,10 @@ export default function DashboardLayout() {
             {navItems.find((item) => item.href === location.pathname)?.name || "Overview"}
           </h1>
           <div className="flex items-center gap-4">
+            <div className="hidden sm:flex flex-col items-end">
+              <span className="text-xs font-semibold text-brand uppercase tracking-widest">Premium</span>
+              <span className="text-[10px] text-white/30 uppercase font-bold">Member</span>
+            </div>
             <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand to-blue-600 border border-white/10 overflow-hidden shadow-lg">
               {user?.photoURL && (
                 <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
