@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { User, Bell, Shield, Palette, Globe, Save, Loader2 } from "lucide-react";
+import { User, Bell, Shield, Palette, Globe, Save, Loader2, Database, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import { useUserProfile } from "../lib/hooks/useFinanceData";
-import { doc, updateDoc } from "firebase/firestore";
+import { useUserProfile, useCategories, useAccounts } from "../lib/hooks/useFinanceData";
+import { doc, updateDoc, collection, addDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../components/AuthProvider";
 import { handleFirestoreError, OperationType } from "../lib/firestore-errors";
+import { DEFAULT_CATEGORIES, DEFAULT_ACCOUNTS } from "../lib/constants";
 
 const TABS = [
   { id: "profile", label: "Profile", icon: User },
   { id: "preferences", label: "Preferences", icon: Palette },
   { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "data", label: "Data Management", icon: Database },
   { id: "security", label: "Security", icon: Shield },
 ];
 
 export default function Settings() {
   const { user } = useAuth();
   const { profile, loading } = useUserProfile();
+  const { categories } = useCategories();
+  const { accounts } = useAccounts();
   const [activeTab, setActiveTab] = useState("profile");
   const [isSaving, setIsSaving] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(false);
   
   const [formData, setFormData] = useState({
     name: "",
@@ -74,6 +79,46 @@ export default function Settings() {
       toast.error("Failed to save settings");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleInitializeData = async () => {
+    if (!user) return;
+    if (!window.confirm("This will add default categories and accounts. Existing data will not be deleted. Continue?")) return;
+
+    setIsInitializing(true);
+    try {
+      // Create default categories if none exist or just add them
+      const categoriesRef = collection(db, 'categories');
+      const accountsRef = collection(db, 'accounts');
+
+      const promises = [];
+
+      // Only add if they don't have them? Or just add all.
+      // To be safe, let's just add them.
+      
+      DEFAULT_CATEGORIES.forEach(cat => {
+        // Check if category already exists by name?
+        const exists = categories.some(c => c.name === cat.name);
+        if (!exists) {
+          promises.push(addDoc(categoriesRef, { ...cat, userId: user.uid }));
+        }
+      });
+
+      DEFAULT_ACCOUNTS.forEach(acc => {
+        const exists = accounts.some(a => a.name === acc.name);
+        if (!exists) {
+          promises.push(addDoc(accountsRef, { ...acc, userId: user.uid }));
+        }
+      });
+
+      await Promise.all(promises);
+      toast.success("Default data initialized successfully");
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'data');
+      toast.error("Failed to initialize data");
+    } finally {
+      setIsInitializing(false);
     }
   };
 
@@ -322,6 +367,39 @@ export default function Settings() {
                       <input type="checkbox" className="sr-only peer" defaultChecked />
                       <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
                     </label>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === "data" && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+                <div className="space-y-6">
+                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                        <RefreshCw className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-white/90">Initialize Default Data</h4>
+                        <p className="text-sm text-white/50">Add standard categories and accounts to your profile</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-white/40 mb-6">
+                      If you're missing categories or accounts in your dropdowns, use this to quickly set up standard options like "Food", "Transportation", "Cash", and "Bank Account".
+                    </p>
+                    <button 
+                      onClick={handleInitializeData}
+                      disabled={isInitializing}
+                      className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-white/90 text-sm font-medium hover:bg-white/10 transition-colors border border-white/10 disabled:opacity-50"
+                    >
+                      {isInitializing ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Database className="w-4 h-4" />
+                      )}
+                      Initialize Defaults
+                    </button>
                   </div>
                 </div>
               </motion.div>

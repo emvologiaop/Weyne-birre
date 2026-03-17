@@ -166,10 +166,28 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
                   className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors appearance-none"
                 >
                   <option value="" disabled>Select Category</option>
-                  {categories.filter(c => c.type === formData.type).map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
+                  {categories.length === 0 ? (
+                    <option value="" disabled>No categories found. Please add some first.</option>
+                  ) : (
+                    <>
+                      <optgroup label="Expense Categories" className="bg-[#141414]">
+                        {categories.filter(c => c.type === 'expense').map(cat => (
+                          <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Income Categories" className="bg-[#141414]">
+                        {categories.filter(c => c.type === 'income').map(cat => (
+                          <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                      </optgroup>
+                    </>
+                  )}
                 </select>
+                {categories.length === 0 && (
+                  <p className="text-xs text-amber-400 mt-1.5">
+                    No categories yet. Go to <a href="/categories" className="underline hover:text-amber-300">Categories</a> or <a href="/settings" className="underline hover:text-amber-300">Settings</a> to add some.
+                  </p>
+                )}
               </div>
 
               <div className="pt-4">

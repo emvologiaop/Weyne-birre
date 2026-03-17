@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, addDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from './AuthProvider';
+import { DEFAULT_CATEGORIES, DEFAULT_ACCOUNTS } from '../lib/constants';
 
 interface ProfileSetupModalProps {
   isOpen: boolean;
@@ -31,6 +32,25 @@ export default function ProfileSetupModal({ isOpen, onComplete }: ProfileSetupMo
         age: Number(formData.age),
         profileCompleted: true
       });
+
+      // Create default categories
+      const categoriesRef = collection(db, 'categories');
+      await Promise.all(DEFAULT_CATEGORIES.map(cat => 
+        addDoc(categoriesRef, {
+          ...cat,
+          userId: user.uid
+        })
+      ));
+
+      // Create default accounts
+      const accountsRef = collection(db, 'accounts');
+      await Promise.all(DEFAULT_ACCOUNTS.map(acc => 
+        addDoc(accountsRef, {
+          ...acc,
+          userId: user.uid
+        })
+      ));
+
       onComplete();
     } catch (error) {
       console.error("Error saving profile:", error);
