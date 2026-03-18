@@ -1,14 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Download, FileText, Sparkles, Loader2, Calendar, TrendingUp, TrendingDown, PieChart } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
 import { useTransactions, useAccounts, useBudgets, useCategories } from '../lib/hooks/useFinanceData';
 import { formatCurrencyCompact, formatCurrencyShort, formatDate } from "../lib/utils";
 import { cn } from '../lib/utils';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+
 
 type ReportPeriod = 'week' | 'month' | 'year';
 
@@ -111,8 +112,10 @@ export default function Reports() {
         contents: [{ role: 'user', parts: [{ text: `Generate a financial report for: ${JSON.stringify(context, null, 2)}` }] }],
       });
       setAiReport(response.text ?? '');
-    } catch (err) {
-      setAiReport('Could not generate AI report. Please check your API key and try again.');
+    } catch (err: any) {
+      const msg = err?.message || String(err);
+      console.error('AI report error:', msg);
+      setAiReport(`Could not generate report: ${msg}`);
     } finally {
       setLoadingAI(false);
     }

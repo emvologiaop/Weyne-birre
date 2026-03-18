@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenAI } from "@google/genai";
 import { Send, Loader2, Sparkles, User, Bot, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions, useAccounts, useCategories, useBudgets } from '../lib/hooks/useFinanceData';
@@ -7,8 +6,10 @@ import { formatCurrency, formatCurrencyShort } from "../lib/utils";
 import { Link } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+
 
 export default function AIAdvisorPage() {
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([
