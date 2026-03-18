@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Receipt, Wallet, PieChart, Settings, LogOut, Tags,
   Scan, CreditCard, Trophy, Menu, X, Sparkles, TrendingUp, Upload,
-  ArrowLeftRight, RefreshCw, FileBarChart2, AlertTriangle, Bug,
+  ArrowLeftRight, RefreshCw, FileBarChart2, AlertTriangle,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../AuthProvider';
@@ -204,16 +204,7 @@ export default function DashboardLayout() {
               <p className="text-[10px] text-muted truncate">{user?.email}</p>
             </div>
           </div>
-          <a
-            href="https://t.me/envologia"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-[13px] font-medium text-muted hover:text-brand hover:bg-brand/8 transition-all group mb-0.5"
-          >
-            <Bug className="w-4 h-4 shrink-0 text-muted group-hover:text-brand transition-colors" />
-            Report a Bug
-          </a>
-          <button
+<button
             onClick={() => setLogoutOpen(true)}
             className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-[13px] font-medium text-muted hover:text-rose-400 hover:bg-rose-500/8 transition-all group"
           >
