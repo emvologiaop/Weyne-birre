@@ -65,7 +65,7 @@ export function AddCategoryModal({ isOpen, onClose }: AddCategoryModalProps) {
           >
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold text-white">New Category</h2>
-              <button onClick={onClose} className="p-2 text-white/50 hover:text-white hover:bg-white/5 rounded-full transition-colors">
+              <button onClick={onClose} className="p-2 text-white/78 hover:text-white hover:bg-white/5 rounded-full transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -81,33 +81,33 @@ export function AddCategoryModal({ isOpen, onClose }: AddCategoryModalProps) {
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, type: 'expense' })}
-                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${formData.type === 'expense' ? 'bg-rose-500 text-white' : 'text-white/50 hover:text-white'}`}
+                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${formData.type === 'expense' ? 'bg-rose-500 text-white' : 'text-white/78 hover:text-white'}`}
                 >
                   Expense
                 </button>
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, type: 'income' })}
-                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${formData.type === 'income' ? 'bg-emerald-500 text-white' : 'text-white/50 hover:text-white'}`}
+                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${formData.type === 'income' ? 'bg-emerald-500 text-white' : 'text-white/78 hover:text-white'}`}
                 >
                   Income
                 </button>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Category Name</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Category Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                   placeholder="e.g. Groceries"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Color</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Color</label>
                 <div className="flex gap-3">
                   {['#ef4444', '#f97316', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'].map(color => (
                     <button

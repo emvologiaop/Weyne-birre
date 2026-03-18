@@ -107,9 +107,9 @@ export function TransferModal({ isOpen, onClose }: TransferModalProps) {
         <div className="flex items-center justify-between p-6 border-b border-white/10">
           <div>
             <h2 className="text-xl font-semibold text-white">Transfer Between Accounts</h2>
-            <p className="text-xs text-white/30 mt-0.5">Move money from one account to another</p>
+            <p className="text-xs text-white/65 mt-0.5">Move money from one account to another</p>
           </div>
-          <button onClick={onClose} className="p-2 text-white/50 hover:text-white hover:bg-white/5 rounded-full transition-colors">
+          <button onClick={onClose} className="p-2 text-white/78 hover:text-white hover:bg-white/5 rounded-full transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -120,7 +120,7 @@ export function TransferModal({ isOpen, onClose }: TransferModalProps) {
           {/* Visual transfer flow */}
           <div className="flex items-center gap-3">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-white/70 mb-1.5">From Account</label>
+              <label className="block text-sm font-medium text-white/90 mb-1.5">From Account</label>
               <select required value={form.fromAccountId} onChange={e => setForm({ ...form, fromAccountId: e.target.value })}
                 className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-rose-500/50 transition-colors appearance-none">
                 <option value="" disabled>Select</option>
@@ -135,7 +135,7 @@ export function TransferModal({ isOpen, onClose }: TransferModalProps) {
               </div>
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-white/70 mb-1.5">To Account</label>
+              <label className="block text-sm font-medium text-white/90 mb-1.5">To Account</label>
               <select required value={form.toAccountId} onChange={e => setForm({ ...form, toAccountId: e.target.value })}
                 className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-brand/50 transition-colors appearance-none">
                 <option value="" disabled>Select</option>
@@ -148,16 +148,16 @@ export function TransferModal({ isOpen, onClose }: TransferModalProps) {
 
           {/* Amount */}
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Amount</label>
+            <label className="block text-sm font-medium text-white/90 mb-1.5">Amount</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold">Br</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/78 text-sm font-bold">Br</span>
               <input type="number" step="0.01" min="0.01" required value={form.amount}
                 onChange={e => setForm({ ...form, amount: e.target.value })}
-                className="w-full pl-12 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-brand/50 transition-colors"
+                className="w-full pl-12 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-brand/50 transition-colors"
                 placeholder="0.00" />
             </div>
             {fromAccount && amountNum > 0 && (
-              <p className={`text-xs mt-1.5 ${amountNum > fromAccount.balance ? 'text-rose-400' : 'text-white/30'}`}>
+              <p className={`text-xs mt-1.5 ${amountNum > fromAccount.balance ? 'text-rose-400' : 'text-white/65'}`}>
                 Available in {fromAccount.name}: Br {(fromAccount.balance || 0).toLocaleString()}
               </p>
             )}
@@ -165,13 +165,13 @@ export function TransferModal({ isOpen, onClose }: TransferModalProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">Note (optional)</label>
+              <label className="block text-sm font-medium text-white/90 mb-1.5">Note (optional)</label>
               <input type="text" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-brand/50 transition-colors"
+                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-brand/50 transition-colors"
                 placeholder="Transfer" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">Date</label>
+              <label className="block text-sm font-medium text-white/90 mb-1.5">Date</label>
               <input type="date" required value={form.date} onChange={e => setForm({ ...form, date: e.target.value })}
                 className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-brand/50 transition-colors" />
             </div>

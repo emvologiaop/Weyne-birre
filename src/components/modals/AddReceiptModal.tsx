@@ -53,12 +53,12 @@ export function AddReceiptModal({ isOpen, onClose }: AddReceiptModalProps) {
       <div className="bg-[#141414] border border-white/10 rounded-2xl p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-white">Scan Receipt</h2>
-          <button onClick={onClose} className="text-white/50 hover:text-white"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="text-white/78 hover:text-white"><X className="w-5 h-5" /></button>
         </div>
         <div {...getRootProps()} className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${isDragActive ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/10 hover:border-white/20'}`}>
           <input {...getInputProps()} />
-          <Upload className="w-10 h-10 text-white/50 mx-auto mb-4" />
-          <p className="text-white/70">Drag & drop receipt image here, or click to select</p>
+          <Upload className="w-10 h-10 text-white/78 mx-auto mb-4" />
+          <p className="text-white/90">Drag & drop receipt image here, or click to select</p>
         </div>
         {loading && (
           <div className="mt-4 flex items-center justify-center gap-2 text-emerald-400">

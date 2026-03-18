@@ -90,7 +90,7 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
           >
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold text-white">New Transaction</h2>
-              <button onClick={onClose} className="p-2 text-white/50 hover:text-white hover:bg-white/5 rounded-full transition-colors">
+              <button onClick={onClose} className="p-2 text-white/78 hover:text-white hover:bg-white/5 rounded-full transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -106,23 +106,23 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, type: 'expense' })}
-                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${formData.type === 'expense' ? 'bg-rose-500 text-white' : 'text-white/50 hover:text-white'}`}
+                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${formData.type === 'expense' ? 'bg-rose-500 text-white' : 'text-white/78 hover:text-white'}`}
                 >
                   Expense
                 </button>
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, type: 'income' })}
-                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${formData.type === 'income' ? 'bg-emerald-500 text-white' : 'text-white/50 hover:text-white'}`}
+                  className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${formData.type === 'income' ? 'bg-emerald-500 text-white' : 'text-white/78 hover:text-white'}`}
                 >
                   Income
                 </button>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Amount</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Amount</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold">Br</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/78 text-sm font-bold">Br</span>
                   <input
                     type="number"
                     step="0.01"
@@ -130,27 +130,27 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
                     required
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                    className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                     placeholder="0.00"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Description</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Description</label>
                 <input
                   type="text"
                   required
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                   placeholder="What was this for?"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Account</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Account</label>
                   <select
                     required
                     value={formData.accountId}
@@ -164,7 +164,7 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Date</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Date</label>
                   <input
                     type="date"
                     required
@@ -176,7 +176,7 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Category</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Category</label>
                 <select
                   required
                   value={formData.categoryId}

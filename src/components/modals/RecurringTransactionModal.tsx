@@ -81,10 +81,10 @@ export function RecurringTransactionModal({ isOpen, onClose }: RecurringTransact
             </div>
             <div>
               <h2 className="text-xl font-semibold text-white">Recurring Transaction</h2>
-              <p className="text-xs text-white/30">Auto-reminders on a schedule</p>
+              <p className="text-xs text-white/65">Auto-reminders on a schedule</p>
             </div>
           </div>
-          <button onClick={() => { reset(); onClose(); }} className="p-2 text-white/50 hover:text-white hover:bg-white/5 rounded-full transition-colors">
+          <button onClick={() => { reset(); onClose(); }} className="p-2 text-white/78 hover:text-white hover:bg-white/5 rounded-full transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -95,32 +95,32 @@ export function RecurringTransactionModal({ isOpen, onClose }: RecurringTransact
           <div className="flex gap-2 p-1 bg-white/5 rounded-xl">
             {(['expense', 'income'] as const).map(t => (
               <button key={t} type="button" onClick={() => setForm({ ...form, type: t, categoryId: '' })}
-                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors capitalize ${form.type === t ? (t === 'expense' ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white') : 'text-white/50 hover:text-white'}`}>
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors capitalize ${form.type === t ? (t === 'expense' ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white') : 'text-white/78 hover:text-white'}`}>
                 {t}
               </button>
             ))}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Description</label>
+            <label className="block text-sm font-medium text-white/90 mb-1.5">Description</label>
             <input type="text" required value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-              className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-brand/50 transition-colors"
+              className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-brand/50 transition-colors"
               placeholder="e.g. Monthly rent, Weekly groceries" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Amount (ETB)</label>
+            <label className="block text-sm font-medium text-white/90 mb-1.5">Amount (ETB)</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold">Br</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/78 text-sm font-bold">Br</span>
               <input type="number" step="0.01" min="0.01" required value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })}
-                className="w-full pl-12 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-brand/50 transition-colors"
+                className="w-full pl-12 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-brand/50 transition-colors"
                 placeholder="0.00" />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">Account</label>
+              <label className="block text-sm font-medium text-white/90 mb-1.5">Account</label>
               <select required value={form.accountId} onChange={e => setForm({ ...form, accountId: e.target.value })}
                 className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-brand/50 transition-colors appearance-none">
                 <option value="" disabled>Select</option>
@@ -128,7 +128,7 @@ export function RecurringTransactionModal({ isOpen, onClose }: RecurringTransact
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">Category</label>
+              <label className="block text-sm font-medium text-white/90 mb-1.5">Category</label>
               <select required value={form.categoryId} onChange={e => setForm({ ...form, categoryId: e.target.value })}
                 className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-brand/50 transition-colors appearance-none">
                 <option value="" disabled>Select</option>
@@ -138,11 +138,11 @@ export function RecurringTransactionModal({ isOpen, onClose }: RecurringTransact
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Repeat Every</label>
+            <label className="block text-sm font-medium text-white/90 mb-1.5">Repeat Every</label>
             <div className="grid grid-cols-3 gap-2">
               {RECURRING_INTERVALS.map(iv => (
                 <button key={iv.value} type="button" onClick={() => setForm({ ...form, interval: iv.value })}
-                  className={`py-2 px-3 text-xs font-bold rounded-xl border transition-all ${form.interval === iv.value ? 'bg-brand text-black border-brand' : 'bg-white/5 text-white/50 border-white/10 hover:text-white'}`}>
+                  className={`py-2 px-3 text-xs font-bold rounded-xl border transition-all ${form.interval === iv.value ? 'bg-brand text-black border-brand' : 'bg-white/5 text-white/78 border-white/10 hover:text-white'}`}>
                   {iv.label}
                 </button>
               ))}
@@ -151,12 +151,12 @@ export function RecurringTransactionModal({ isOpen, onClose }: RecurringTransact
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">Start Date</label>
+              <label className="block text-sm font-medium text-white/90 mb-1.5">Start Date</label>
               <input type="date" required value={form.startDate} onChange={e => setForm({ ...form, startDate: e.target.value })}
                 className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-brand/50 transition-colors" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">End Date <span className="text-white/20">(optional)</span></label>
+              <label className="block text-sm font-medium text-white/90 mb-1.5">End Date <span className="text-white/55">(optional)</span></label>
               <input type="date" value={form.endDate} onChange={e => setForm({ ...form, endDate: e.target.value })}
                 min={form.startDate}
                 className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-brand/50 transition-colors" />

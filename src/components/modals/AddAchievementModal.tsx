@@ -63,7 +63,7 @@ export function AddAchievementModal({ isOpen, onClose }: AddAchievementModalProp
           >
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold text-white">Add Achievement</h2>
-              <button onClick={onClose} className="p-2 text-white/50 hover:text-white hover:bg-white/5 rounded-full transition-colors">
+              <button onClick={onClose} className="p-2 text-white/78 hover:text-white hover:bg-white/5 rounded-full transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -76,24 +76,24 @@ export function AddAchievementModal({ isOpen, onClose }: AddAchievementModalProp
               )}
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Achievement Name</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Achievement Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                   placeholder="e.g. Debt Free, First $1000"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Description</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Description</label>
                 <textarea
                   required
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors h-24 resize-none"
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors h-24 resize-none"
                   placeholder="Tell us about your success..."
                 />
               </div>

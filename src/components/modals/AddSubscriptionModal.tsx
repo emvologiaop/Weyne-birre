@@ -74,7 +74,7 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
           >
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold text-white">New Subscription</h2>
-              <button onClick={onClose} className="p-2 text-white/50 hover:text-white hover:bg-white/5 rounded-full transition-colors">
+              <button onClick={onClose} className="p-2 text-white/78 hover:text-white hover:bg-white/5 rounded-full transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -87,22 +87,22 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
               )}
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Service Name</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Service Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                   placeholder="e.g. Netflix, Spotify"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Amount</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Amount</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold">Br</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/78 text-sm font-bold">Br</span>
                     <input
                       type="number"
                       step="0.01"
@@ -110,13 +110,13 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
                       required
                       value={formData.amount}
                       onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                      className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                      className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                       placeholder="0.00"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Frequency</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Frequency</label>
                   <select
                     value={formData.frequency}
                     onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
@@ -131,7 +131,7 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Category</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Category</label>
                   <select
                     required
                     value={formData.categoryId}
@@ -145,7 +145,7 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Account</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Account</label>
                   <select
                     required
                     value={formData.accountId}
@@ -161,7 +161,7 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Start Date</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Start Date</label>
                 <input
                   type="date"
                   required

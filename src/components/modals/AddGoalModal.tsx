@@ -72,7 +72,7 @@ export function AddGoalModal({ isOpen, onClose }: AddGoalModalProps) {
           >
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold text-white">Create Goal</h2>
-              <button onClick={onClose} className="p-2 text-white/50 hover:text-white hover:bg-white/5 rounded-full transition-colors">
+              <button onClick={onClose} className="p-2 text-white/78 hover:text-white hover:bg-white/5 rounded-full transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -85,43 +85,43 @@ export function AddGoalModal({ isOpen, onClose }: AddGoalModalProps) {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Goal Name</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Goal Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                   placeholder="e.g. Emergency Fund"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Target Amount</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Target Amount</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold">Br</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/78 text-sm font-bold">Br</span>
                     <input
                       type="number"
                       step="0.01"
                       required
                       value={formData.targetAmount}
                       onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
-                      className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                      className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                       placeholder="0.00"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Current Amount</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Current Amount</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold">Br</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/78 text-sm font-bold">Br</span>
                     <input
                       type="number"
                       step="0.01"
                       value={formData.currentAmount}
                       onChange={(e) => setFormData({ ...formData, currentAmount: e.target.value })}
-                      className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                      className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                       placeholder="0.00"
                     />
                   </div>
@@ -129,7 +129,7 @@ export function AddGoalModal({ isOpen, onClose }: AddGoalModalProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Target Date</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Target Date</label>
                 <input
                   type="date"
                   required

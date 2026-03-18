@@ -66,7 +66,7 @@ export function AddAccountModal({ isOpen, onClose }: AddAccountModalProps) {
           >
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold text-white">Add Account</h2>
-              <button onClick={onClose} className="p-2 text-white/50 hover:text-white hover:bg-white/5 rounded-full transition-colors">
+              <button onClick={onClose} className="p-2 text-white/78 hover:text-white hover:bg-white/5 rounded-full transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -79,19 +79,19 @@ export function AddAccountModal({ isOpen, onClose }: AddAccountModalProps) {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Account Name</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Account Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                   placeholder="e.g. Chase Checking"
                 />
               </div>
 
               <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Account Type</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Account Type</label>
                   <select
                     required
                     value={formData.type}
@@ -108,28 +108,28 @@ export function AddAccountModal({ isOpen, onClose }: AddAccountModalProps) {
                 </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Current Balance</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Current Balance</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 font-bold text-sm">Br</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/78 font-bold text-sm">Br</span>
                   <input
                     type="number"
                     step="0.01"
                     required
                     value={formData.balance}
                     onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
-                    className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                    className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                     placeholder="0.00"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Institution (Optional)</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Institution (Optional)</label>
                 <input
                   type="text"
                   value={formData.institution}
                   onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                   placeholder="e.g. Chase Bank"
                 />
               </div>

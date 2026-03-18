@@ -65,7 +65,7 @@ export function AddBudgetModal({ isOpen, onClose }: AddBudgetModalProps) {
           >
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold text-white">Create Budget</h2>
-              <button onClick={onClose} className="p-2 text-white/50 hover:text-white hover:bg-white/5 rounded-full transition-colors">
+              <button onClick={onClose} className="p-2 text-white/78 hover:text-white hover:bg-white/5 rounded-full transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -78,7 +78,7 @@ export function AddBudgetModal({ isOpen, onClose }: AddBudgetModalProps) {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Category</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Category</label>
                 <select
                   required
                   value={formData.categoryId}
@@ -93,9 +93,9 @@ export function AddBudgetModal({ isOpen, onClose }: AddBudgetModalProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Budget Amount</label>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Budget Amount</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold">Br</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/78 text-sm font-bold">Br</span>
                   <input
                     type="number"
                     step="0.01"
@@ -103,7 +103,7 @@ export function AddBudgetModal({ isOpen, onClose }: AddBudgetModalProps) {
                     required
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                    className="w-full pl-8 pr-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-white/65 focus:outline-none focus:border-emerald-500/50 transition-colors"
                     placeholder="0.00"
                   />
                 </div>
@@ -111,7 +111,7 @@ export function AddBudgetModal({ isOpen, onClose }: AddBudgetModalProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Period</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Period</label>
                   <select
                     required
                     value={formData.period}
@@ -124,7 +124,7 @@ export function AddBudgetModal({ isOpen, onClose }: AddBudgetModalProps) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Start Date</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1.5">Start Date</label>
                   <input
                     type="date"
                     required
