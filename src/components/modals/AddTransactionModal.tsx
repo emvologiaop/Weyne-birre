@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2 } from 'lucide-react';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../AuthProvider';
 import { useAccounts, useCategories } from '../../lib/hooks/useFinanceData';
 import { handleFirestoreError, OperationType } from '../../lib/firestore-errors';
+import { toast } from 'sonner';
 
 interface AddTransactionModalProps {
   isOpen: boolean;
@@ -38,6 +39,7 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
       const amountNum = parseFloat(formData.amount);
       const finalAmount = formData.type === 'expense' ? -Math.abs(amountNum) : Math.abs(amountNum);
 
+      // Save the transaction
       await addDoc(collection(db, 'transactions'), {
         userId: user.uid,
         accountId: formData.accountId,
@@ -48,6 +50,21 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
         type: formData.type,
         status: 'cleared',
         tags: []
+      });
+
+      // Update the account balance — add for income, subtract for expense
+      await updateDoc(doc(db, 'accounts', formData.accountId), {
+        balance: increment(finalAmount)
+      });
+
+      toast.success('Transaction saved!');
+      setFormData({
+        type: 'expense',
+        amount: '',
+        description: '',
+        date: new Date().toISOString().split('T')[0],
+        accountId: '',
+        categoryId: '',
       });
       onClose();
     } catch (err) {
@@ -105,10 +122,11 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-1.5">Amount</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold">Br</span>
                   <input
                     type="number"
                     step="0.01"
+                    min="0.01"
                     required
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
@@ -170,22 +188,20 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
                     <option value="" disabled>No categories found. Please add some first.</option>
                   ) : (
                     <>
-                      <optgroup label="Expense Categories" className="bg-[#141414]">
-                        {categories.filter(c => c.type === 'expense').map(cat => (
+                      {categories.filter(c => c.type === formData.type).length === 0 ? (
+                        <option value="" disabled>No {formData.type} categories — add one first</option>
+                      ) : (
+                        categories.filter(c => c.type === formData.type).map(cat => (
                           <option key={cat.id} value={cat.id}>{cat.name}</option>
-                        ))}
-                      </optgroup>
-                      <optgroup label="Income Categories" className="bg-[#141414]">
-                        {categories.filter(c => c.type === 'income').map(cat => (
-                          <option key={cat.id} value={cat.id}>{cat.name}</option>
-                        ))}
-                      </optgroup>
+                        ))
+                      )}
                     </>
                   )}
                 </select>
-                {categories.length === 0 && (
+                {categories.filter(c => c.type === formData.type).length === 0 && (
                   <p className="text-xs text-amber-400 mt-1.5">
-                    No categories yet. Go to <a href="/categories" className="underline hover:text-amber-300">Categories</a> or <a href="/settings" className="underline hover:text-amber-300">Settings</a> to add some.
+                    No {formData.type} categories yet. Go to{' '}
+                    <a href="/categories" className="underline hover:text-amber-300">Categories</a> to add some.
                   </p>
                 )}
               </div>

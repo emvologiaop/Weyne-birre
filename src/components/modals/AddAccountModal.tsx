@@ -20,9 +20,9 @@ export function AddAccountModal({ isOpen, onClose }: AddAccountModalProps) {
     name: '',
     type: 'checking',
     balance: '',
-    currency: 'USD',
     institution: '',
   });
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,10 +36,12 @@ export function AddAccountModal({ isOpen, onClose }: AddAccountModalProps) {
         name: formData.name,
         type: formData.type,
         balance: parseFloat(formData.balance) || 0,
-        currency: formData.currency,
+        currency: 'ETB',
         institution: formData.institution,
         isDefault: false,
       });
+      setFormData({ name: '', type: 'checking', balance: '', institution: '' });
+      setError('');
       onClose();
     } catch (err) {
       try {
@@ -88,8 +90,7 @@ export function AddAccountModal({ isOpen, onClose }: AddAccountModalProps) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div>
                   <label className="block text-sm font-medium text-white/70 mb-1.5">Account Type</label>
                   <select
                     required
@@ -105,26 +106,11 @@ export function AddAccountModal({ isOpen, onClose }: AddAccountModalProps) {
                     <option value="debt">Debt/Loan</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Currency</label>
-                  <select
-                    required
-                    value={formData.currency}
-                    onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                    className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors appearance-none"
-                  >
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="JPY">JPY (¥)</option>
-                  </select>
-                </div>
-              </div>
 
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-1.5">Current Balance</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 font-bold text-sm">Br</span>
                   <input
                     type="number"
                     step="0.01"

@@ -20,7 +20,7 @@ export function AddGoalModal({ isOpen, onClose }: AddGoalModalProps) {
     name: '',
     targetAmount: '',
     currentAmount: '0',
-    targetDate: new Date().toISOString().split('T')[0],
+    targetDate: (() => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().split('T')[0]; })(),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,16 +29,25 @@ export function AddGoalModal({ isOpen, onClose }: AddGoalModalProps) {
     setLoading(true);
     setError('');
 
+    const target = parseFloat(formData.targetAmount) || 0;
+    const current = parseFloat(formData.currentAmount) || 0;
+    if (current > target) {
+      setError('Amount saved so far cannot be more than the target amount.');
+      setLoading(false);
+      return;
+    }
     try {
       await addDoc(collection(db, 'goals'), {
         userId: user.uid,
         name: formData.name,
-        targetAmount: parseFloat(formData.targetAmount) || 0,
-        currentAmount: parseFloat(formData.currentAmount) || 0,
+        targetAmount: target,
+        currentAmount: current,
         targetDate: new Date(formData.targetDate).toISOString(),
         color: '#10B981',
         icon: 'Target',
       });
+      setFormData({ name: '', targetAmount: '', currentAmount: '0', targetDate: new Date().toISOString().split('T')[0] });
+      setError('');
       onClose();
     } catch (err) {
       try {
@@ -91,7 +100,7 @@ export function AddGoalModal({ isOpen, onClose }: AddGoalModalProps) {
                 <div>
                   <label className="block text-sm font-medium text-white/70 mb-1.5">Target Amount</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold">Br</span>
                     <input
                       type="number"
                       step="0.01"
@@ -106,7 +115,7 @@ export function AddGoalModal({ isOpen, onClose }: AddGoalModalProps) {
                 <div>
                   <label className="block text-sm font-medium text-white/70 mb-1.5">Current Amount</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold">Br</span>
                     <input
                       type="number"
                       step="0.01"

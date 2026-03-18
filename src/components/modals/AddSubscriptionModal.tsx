@@ -47,7 +47,9 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
         status: 'active',
         createdAt: new Date().toISOString(),
       });
-      toast.success('Subscription added successfully');
+      toast.success('Subscription added!');
+      setFormData({ name: '', amount: '', frequency: 'monthly', startDate: new Date().toISOString().split('T')[0], categoryId: '', accountId: '' });
+      setError('');
       onClose();
     } catch (err) {
       try {
@@ -100,10 +102,11 @@ export function AddSubscriptionModal({ isOpen, onClose }: AddSubscriptionModalPr
                 <div>
                   <label className="block text-sm font-medium text-white/70 mb-1.5">Amount</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold">Br</span>
                     <input
                       type="number"
                       step="0.01"
+                      min="0.01"
                       required
                       value={formData.amount}
                       onChange={(e) => setFormData({ ...formData, amount: e.target.value })}

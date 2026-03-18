@@ -37,6 +37,8 @@ export function AddAchievementModal({ isOpen, onClose }: AddAchievementModalProp
         type: 'manual',
       });
       toast.success('Achievement added!');
+      setFormData({ name: '', description: '' });
+      setError('');
       onClose();
     } catch (err) {
       try {

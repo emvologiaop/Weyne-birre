@@ -38,7 +38,9 @@ export function AddCategoryModal({ isOpen, onClose }: AddCategoryModalProps) {
         color: formData.color,
         icon: formData.icon,
       });
-      toast.success('Category created');
+      toast.success('Category created!');
+      setFormData({ name: '', type: 'expense', color: '#10b981', icon: 'Tag' });
+      setError('');
       onClose();
     } catch (err) {
       try {
