@@ -73,6 +73,31 @@ export default function Dashboard() {
     .filter(tx => tx.type === 'expense')
     .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
 
+  const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+  const prevMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+  const prevMonthTx = transactions.filter(tx => {
+    const d = new Date(tx.date);
+    return d.getMonth() === prevMonth && d.getFullYear() === prevMonthYear;
+  });
+
+  const prevMonthlyIncome = prevMonthTx
+    .filter(tx => tx.type === 'income')
+    .reduce((sum, tx) => sum + tx.amount, 0);
+
+  const prevMonthlyExpenses = prevMonthTx
+    .filter(tx => tx.type === 'expense')
+    .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+
+  const incomeTrend = prevMonthlyIncome === 0 ? 0 : Math.round(((monthlyIncome - prevMonthlyIncome) / prevMonthlyIncome) * 100);
+  const expenseTrend = prevMonthlyExpenses === 0 ? 0 : Math.round(((monthlyExpenses - prevMonthlyExpenses) / prevMonthlyExpenses) * 100);
+  
+  // Calculate a mock efficiency based on budget adherence if budgets existed, 
+  // but for now let's use a ratio of income to expenses
+  const efficiency = monthlyIncome > 0 ? Math.min(Math.round((1 - (monthlyExpenses / monthlyIncome)) * 100), 100) : 0;
+  const liquidityIndex = totalBalance > 0 ? Math.min(Math.round((monthlyIncome / (monthlyExpenses || 1)) * 20 + 50), 100) : 0;
+  const activeBars = Math.round((efficiency / 100) * 8);
+
   const last6Months = Array.from({ length: 6 }, (_, i) => {
     const d = new Date();
     d.setMonth(d.getMonth() - (5 - i));
@@ -135,15 +160,17 @@ export default function Dashboard() {
                         <motion.div 
                           key={i} 
                           initial={{ height: 4 }}
-                          animate={{ height: i <= 7 ? [16, 24, 16] : 4 }}
+                          animate={{ height: i <= activeBars ? [16, 24, 16] : 4 }}
                           transition={{ repeat: Infinity, duration: 2, delay: i * 0.1 }}
-                          className={cn("w-2 rounded-full transition-all duration-500", i <= 7 ? "bg-brand shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "bg-white/5")} 
+                          className={cn("w-2 rounded-full transition-all duration-500", i <= activeBars ? "bg-brand shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "bg-white/5")} 
                         />
                       ))}
                     </div>
                     <div className="space-y-0.5">
-                      <span className="text-2xl font-display font-bold text-white block">OPTIMAL</span>
-                      <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest">94.2% Efficiency</span>
+                      <span className="text-2xl font-display font-bold text-white block">
+                        {efficiency > 80 ? 'OPTIMAL' : efficiency > 50 ? 'STABLE' : 'CRITICAL'}
+                      </span>
+                      <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest">{efficiency}% Efficiency</span>
                     </div>
                   </div>
                 </div>
@@ -165,13 +192,20 @@ export default function Dashboard() {
               </h2>
             </div>
             <div className="flex flex-wrap gap-4">
-              <div className="px-6 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3">
-                <ArrowUpRight className="w-5 h-5 text-emerald-400" />
-                <span className="text-sm font-bold text-emerald-400">+12.4% <span className="text-white/20 ml-1 font-normal">vs last month</span></span>
-              </div>
+              {transactions.length > 0 && (
+                <div className={cn(
+                  "px-6 py-3 rounded-2xl border flex items-center gap-3",
+                  incomeTrend >= 0 ? "bg-emerald-500/10 border-emerald-500/20" : "bg-rose-500/10 border-rose-500/20"
+                )}>
+                  {incomeTrend >= 0 ? <ArrowUpRight className="w-5 h-5 text-emerald-400" /> : <ArrowDownRight className="w-5 h-5 text-rose-400" />}
+                  <span className={cn("text-sm font-bold", incomeTrend >= 0 ? "text-emerald-400" : "text-rose-400")}>
+                    {incomeTrend >= 0 ? '+' : ''}{incomeTrend}% <span className="text-white/20 ml-1 font-normal">vs last month</span>
+                  </span>
+                </div>
+              )}
               <div className="px-6 py-3 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center gap-3">
                 <TrendingUp className="w-5 h-5 text-white/40" />
-                <span className="text-sm font-bold text-white/60">Peak: <span className="text-white ml-1">{formatCurrency(totalBalance * 1.05)}</span></span>
+                <span className="text-sm font-bold text-white/60">Peak: <span className="text-white ml-1">{formatCurrency(totalBalance)}</span></span>
               </div>
             </div>
           </div>
@@ -185,13 +219,15 @@ export default function Dashboard() {
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-end">
-                    <span className="text-4xl font-display font-bold text-white">78.5</span>
-                    <span className="text-[10px] font-bold text-brand uppercase tracking-widest mb-1">High Liquidity</span>
+                    <span className="text-4xl font-display font-bold text-white">{liquidityIndex}</span>
+                    <span className="text-[10px] font-bold text-brand uppercase tracking-widest mb-1">
+                      {liquidityIndex > 70 ? 'High Liquidity' : liquidityIndex > 40 ? 'Moderate' : 'Low Liquidity'}
+                    </span>
                   </div>
                   <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
                     <motion.div 
                       initial={{ width: 0 }}
-                      animate={{ width: "78.5%" }}
+                      animate={{ width: `${liquidityIndex}%` }}
                       transition={{ duration: 1.5, ease: "easeOut" }}
                       className="h-full bg-gradient-to-r from-brand to-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.5)]" 
                     />
@@ -212,21 +248,21 @@ export default function Dashboard() {
           title="Consolidated Assets" 
           amount={totalBalance} 
           icon={Wallet} 
-          trend={12.5}
+          trend={undefined}
           color="bg-emerald-500"
         />
         <SummaryCard 
           title="Monthly Inflow" 
           amount={monthlyIncome} 
           icon={TrendingUp} 
-          trend={8.2}
+          trend={incomeTrend || undefined}
           color="bg-blue-500"
         />
         <SummaryCard 
           title="Monthly Outflow" 
           amount={monthlyExpenses} 
           icon={TrendingDown} 
-          trend={-3.1}
+          trend={expenseTrend || undefined}
           color="bg-rose-500"
         />
       </div>
@@ -322,34 +358,40 @@ export default function Dashboard() {
               </div>
             </div>
           <div className="space-y-8">
-            {categories.slice(0, 5).map((cat, i) => {
-              const amount = transactions
-                .filter(tx => tx.categoryId === cat.id && tx.type === 'expense')
-                .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
-              const total = monthlyExpenses || 1;
-              const percentage = Math.round((amount / total) * 100);
-              
-              return (
-                <div key={cat.id} className="group cursor-pointer">
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center gap-4">
-                      <div className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.1)]" style={{ backgroundColor: cat.color }} />
-                      <span className="text-sm font-bold text-white/40 group-hover:text-white transition-all duration-500 tracking-tight">{cat.name}</span>
+            {monthlyExpenses > 0 ? (
+              categories.slice(0, 5).map((cat, i) => {
+                const amount = transactions
+                  .filter(tx => tx.categoryId === cat.id && tx.type === 'expense')
+                  .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+                const total = monthlyExpenses || 1;
+                const percentage = Math.round((amount / total) * 100);
+                
+                return (
+                  <div key={cat.id} className="group cursor-pointer">
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-4">
+                        <div className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.1)]" style={{ backgroundColor: cat.color }} />
+                        <span className="text-sm font-bold text-white/40 group-hover:text-white transition-all duration-500 tracking-tight">{cat.name}</span>
+                      </div>
+                      <span className="text-[10px] font-bold text-white/10 tracking-[0.2em] uppercase">{percentage}%</span>
                     </div>
-                    <span className="text-[10px] font-bold text-white/10 tracking-[0.2em] uppercase">{percentage}%</span>
+                    <div className="h-1.5 w-full bg-white/[0.01] rounded-full overflow-hidden border border-white/[0.03]">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${percentage}%` }}
+                        transition={{ duration: 1.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                        className="h-full rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+                        style={{ backgroundColor: cat.color }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-1.5 w-full bg-white/[0.01] rounded-full overflow-hidden border border-white/[0.03]">
-                    <motion.div 
-                      initial={{ width: 0 }}
-                      animate={{ width: `${percentage}%` }}
-                      transition={{ duration: 1.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                      className="h-full rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)]"
-                      style={{ backgroundColor: cat.color }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <div className="py-12 text-center border border-dashed border-white/5 rounded-3xl">
+                <p className="text-xs text-white/10 font-bold uppercase tracking-[0.2em]">No Allocation Data</p>
+              </div>
+            )}
           </div>
           
           <div className="mt-12 p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] relative overflow-hidden group">
@@ -357,7 +399,10 @@ export default function Dashboard() {
             <div className="relative z-10">
               <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em] mb-3">Strategic Insight</p>
               <p className="text-xs text-white/40 leading-relaxed italic">
-                "Your expenditure in the <span className="text-white/60 font-bold">Lifestyle</span> sector has decreased by 14% this quarter, significantly improving your net savings velocity."
+                {transactions.length > 0 
+                  ? `"Your capital velocity is currently ${efficiency > 70 ? 'optimized' : 'stabilizing'}. Maintaining this trajectory will accelerate your long-term wealth accumulation goals."`
+                  : '"Begin recording your financial movements to generate personalized strategic insights and capital velocity analysis."'
+                }
               </p>
             </div>
           </div>
