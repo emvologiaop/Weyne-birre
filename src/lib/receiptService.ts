@@ -11,7 +11,7 @@ export interface ReceiptData {
 
 export async function processReceipt(base64Image: string, mimeType: string): Promise<ReceiptData> {
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-2.0-flash",
     contents: {
       parts: [
         {
