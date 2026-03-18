@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenAI } from "@google/genai";
 import { MessageSquare, Send, X, Loader2, Sparkles, User, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions, useAccounts, useCategories, useBudgets } from '../lib/hooks/useFinanceData';
 import { formatCurrency, formatCurrencyShort } from "../lib/utils";
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+
 
 export function AIAdvisor() {
   const [isOpen, setIsOpen] = useState(false);
