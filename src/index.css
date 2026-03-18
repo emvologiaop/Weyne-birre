@@ -23,14 +23,14 @@
   --bg-overlay-md: rgba(255,255,255,0.09);
 
   /* Text — much higher opacity for dark mode readability */
-  --text-primary:   #f2f2f2;
-  --text-secondary: rgba(242,242,242,0.80);
-  --text-muted:     rgba(242,242,242,0.55);
-  --text-faint:     rgba(242,242,242,0.35);
+  --text-primary:   #f0f0f0;
+  --text-secondary: rgba(240,240,240,0.88);
+  --text-muted:     rgba(240,240,240,0.68);
+  --text-faint:     rgba(240,240,240,0.48);
 
-  --border-subtle:  rgba(255,255,255,0.08);
-  --border-normal:  rgba(255,255,255,0.13);
-  --border-strong:  rgba(255,255,255,0.22);
+  --border-subtle:  rgba(255,255,255,0.10);
+  --border-normal:  rgba(255,255,255,0.16);
+  --border-strong:  rgba(255,255,255,0.26);
 
   --shadow-card:    0 20px 60px rgba(0,0,0,0.5);
   --shadow-sm:      0 4px 16px rgba(0,0,0,0.3);
