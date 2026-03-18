@@ -174,3 +174,47 @@ export function useUserProfile() {
 
   return { profile, loading };
 }
+
+export function useNetWorthSnapshots() {
+  const { user } = useAuth();
+  const [snapshots, setSnapshots] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    const q = query(
+      collection(db, 'netWorthSnapshots'),
+      where('userId', '==', user.uid),
+      orderBy('date', 'asc')
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setSnapshots(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setLoading(false);
+    }, () => setLoading(false));
+    return () => unsubscribe();
+  }, [user]);
+
+  return { snapshots, loading };
+}
+
+export function useRecurringTransactions() {
+  const { user } = useAuth();
+  const [recurring, setRecurring] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    const q = query(
+      collection(db, 'recurringTransactions'),
+      where('userId', '==', user.uid),
+      where('active', '==', true)
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setRecurring(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setLoading(false);
+    }, () => setLoading(false));
+    return () => unsubscribe();
+  }, [user]);
+
+  return { recurring, loading };
+}
