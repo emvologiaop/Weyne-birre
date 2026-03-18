@@ -49,7 +49,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
               <AlertTriangle className="w-8 h-8 text-rose-500" />
             </div>
             <h1 className="text-xl font-semibold text-white">Something went wrong</h1>
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-white/84">
               {isFirestoreError 
                 ? "We encountered an issue communicating with the database. This might be a permissions issue or a network error."
                 : "The application encountered an unexpected error."}

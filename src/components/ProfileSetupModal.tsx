@@ -71,20 +71,20 @@ export default function ProfileSetupModal({ isOpen, onComplete }: ProfileSetupMo
             <h2 className="text-2xl font-semibold text-white mb-6">Complete Your Profile</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-white/90 mb-1">Full Name</label>
                 <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1">Username</label>
+                <label className="block text-sm font-medium text-white/90 mb-1">Username</label>
                 <input required type="text" value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} className="w-full px-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">Age</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1">Age</label>
                   <input required type="number" value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} className="w-full px-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">Gender</label>
+                  <label className="block text-sm font-medium text-white/90 mb-1">Gender</label>
                   <select value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})} className="w-full px-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50">
                     <option value="prefer-not-to-say">Prefer not to say</option>
                     <option value="male">Male</option>

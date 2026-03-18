@@ -106,7 +106,7 @@ export function AIAdvisor() {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 text-white/30 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                className="p-2 text-white/65 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -156,7 +156,7 @@ export function AIAdvisor() {
                   <Send className="w-5 h-5" />
                 </button>
               </div>
-              <p className="text-[10px] text-white/20 text-center mt-2">
+              <p className="text-[10px] text-white/55 text-center mt-2">
                 AI can make mistakes. Check important info.
               </p>
             </div>

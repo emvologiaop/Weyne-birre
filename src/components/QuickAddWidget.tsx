@@ -112,8 +112,8 @@ export function QuickAddWidget() {
               className="fixed bottom-44 right-6 z-[60] w-80 bg-[#141414] border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
             >
               <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-white/[0.06]">
-                <p className="text-sm font-bold text-white">Quick Add <span className="ml-2 text-[10px] text-white/20 font-normal bg-white/5 px-2 py-0.5 rounded-md">N</span></p>
-                <button onClick={() => setOpen(false)} className="text-white/30 hover:text-white"><X className="w-4 h-4" /></button>
+                <p className="text-sm font-bold text-white">Quick Add <span className="ml-2 text-[10px] text-white/55 font-normal bg-white/5 px-2 py-0.5 rounded-md">N</span></p>
+                <button onClick={() => setOpen(false)} className="text-white/65 hover:text-white"><X className="w-4 h-4" /></button>
               </div>
 
               <form onSubmit={handleSubmit} className="p-4 space-y-3">
@@ -122,7 +122,7 @@ export function QuickAddWidget() {
                   {(['expense', 'income'] as const).map(t => (
                     <button key={t} type="button" onClick={() => { setType(t); setCategoryId(''); }}
                       className={cn('flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors capitalize',
-                        type === t ? (t === 'expense' ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white') : 'text-white/40 hover:text-white')}>
+                        type === t ? (t === 'expense' ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white') : 'text-white/72 hover:text-white')}>
                       {t}
                     </button>
                   ))}
@@ -130,16 +130,16 @@ export function QuickAddWidget() {
 
                 {/* Amount */}
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-xs font-bold">Br</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/72 text-xs font-bold">Br</span>
                   <input ref={amountRef} type="number" step="0.01" min="0.01" required value={amount}
                     onChange={e => setAmount(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-brand/50"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder:text-white/55 focus:outline-none focus:border-brand/50"
                     placeholder="Amount" />
                 </div>
 
                 {/* Description */}
                 <input type="text" value={description} onChange={e => setDescription(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-brand/50"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder:text-white/55 focus:outline-none focus:border-brand/50"
                   placeholder="What for? (optional)" />
 
                 {/* Account + Category */}

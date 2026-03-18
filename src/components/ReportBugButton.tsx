@@ -35,7 +35,7 @@ export function ReportBugButton() {
         onClick={() => setIsOpen(true)}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 left-6 z-50 flex items-center gap-2.5 bg-[#1a1a1a] dark:bg-[#1a1a1a] light:bg-white/90 border border-white/10 light:border-black/10 text-white/70 light:text-black/70 hover:text-brand hover:border-brand/30 px-4 py-3 rounded-2xl shadow-2xl transition-all duration-300 backdrop-blur-xl group"
+        className="fixed bottom-6 left-6 z-50 flex items-center gap-2.5 bg-[#1a1a1a] dark:bg-[#1a1a1a] light:bg-white/90 border border-white/10 light:border-black/10 text-white/90 light:text-black/70 hover:text-brand hover:border-brand/30 px-4 py-3 rounded-2xl shadow-2xl transition-all duration-300 backdrop-blur-xl group"
         title="Report a bug"
       >
         <Bug className="w-4 h-4 text-brand group-hover:animate-bounce" />
@@ -68,10 +68,10 @@ export function ReportBugButton() {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-white light:text-black">Report a Bug</p>
-                    <p className="text-[10px] text-white/30 light:text-black/40">Help us improve ወይኔ ብሬ</p>
+                    <p className="text-[10px] text-white/65 light:text-black/40">Help us improve ወይኔ ብሬ</p>
                   </div>
                 </div>
-                <button onClick={handleClose} className="p-1.5 rounded-lg hover:bg-white/5 light:hover:bg-black/5 text-white/30 light:text-black/30 hover:text-white light:hover:text-black transition-colors">
+                <button onClick={handleClose} className="p-1.5 rounded-lg hover:bg-white/5 light:hover:bg-black/5 text-white/65 light:text-black/30 hover:text-white light:hover:text-black transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -90,10 +90,10 @@ export function ReportBugButton() {
                       className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl bg-white/[0.03] light:bg-black/[0.03] hover:bg-brand/10 border border-white/[0.05] light:border-black/[0.05] hover:border-brand/20 transition-all group"
                     >
                       <div className="flex items-center gap-3">
-                        <Bug className="w-4 h-4 text-white/30 light:text-black/30 group-hover:text-brand" />
-                        <span className="text-sm font-medium text-white/70 light:text-black/70 group-hover:text-white light:group-hover:text-black">Describe the bug</span>
+                        <Bug className="w-4 h-4 text-white/65 light:text-black/30 group-hover:text-brand" />
+                        <span className="text-sm font-medium text-white/90 light:text-black/70 group-hover:text-white light:group-hover:text-black">Describe the bug</span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-white/20 light:text-black/20 group-hover:text-brand" />
+                      <ChevronRight className="w-4 h-4 text-white/55 light:text-black/20 group-hover:text-brand" />
                     </button>
 
                     <a
@@ -103,15 +103,15 @@ export function ReportBugButton() {
                       className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl bg-white/[0.03] light:bg-black/[0.03] hover:bg-[#229ED9]/10 border border-white/[0.05] light:border-black/[0.05] hover:border-[#229ED9]/20 transition-all group"
                     >
                       <div className="flex items-center gap-3">
-                        <svg className="w-4 h-4 text-white/30 light:text-black/30 group-hover:text-[#229ED9]" viewBox="0 0 24 24" fill="currentColor">
+                        <svg className="w-4 h-4 text-white/65 light:text-black/30 group-hover:text-[#229ED9]" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.018 9.51c-.148.674-.543.838-1.1.521l-3.05-2.247-1.47 1.416c-.163.163-.3.3-.614.3l.218-3.09 5.63-5.087c.245-.218-.053-.34-.38-.122l-6.953 4.375-2.995-.937c-.652-.204-.664-.652.136-.965l11.702-4.512c.543-.196 1.018.133.894.838z"/>
                         </svg>
-                        <span className="text-sm font-medium text-white/70 light:text-black/70 group-hover:text-white light:group-hover:text-black">Chat on Telegram</span>
+                        <span className="text-sm font-medium text-white/90 light:text-black/70 group-hover:text-white light:group-hover:text-black">Chat on Telegram</span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-white/20 light:text-black/20 group-hover:text-[#229ED9]" />
+                      <ChevronRight className="w-4 h-4 text-white/55 light:text-black/20 group-hover:text-[#229ED9]" />
                     </a>
 
-                    <p className="text-[10px] text-white/20 light:text-black/30 text-center px-2 leading-relaxed">
+                    <p className="text-[10px] text-white/55 light:text-black/30 text-center px-2 leading-relaxed">
                       Your feedback helps make ወይኔ ብሬ better for everyone.
                     </p>
                   </motion.div>
@@ -129,12 +129,12 @@ export function ReportBugButton() {
                       onChange={(e) => setBugText(e.target.value)}
                       placeholder="What happened? What did you expect? Which page?"
                       rows={5}
-                      className="w-full px-4 py-3 bg-white/[0.03] light:bg-black/[0.03] border border-white/[0.08] light:border-black/[0.08] rounded-2xl text-sm text-white light:text-black placeholder:text-white/20 light:placeholder:text-black/30 focus:outline-none focus:border-brand/30 resize-none transition-colors leading-relaxed"
+                      className="w-full px-4 py-3 bg-white/[0.03] light:bg-black/[0.03] border border-white/[0.08] light:border-black/[0.08] rounded-2xl text-sm text-white light:text-black placeholder:text-white/55 light:placeholder:text-black/30 focus:outline-none focus:border-brand/30 resize-none transition-colors leading-relaxed"
                     />
                     <div className="flex gap-3">
                       <button
                         onClick={() => setStep('menu')}
-                        className="flex-1 py-2.5 rounded-xl bg-white/[0.03] light:bg-black/[0.03] border border-white/[0.05] light:border-black/[0.05] text-sm font-medium text-white/50 light:text-black/50 hover:text-white light:hover:text-black transition-colors"
+                        className="flex-1 py-2.5 rounded-xl bg-white/[0.03] light:bg-black/[0.03] border border-white/[0.05] light:border-black/[0.05] text-sm font-medium text-white/78 light:text-black/50 hover:text-white light:hover:text-black transition-colors"
                       >
                         Back
                       </button>

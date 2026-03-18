@@ -35,7 +35,7 @@ export function KeyboardShortcutsHelp() {
     <>
       {/* Help trigger */}
       <button onClick={() => setVisible(true)}
-        className="fixed bottom-6 right-24 z-50 w-10 h-10 rounded-full bg-[#1a1a1a] border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/20 transition-all shadow-lg"
+        className="fixed bottom-6 right-24 z-50 w-10 h-10 rounded-full bg-[#1a1a1a] border border-white/10 flex items-center justify-center text-white/65 hover:text-white hover:border-white/20 transition-all shadow-lg"
         title="Keyboard shortcuts (?)">
         <Keyboard className="w-4 h-4" />
       </button>
@@ -57,24 +57,24 @@ export function KeyboardShortcutsHelp() {
                     <Keyboard className="w-5 h-5 text-brand" />
                     <h2 className="text-lg font-bold text-white">Keyboard Shortcuts</h2>
                   </div>
-                  <button onClick={() => setVisible(false)} className="text-white/30 hover:text-white">
+                  <button onClick={() => setVisible(false)} className="text-white/65 hover:text-white">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
                 <div className="p-6 grid grid-cols-1 gap-2">
                   {shortcuts.map(sc => (
                     <div key={sc.description} className="flex items-center justify-between py-2 border-b border-white/[0.03] last:border-0">
-                      <span className="text-sm text-white/60">{sc.description}</span>
+                      <span className="text-sm text-white/84">{sc.description}</span>
                       <div className="flex items-center gap-1">
                         {sc.keys.map(k => (
-                          <kbd key={k} className="px-2 py-1 bg-white/5 border border-white/10 rounded-lg text-[11px] font-mono font-bold text-white/60">{k}</kbd>
+                          <kbd key={k} className="px-2 py-1 bg-white/5 border border-white/10 rounded-lg text-[11px] font-mono font-bold text-white/84">{k}</kbd>
                         ))}
                       </div>
                     </div>
                   ))}
                 </div>
                 <div className="px-6 pb-4 text-center">
-                  <p className="text-xs text-white/20">Press <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-white/40 font-mono text-[10px]">?</kbd> to toggle this panel</p>
+                  <p className="text-xs text-white/55">Press <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-white/72 font-mono text-[10px]">?</kbd> to toggle this panel</p>
                 </div>
               </div>
             </motion.div>
