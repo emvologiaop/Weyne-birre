@@ -16,7 +16,7 @@ function SummaryCard({ title, amount, icon: Icon, trend, color, trendLabel }: { 
       
       <div className="relative z-10">
         <div className="flex justify-between items-start mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-white/40 group-hover:text-white group-hover:bg-white/10 transition-all duration-500 shadow-lg">
+          <div className="w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-white/72 group-hover:text-white group-hover:bg-white/10 transition-all duration-500 shadow-lg">
             <Icon className="w-7 h-7" />
           </div>
           {trend !== undefined && (
@@ -30,14 +30,14 @@ function SummaryCard({ title, amount, icon: Icon, trend, color, trendLabel }: { 
             </div>
           )}
           {trendLabel && (trend === undefined || trend === null) && (
-             <div className="px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest bg-white/5 text-white/40 border border-white/10">
+             <div className="px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest bg-white/5 text-white/72 border border-white/10">
                {trendLabel}
              </div>
           )}
         </div>
         
         <div className="space-y-1">
-          <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.2em]">{title}</p>
+          <p className="text-[11px] font-bold text-white/65 uppercase tracking-[0.2em]">{title}</p>
           <h3 className="text-3xl font-display font-bold text-white tracking-tight">
             {formatCurrencyShort(amount)}
           </h3>
@@ -141,7 +141,7 @@ export default function Dashboard() {
         <div className="relative z-10 space-y-10">
           <div className="flex items-center gap-6">
             <div className="w-16 h-[1px] bg-white/10" />
-            <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.6em]">Your Money Overview</p>
+            <p className="text-[11px] font-bold text-white/65 uppercase tracking-[0.6em]">Your Money Overview</p>
           </div>
           
           <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-12">
@@ -150,7 +150,7 @@ export default function Dashboard() {
                 Your<br />
                 <span className="text-brand italic serif">Dashboard</span>
               </h1>
-              <p className="text-lg text-white/40 font-light max-w-xl leading-relaxed tracking-tight">
+              <p className="text-lg text-white/72 font-light max-w-xl leading-relaxed tracking-tight">
                 See all your money in one place — what you have, spend, and earn.
               </p>
             </div>
@@ -159,7 +159,7 @@ export default function Dashboard() {
               <div className="p-8 rounded-[40px] bg-white/[0.02] border border-white/[0.05] backdrop-blur-3xl shadow-2xl relative group overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-brand/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="relative z-10">
-                  <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.3em] mb-4">Your Finances</p>
+                  <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.3em] mb-4">Your Finances</p>
                   <div className="flex items-center gap-6">
                     <div className="flex gap-1.5">
                       {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
@@ -176,7 +176,7 @@ export default function Dashboard() {
                       <span className="text-2xl font-display font-bold text-white block">
                         {efficiency > 80 ? 'OPTIMAL' : efficiency > 50 ? 'STABLE' : 'CRITICAL'}
                       </span>
-                      <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest">{efficiency}% Efficiency</span>
+                      <span className="text-[10px] text-white/65 font-bold uppercase tracking-widest">{efficiency}% Efficiency</span>
                     </div>
                   </div>
                 </div>
@@ -205,13 +205,13 @@ export default function Dashboard() {
                 )}>
                   {incomeTrend >= 0 ? <ArrowUpRight className="w-5 h-5 text-emerald-400" /> : <ArrowDownRight className="w-5 h-5 text-rose-400" />}
                   <span className={cn("text-sm font-bold", incomeTrend >= 0 ? "text-emerald-400" : "text-rose-400")}>
-                    {incomeTrend >= 0 ? '+' : ''}{incomeTrend}% <span className="text-white/20 ml-1 font-normal">vs last month</span>
+                    {incomeTrend >= 0 ? '+' : ''}{incomeTrend}% <span className="text-white/55 ml-1 font-normal">vs last month</span>
                   </span>
                 </div>
               )}
               <div className="px-6 py-3 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center gap-3">
-                <TrendingUp className="w-5 h-5 text-white/40" />
-                <span className="text-sm font-bold text-white/60">Net this month: <span className="text-white ml-1">{formatCurrencyShort(monthlyIncome - monthlyExpenses)}</span></span>
+                <TrendingUp className="w-5 h-5 text-white/72" />
+                <span className="text-sm font-bold text-white/84">Net this month: <span className="text-white ml-1">{formatCurrencyShort(monthlyIncome - monthlyExpenses)}</span></span>
               </div>
             </div>
           </div>
@@ -220,8 +220,8 @@ export default function Dashboard() {
               <div className="absolute top-0 right-0 w-64 h-64 bg-brand/10 rounded-full blur-[100px] -mr-32 -mt-32" />
               <div className="relative z-10 space-y-8">
                 <div className="flex justify-between items-center">
-                  <h4 className="text-[11px] font-bold text-white/30 uppercase tracking-[0.3em]">Spending Health</h4>
-                  <CreditCard className="w-5 h-5 text-white/20" />
+                  <h4 className="text-[11px] font-bold text-white/65 uppercase tracking-[0.3em]">Spending Health</h4>
+                  <CreditCard className="w-5 h-5 text-white/55" />
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-end">
@@ -239,7 +239,7 @@ export default function Dashboard() {
                     />
                   </div>
                 </div>
-                <p className="text-xs text-white/30 leading-relaxed">
+                <p className="text-xs text-white/65 leading-relaxed">
                   {liquidityIndex > 70 ? 'Your spending looks healthy. Keep it up!' : liquidityIndex > 40 ? 'Watch your spending — it is getting close to your income.' : liquidityIndex === 0 ? 'Add transactions to see your spending health.' : 'You are spending more than you earn. Try to cut back.'}
                 </p>
               </div>
@@ -281,16 +281,16 @@ export default function Dashboard() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8 mb-16">
               <div>
                 <h3 className="text-3xl font-display font-bold text-white tracking-tight">Monthly Overview</h3>
-                <p className="text-[11px] text-white/20 mt-2 uppercase tracking-[0.4em] font-bold">Last 6 Months</p>
+                <p className="text-[11px] text-white/55 mt-2 uppercase tracking-[0.4em] font-bold">Last 6 Months</p>
               </div>
               <div className="flex gap-8 p-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-xl">
                 <div className="flex items-center gap-3 px-4 py-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-brand shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-                  <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Money In</span>
+                  <span className="text-[11px] font-bold text-white/72 uppercase tracking-widest">Money In</span>
                 </div>
                 <div className="flex items-center gap-3 px-4 py-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
-                  <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Money Out</span>
+                  <span className="text-[11px] font-bold text-white/72 uppercase tracking-widest">Money Out</span>
                 </div>
               </div>
             </div>
@@ -360,7 +360,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between mb-12">
               <h3 className="text-3xl font-display font-bold text-white tracking-tight">Spending by Category</h3>
               <div className="w-12 h-12 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center group-hover:bg-white/5 transition-colors">
-                <PieChart className="w-6 h-6 text-white/30" />
+                <PieChart className="w-6 h-6 text-white/65" />
               </div>
             </div>
           <div className="space-y-8">
@@ -385,9 +385,9 @@ export default function Dashboard() {
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center gap-4">
                         <div className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.1)]" style={{ backgroundColor: cat.color }} />
-                        <span className="text-sm font-bold text-white/40 group-hover:text-white transition-all duration-500 tracking-tight">{cat.name}</span>
+                        <span className="text-sm font-bold text-white/72 group-hover:text-white transition-all duration-500 tracking-tight">{cat.name}</span>
                       </div>
-                      <span className="text-[10px] font-bold text-white/10 tracking-[0.2em] uppercase">{percentage}%</span>
+                      <span className="text-[10px] font-bold text-white/45 tracking-[0.2em] uppercase">{percentage}%</span>
                     </div>
                     <div className="h-1.5 w-full bg-white/[0.01] rounded-full overflow-hidden border border-white/[0.03]">
                       <motion.div 
@@ -403,7 +403,7 @@ export default function Dashboard() {
               })
             ) : (
               <div className="py-12 text-center border border-dashed border-white/5 rounded-3xl">
-                <p className="text-xs text-white/10 font-bold uppercase tracking-[0.2em]">No Data Yet</p>
+                <p className="text-xs text-white/45 font-bold uppercase tracking-[0.2em]">No Data Yet</p>
               </div>
             )}
           </div>
@@ -411,8 +411,8 @@ export default function Dashboard() {
           <div className="mt-12 p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-brand/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             <div className="relative z-10">
-              <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em] mb-3">Tip</p>
-              <p className="text-xs text-white/40 leading-relaxed italic">
+              <p className="text-[10px] font-bold text-white/45 uppercase tracking-[0.3em] mb-3">Tip</p>
+              <p className="text-xs text-white/72 leading-relaxed italic">
                 {transactions.length > 0 
                   ? `Your spending is ${efficiency > 70 ? 'under control' : 'a bit high this month'}. Keep tracking to reach your goals.`
                   : 'Add your first transaction to see tips here.'
@@ -430,9 +430,9 @@ export default function Dashboard() {
           <div className="flex justify-between items-center mb-10">
             <div>
               <h3 className="text-2xl font-display font-bold text-white tracking-tight">Recent Activity</h3>
-              <p className="text-[10px] text-white/20 mt-1 uppercase tracking-[0.3em] font-bold">Recent Transactions</p>
+              <p className="text-[10px] text-white/55 mt-1 uppercase tracking-[0.3em] font-bold">Recent Transactions</p>
             </div>
-            <Link to="/transactions" className="px-6 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] hover:bg-white/[0.05] hover:text-white transition-all duration-500">View All</Link>
+            <Link to="/transactions" className="px-6 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-[10px] font-bold text-white/72 uppercase tracking-[0.2em] hover:bg-white/[0.05] hover:text-white transition-all duration-500">View All</Link>
           </div>
           <div className="space-y-2">
             {transactions.slice(0, 5).map((tx) => (
@@ -440,20 +440,20 @@ export default function Dashboard() {
                 <div className="flex items-center gap-6">
                   <div className={cn(
                     "w-12 h-12 rounded-[18px] flex items-center justify-center transition-all duration-700 shadow-2xl border border-white/[0.05]",
-                    tx.type === 'income' ? "bg-brand/10 text-brand" : "bg-white/[0.02] text-white/20 group-hover:bg-white/[0.05] group-hover:text-white/40"
+                    tx.type === 'income' ? "bg-brand/10 text-brand" : "bg-white/[0.02] text-white/55 group-hover:bg-white/[0.05] group-hover:text-white/72"
                   )}>
                     <Receipt className="w-6 h-6" />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-white/80 group-hover:text-white transition-all duration-500">{tx.description}</p>
-                    <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.2em] mt-1.5">
+                    <p className="text-[10px] font-bold text-white/45 uppercase tracking-[0.2em] mt-1.5">
                       {new Date(tx.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                     </p>
                   </div>
                 </div>
                 <p className={cn(
                   "text-base font-mono font-bold tracking-tight",
-                  tx.type === 'income' ? "text-brand" : "text-white/60 group-hover:text-white/90 transition-all duration-500"
+                  tx.type === 'income' ? "text-brand" : "text-white/84 group-hover:text-white/90 transition-all duration-500"
                 )}>
                   {tx.type === 'income' ? '+' : '-'}{formatCurrencyShort(Math.abs(tx.amount))}
                 </p>
@@ -468,22 +468,22 @@ export default function Dashboard() {
             <div className="flex items-center justify-between mb-10">
               <div>
                 <h3 className="text-2xl font-display font-bold text-white tracking-tight">Upcoming Charges</h3>
-                <p className="text-[10px] text-white/20 mt-1 uppercase tracking-[0.3em] font-bold">Subscriptions</p>
+                <p className="text-[10px] text-white/55 mt-1 uppercase tracking-[0.3em] font-bold">Subscriptions</p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center">
-                <CreditCard className="w-5 h-5 text-white/20" />
+                <CreditCard className="w-5 h-5 text-white/55" />
               </div>
             </div>
             <div className="space-y-5">
               {subscriptions.slice(0, 3).map(sub => (
                 <div key={sub.id} className="flex items-center justify-between p-6 rounded-3xl bg-white/[0.01] border border-white/[0.03] hover:border-white/10 transition-all duration-700 group">
                   <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 rounded-[18px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/10 group-hover:text-white/40 group-hover:bg-white/[0.05] transition-all duration-700">
+                    <div className="w-12 h-12 rounded-[18px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/45 group-hover:text-white/72 group-hover:bg-white/[0.05] transition-all duration-700">
                       <CreditCard className="w-6 h-6" />
                     </div>
                     <div>
                       <p className="text-sm font-bold text-white/80 group-hover:text-white transition-all duration-500">{sub.name}</p>
-                      <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.2em] mt-1.5">{(() => {
+                      <p className="text-[10px] font-bold text-white/45 uppercase tracking-[0.2em] mt-1.5">{(() => {
   const start = new Date(sub.startDate);
   const origDay = start.getDate();
   const now = new Date(); now.setHours(0,0,0,0);
@@ -500,12 +500,12 @@ export default function Dashboard() {
 })()}</p>
                     </div>
                   </div>
-                  <p className="text-base font-mono font-bold text-white/60 group-hover:text-white transition-all duration-500 tracking-tight">{formatCurrencyShort(sub.amount)}</p>
+                  <p className="text-base font-mono font-bold text-white/84 group-hover:text-white transition-all duration-500 tracking-tight">{formatCurrencyShort(sub.amount)}</p>
                 </div>
               ))}
               {subscriptions.length === 0 && (
                 <div className="text-center py-12 border border-dashed border-white/5 rounded-3xl">
-                  <p className="text-xs text-white/10 font-bold uppercase tracking-[0.2em]">No subscriptions yet</p>
+                  <p className="text-xs text-white/45 font-bold uppercase tracking-[0.2em]">No subscriptions yet</p>
                 </div>
               )}
             </div>
@@ -517,7 +517,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between mb-10">
                 <div>
                   <h3 className="text-2xl font-display font-bold text-white tracking-tight">Milestones</h3>
-                  <p className="text-[10px] text-white/20 mt-1 uppercase tracking-[0.3em] font-bold">Achievements</p>
+                  <p className="text-[10px] text-white/55 mt-1 uppercase tracking-[0.3em] font-bold">Achievements</p>
                 </div>
                 <Trophy className="w-8 h-8 text-brand/40 group-hover:text-brand transition-colors duration-700" />
               </div>
@@ -536,7 +536,7 @@ export default function Dashboard() {
                   </motion.div>
                 ))}
                 {achievements.length === 0 && (
-                  <p className="text-xs text-white/10 font-bold uppercase tracking-[0.2em] italic py-4">Complete goals to earn badges</p>
+                  <p className="text-xs text-white/45 font-bold uppercase tracking-[0.2em] italic py-4">Complete goals to earn badges</p>
                 )}
               </div>
             </div>

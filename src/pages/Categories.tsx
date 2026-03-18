@@ -42,7 +42,7 @@ export default function Categories() {
           <h2 className="text-5xl md:text-6xl font-display font-bold text-white tracking-tighter leading-none">
             Your <span className="text-brand italic">Categories</span>
           </h2>
-          <p className="text-sm text-white/40 max-w-md font-medium leading-relaxed">
+          <p className="text-sm text-white/72 max-w-md font-medium leading-relaxed">
             Group your transactions into categories to keep things organised.
           </p>
         </div>
@@ -76,7 +76,7 @@ export default function Categories() {
                 <stat.icon className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mb-1">{stat.label}</p>
+                <p className="text-[10px] font-bold text-white/55 uppercase tracking-[0.2em] mb-1">{stat.label}</p>
                 <p className="text-3xl font-display font-bold text-white tracking-tight">
                   {stat.value}
                 </p>
@@ -92,11 +92,11 @@ export default function Categories() {
         </div>
       ) : categories.length === 0 ? (
         <div className="text-center py-24 bg-[#141414] rounded-[40px] border border-white/[0.03] shadow-2xl">
-          <div className="flex flex-col items-center justify-center text-white/20">
+          <div className="flex flex-col items-center justify-center text-white/55">
             <div className="w-20 h-20 rounded-3xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-6">
               <Tag className="w-10 h-10 opacity-20" />
             </div>
-            <p className="text-lg font-display font-bold text-white/40">No Categories Yet</p>
+            <p className="text-lg font-display font-bold text-white/72">No Categories Yet</p>
             <p className="text-sm mt-2 font-medium">Add your first category to get started.</p>
           </div>
         </div>
@@ -126,12 +126,12 @@ export default function Categories() {
                   </div>
                   <div>
                     <h3 className="font-display font-bold text-white text-2xl tracking-tight">{category.name}</h3>
-                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mt-1">{category.type}</p>
+                    <p className="text-[10px] font-bold text-white/55 uppercase tracking-[0.2em] mt-1">{category.type}</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => handleDelete(category.id)}
-                  className="p-3 text-white/10 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
+                  className="p-3 text-white/45 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>

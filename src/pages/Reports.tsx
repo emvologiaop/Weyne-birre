@@ -129,15 +129,15 @@ export default function Reports() {
       {/* Header */}
       <div className="pt-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.5em] mb-3">Reports & Export</p>
+          <p className="text-[11px] font-bold text-white/65 uppercase tracking-[0.5em] mb-3">Reports & Export</p>
           <h1 className="text-5xl font-display font-bold text-white tracking-tighter">Financial Reports</h1>
-          <p className="text-white/40 mt-2">Get AI-powered insights and export your data.</p>
+          <p className="text-white/72 mt-2">Get AI-powered insights and export your data.</p>
         </div>
         <div className="flex gap-2 p-1 bg-white/5 rounded-2xl">
           {(['week', 'month', 'year'] as ReportPeriod[]).map(p => (
             <button key={p} onClick={() => { setPeriod(p); setAiReport(''); }}
               className={cn('px-5 py-2.5 rounded-xl text-sm font-bold capitalize transition-all',
-                period === p ? 'bg-brand text-black' : 'text-white/50 hover:text-white')}>
+                period === p ? 'bg-brand text-black' : 'text-white/78 hover:text-white')}>
               {p === 'week' ? 'This Week' : p === 'month' ? 'This Month' : 'This Year'}
             </button>
           ))}
@@ -147,9 +147,9 @@ export default function Reports() {
       {/* Period label */}
       <div className="flex items-center gap-3">
         <Calendar className="w-4 h-4 text-brand" />
-        <span className="text-sm font-bold text-white/60">{label}</span>
-        <span className="text-white/20">·</span>
-        <span className="text-sm text-white/30">{periodTx.length} transactions</span>
+        <span className="text-sm font-bold text-white/84">{label}</span>
+        <span className="text-white/55">·</span>
+        <span className="text-sm text-white/65">{periodTx.length} transactions</span>
       </div>
 
       {/* Stats */}
@@ -160,7 +160,7 @@ export default function Reports() {
             <div className={cn('w-12 h-12 rounded-2xl flex items-center justify-center mb-5', stat.bg, stat.color)}>
               <stat.icon className="w-6 h-6" />
             </div>
-            <p className="text-[11px] font-bold text-white/30 uppercase tracking-widest mb-2">{stat.label}</p>
+            <p className="text-[11px] font-bold text-white/65 uppercase tracking-widest mb-2">{stat.label}</p>
             <p className={cn('text-3xl font-display font-bold tabular-nums', stat.color)}>{formatCurrencyCompact(Math.abs(stat.value))}</p>
           </motion.div>
         ))}
@@ -169,7 +169,7 @@ export default function Reports() {
       {/* Savings rate */}
       <div className="p-6 rounded-2xl bg-white/[0.01] border border-white/[0.03] flex items-center justify-between">
         <div>
-          <p className="text-sm font-bold text-white/40">Savings Rate</p>
+          <p className="text-sm font-bold text-white/72">Savings Rate</p>
           <p className={cn('text-4xl font-display font-bold mt-1', parseFloat(savingsRate) >= 20 ? 'text-brand' : parseFloat(savingsRate) >= 0 ? 'text-amber-400' : 'text-rose-400')}>
             {savingsRate}%
           </p>
@@ -188,7 +188,7 @@ export default function Reports() {
             {catSpend.map(cat => (
               <div key={cat.name} className="flex items-center gap-4">
                 <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
-                <span className="text-sm text-white/60 flex-1">{cat.name}</span>
+                <span className="text-sm text-white/84 flex-1">{cat.name}</span>
                 <span className="text-sm font-bold text-white tabular-nums">{formatCurrencyShort(cat.amount)}</span>
                 <div className="w-24 bg-white/5 rounded-full h-1.5 overflow-hidden">
                   <div className="h-full rounded-full" style={{ width: `${(cat.amount / expenses) * 100}%`, backgroundColor: cat.color }} />
@@ -203,10 +203,10 @@ export default function Reports() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <button onClick={() => exportCSV(periodTx, categories, accounts, period)}
           className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] hover:border-brand/20 transition-all group">
-          <Download className="w-5 h-5 text-white/40 group-hover:text-brand transition-colors" />
+          <Download className="w-5 h-5 text-white/72 group-hover:text-brand transition-colors" />
           <div className="text-left">
             <p className="text-sm font-bold text-white">Export CSV</p>
-            <p className="text-xs text-white/30">Download as spreadsheet</p>
+            <p className="text-xs text-white/65">Download as spreadsheet</p>
           </div>
         </button>
         <button onClick={generateAIReport} disabled={loadingAI}
@@ -214,7 +214,7 @@ export default function Reports() {
           {loadingAI ? <Loader2 className="w-5 h-5 text-brand animate-spin" /> : <Sparkles className="w-5 h-5 text-brand" />}
           <div className="text-left">
             <p className="text-sm font-bold text-white">Generate AI Report</p>
-            <p className="text-xs text-white/30">Personalised insights + export</p>
+            <p className="text-xs text-white/65">Personalised insights + export</p>
           </div>
         </button>
       </div>
@@ -230,13 +230,13 @@ export default function Reports() {
             </div>
             {aiReport && (
               <button onClick={() => exportTextReport(aiReport, period)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white text-sm transition-colors">
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/84 hover:text-white text-sm transition-colors">
                 <Download className="w-4 h-4" /> Export
               </button>
             )}
           </div>
           {loadingAI ? (
-            <div className="flex items-center gap-3 text-white/40">
+            <div className="flex items-center gap-3 text-white/72">
               <Loader2 className="w-5 h-5 animate-spin text-brand" />
               <span className="text-sm">Generating your personalised report...</span>
             </div>

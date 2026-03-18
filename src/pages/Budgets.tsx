@@ -81,7 +81,7 @@ export default function Budgets() {
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-[1px] bg-white/20" />
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Budgets & Goals</p>
+            <p className="text-[10px] font-bold text-white/72 uppercase tracking-[0.5em]">Budgets & Goals</p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <h1 className="text-6xl md:text-8xl font-display font-bold text-white tracking-tighter leading-[0.85] uppercase">
@@ -91,7 +91,7 @@ export default function Budgets() {
             <div className="flex gap-4 w-full sm:w-auto">
               <button 
                 onClick={() => setIsGoalModalOpen(true)}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 rounded-[24px] bg-white/[0.03] border border-white/[0.05] text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 hover:bg-white/[0.08] hover:text-white transition-all duration-500 active:scale-95 shadow-xl backdrop-blur-xl"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 rounded-[24px] bg-white/[0.03] border border-white/[0.05] text-[10px] font-bold uppercase tracking-[0.2em] text-white/84 hover:bg-white/[0.08] hover:text-white transition-all duration-500 active:scale-95 shadow-xl backdrop-blur-xl"
               >
                 <Target className="w-4 h-4" />
                 New Goal
@@ -125,7 +125,7 @@ export default function Budgets() {
             <div className={cn("absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-700", stat.accent)} />
             <div className="relative z-10 flex justify-between items-start">
               <div className="space-y-4">
-                <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">{stat.label}</p>
+                <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.4em]">{stat.label}</p>
                 <h3 className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">
                   {formatCurrencyShort(stat.value)}
                 </h3>
@@ -145,7 +145,7 @@ export default function Budgets() {
             <div className="w-2 h-10 bg-brand rounded-full shadow-[0_0_15px_rgba(16,185,129,0.4)]" />
             <h3 className="text-3xl font-display font-bold text-white tracking-tight">Monthly Budgets</h3>
           </div>
-          <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">This Period</p>
+          <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.4em]">This Period</p>
         </div>
 
         {budgetsLoading ? (
@@ -157,10 +157,10 @@ export default function Budgets() {
             <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             <div className="flex flex-col items-center justify-center relative z-10">
               <div className="w-28 h-28 rounded-[40px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-10 shadow-2xl">
-                <PieChart className="w-12 h-12 text-white/5" />
+                <PieChart className="w-12 h-12 text-white/35" />
               </div>
               <h4 className="text-3xl font-display font-bold text-white mb-4">No Budgets Yet</h4>
-              <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Create your first budget to start controlling your spending.</p>
+              <p className="text-sm text-white/55 max-w-xs mx-auto leading-relaxed">Create your first budget to start controlling your spending.</p>
             </div>
           </div>
         ) : (
@@ -188,14 +188,14 @@ export default function Budgets() {
                   <div className="relative z-10">
                     <div className="flex justify-between items-start mb-12">
                       <div className="flex items-center gap-8">
-                        <div className="w-20 h-20 rounded-[32px] flex items-center justify-center bg-white/[0.02] border border-white/[0.05] text-white/20 group-hover:bg-white/[0.05] group-hover:text-white/40 transition-all duration-700 shadow-2xl">
+                        <div className="w-20 h-20 rounded-[32px] flex items-center justify-center bg-white/[0.02] border border-white/[0.05] text-white/55 group-hover:bg-white/[0.05] group-hover:text-white/72 transition-all duration-700 shadow-2xl">
                           <TrendingUp className="w-10 h-10" />
                         </div>
                         <div>
                           <h4 className="font-display font-bold text-white text-3xl tracking-tight">{getCategoryName(budget.categoryId)}</h4>
                           <div className="flex items-center gap-3 mt-2.5">
                             <div className={cn("w-2 h-2 rounded-full", isOver ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]' : isWarning ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'bg-brand shadow-[0_0_10px_rgba(16,185,129,0.5)]')} />
-                            <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.3em]">{formatCurrencyShort(budget.amount)} limit</p>
+                            <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.3em]">{formatCurrencyShort(budget.amount)} limit</p>
                           </div>
                         </div>
                       </div>
@@ -211,7 +211,7 @@ export default function Budgets() {
                             e.stopPropagation();
                             handleDeleteBudget(budget.id);
                           }}
-                          className="p-4 text-white/5 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"
+                          className="p-4 text-white/35 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>
@@ -221,11 +221,11 @@ export default function Budgets() {
                     <div className="space-y-8">
                       <div className="flex justify-between items-end">
                         <div className="space-y-3">
-                          <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">Spent So Far</p>
+                          <p className="text-[11px] font-bold text-white/45 uppercase tracking-[0.4em]">Spent So Far</p>
                           <p className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">{formatCurrencyShort(spent)}</p>
                         </div>
                         <div className="text-right space-y-3">
-                          <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">{isOver ? 'Over by' : 'Available'}</p>
+                          <p className="text-[11px] font-bold text-white/45 uppercase tracking-[0.4em]">{isOver ? 'Over by' : 'Available'}</p>
                           <p className={cn(
                             "text-3xl font-display font-bold tracking-tight transition-colors duration-500 tabular-nums",
                             isOver ? 'text-rose-400' : 'text-brand'
@@ -246,7 +246,7 @@ export default function Budgets() {
                         />
                       </div>
                       <div className="flex justify-between items-center">
-                        <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Used</p>
+                        <p className="text-[10px] font-bold text-white/45 uppercase tracking-[0.3em]">Used</p>
                         <p className={cn(
                           "text-[11px] font-bold uppercase tracking-[0.3em]",
                           isOver ? 'text-rose-400' : isWarning ? 'text-amber-500' : 'text-brand/60'
@@ -270,7 +270,7 @@ export default function Budgets() {
             <div className="w-2 h-10 bg-blue-500 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.4)]" />
             <h3 className="text-3xl font-display font-bold text-white tracking-tight">Savings Goals</h3>
           </div>
-          <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Your Goals</p>
+          <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.4em]">Your Goals</p>
         </div>
 
         {goalsLoading ? (
@@ -282,10 +282,10 @@ export default function Budgets() {
             <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             <div className="flex flex-col items-center justify-center relative z-10">
               <div className="w-28 h-28 rounded-[40px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-10 shadow-2xl">
-                <Target className="w-12 h-12 text-white/5" />
+                <Target className="w-12 h-12 text-white/35" />
               </div>
               <h4 className="text-3xl font-display font-bold text-white mb-4">No Goals Yet</h4>
-              <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Set a savings goal and track how close you are to reaching it.</p>
+              <p className="text-sm text-white/55 max-w-xs mx-auto leading-relaxed">Set a savings goal and track how close you are to reaching it.</p>
             </div>
           </div>
         ) : (
@@ -310,14 +310,14 @@ export default function Budgets() {
                   <div className="relative z-10">
                     <div className="flex justify-between items-start mb-12">
                       <div className="flex items-center gap-8">
-                        <div className="w-20 h-20 rounded-[32px] flex items-center justify-center bg-white/[0.02] border border-white/[0.05] text-white/20 group-hover:bg-white/[0.05] group-hover:text-white/40 transition-all duration-700 shadow-2xl">
+                        <div className="w-20 h-20 rounded-[32px] flex items-center justify-center bg-white/[0.02] border border-white/[0.05] text-white/55 group-hover:bg-white/[0.05] group-hover:text-white/72 transition-all duration-700 shadow-2xl">
                           <Trophy className="w-10 h-10" />
                         </div>
                         <div>
                           <h4 className="font-display font-bold text-white text-3xl tracking-tight">{goal.name}</h4>
                           <div className="flex items-center gap-3 mt-2.5">
                             <div className={cn("w-2 h-2 rounded-full", isCompleted ? 'bg-brand shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]')} />
-                            <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.3em]">Target: {new Date(goal.targetDate).toLocaleDateString()}</p>
+                            <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.3em]">Target: {new Date(goal.targetDate).toLocaleDateString()}</p>
                           </div>
                         </div>
                       </div>
@@ -333,7 +333,7 @@ export default function Budgets() {
                             e.stopPropagation();
                             handleDeleteGoal(goal.id);
                           }}
-                          className="p-4 text-white/5 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"
+                          className="p-4 text-white/35 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all duration-500 opacity-0 group-hover:opacity-100"
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>
@@ -343,11 +343,11 @@ export default function Budgets() {
                     <div className="space-y-8">
                       <div className="flex justify-between items-end">
                         <div className="space-y-3">
-                          <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">Saved So Far</p>
+                          <p className="text-[11px] font-bold text-white/45 uppercase tracking-[0.4em]">Saved So Far</p>
                           <p className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">{formatCurrencyShort(goal.currentAmount)}</p>
                         </div>
                         <div className="text-right space-y-3">
-                          <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">{isCompleted ? 'Goal Achieved' : 'Remaining'}</p>
+                          <p className="text-[11px] font-bold text-white/45 uppercase tracking-[0.4em]">{isCompleted ? 'Goal Achieved' : 'Remaining'}</p>
                           <p className={cn(
                             "text-3xl font-display font-bold tracking-tight transition-colors duration-500 tabular-nums",
                             isCompleted ? 'text-brand' : 'text-blue-400'
@@ -368,7 +368,7 @@ export default function Budgets() {
                         />
                       </div>
                       <div className="flex justify-between items-center">
-                        <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Progress</p>
+                        <p className="text-[10px] font-bold text-white/45 uppercase tracking-[0.3em]">Progress</p>
                         <p className={cn(
                           "text-[11px] font-bold uppercase tracking-[0.3em]",
                           isCompleted ? 'text-brand' : 'text-blue-400/60'

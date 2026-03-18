@@ -42,7 +42,7 @@ export default function Accounts() {
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-[1px] bg-white/20" />
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Your Accounts</p>
+            <p className="text-[10px] font-bold text-white/72 uppercase tracking-[0.5em]">Your Accounts</p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <h1 className="text-6xl md:text-8xl font-display font-bold text-white tracking-tighter leading-[0.85] uppercase">
@@ -94,7 +94,7 @@ export default function Accounts() {
             <div className={cn("absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-700", stat.accent)} />
             <div className="relative z-10 flex justify-between items-start">
               <div className="space-y-4">
-                <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">{stat.label}</p>
+                <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.4em]">{stat.label}</p>
                 <h3 className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">
                   {formatCurrencyShort(stat.value)}
                 </h3>
@@ -116,10 +116,10 @@ export default function Accounts() {
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
           <div className="flex flex-col items-center justify-center relative z-10">
             <div className="w-28 h-28 rounded-[40px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-10 shadow-2xl">
-              <Wallet className="w-12 h-12 text-white/5" />
+              <Wallet className="w-12 h-12 text-white/35" />
             </div>
             <h3 className="text-3xl font-display font-bold text-white mb-4">No Accounts Yet</h3>
-            <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Add your first account to start tracking your money.</p>
+            <p className="text-sm text-white/55 max-w-xs mx-auto leading-relaxed">Add your first account to start tracking your money.</p>
           </div>
         </div>
       ) : (
@@ -139,12 +139,12 @@ export default function Accounts() {
                 <div className="relative z-10">
                   <div className="flex items-start justify-between mb-12">
                     <div className="flex items-center gap-8">
-                      <div className="w-20 h-20 rounded-[32px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 group-hover:text-brand group-hover:bg-brand/10 group-hover:border-brand/20 transition-all duration-700 shadow-2xl">
+                      <div className="w-20 h-20 rounded-[32px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/55 group-hover:text-brand group-hover:bg-brand/10 group-hover:border-brand/20 transition-all duration-700 shadow-2xl">
                         <Icon className="w-10 h-10" />
                       </div>
                       <div>
                         <h3 className="font-display font-bold text-white text-3xl tracking-tight group-hover:text-brand transition-colors duration-500">{account.name}</h3>
-                        <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.3em] mt-2">{account.institution || account.type}</p>
+                        <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.3em] mt-2">{account.institution || account.type}</p>
                       </div>
                     </div>
                     <button 
@@ -152,7 +152,7 @@ export default function Accounts() {
                         e.stopPropagation();
                         handleDelete(account.id);
                       }}
-                      className="p-4 text-white/5 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all opacity-0 group-hover:opacity-100 duration-500"
+                      className="p-4 text-white/35 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all opacity-0 group-hover:opacity-100 duration-500"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -161,7 +161,7 @@ export default function Accounts() {
                   <div className="space-y-8">
                     <div className="flex justify-between items-end">
                       <div className="space-y-3">
-                        <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Current Balance</p>
+                        <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.4em]">Current Balance</p>
                         <p className={cn(
                           "text-5xl font-display font-bold tracking-tighter tabular-nums",
                           account.balance < 0 ? 'text-rose-400' : 'text-white'
@@ -170,17 +170,17 @@ export default function Accounts() {
                         </p>
                       </div>
                       <div className="text-right space-y-2">
-                        <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Account ID</p>
-                        <p className="text-[11px] font-mono text-white/30 tracking-widest">•••• {account.id.slice(-4).toUpperCase()}</p>
+                        <p className="text-[10px] font-bold text-white/45 uppercase tracking-[0.3em]">Account ID</p>
+                        <p className="text-[11px] font-mono text-white/65 tracking-widest">•••• {account.id.slice(-4).toUpperCase()}</p>
                       </div>
                     </div>
 
                     <div className="pt-8 border-t border-white/[0.03] flex justify-between items-center">
                       <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-brand animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                        <span className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Active</span>
+                        <span className="text-[11px] font-bold text-white/55 uppercase tracking-[0.4em]">Active</span>
                       </div>
-                      <span className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em] italic">Active</span>
+                      <span className="text-[11px] font-bold text-white/45 uppercase tracking-[0.4em] italic">Active</span>
                     </div>
                   </div>
                 </div>

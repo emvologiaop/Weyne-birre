@@ -160,9 +160,9 @@ export default function BankImport() {
   return (
     <div className="space-y-8 pb-24 max-w-4xl mx-auto">
       <div className="pt-8">
-        <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.5em] mb-3">Bank Statement Import</p>
+        <p className="text-[11px] font-bold text-white/65 uppercase tracking-[0.5em] mb-3">Bank Statement Import</p>
         <h1 className="text-5xl font-display font-bold text-white tracking-tighter">Import Transactions</h1>
-        <p className="text-white/40 mt-2">Upload a CSV export from your bank to import transactions automatically.</p>
+        <p className="text-white/72 mt-2">Upload a CSV export from your bank to import transactions automatically.</p>
       </div>
 
       {/* Steps */}
@@ -174,11 +174,11 @@ export default function BankImport() {
           return (
             <React.Fragment key={s}>
               <div className={cn('flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all',
-                active ? 'bg-brand text-black' : done ? 'bg-brand/20 text-brand' : 'bg-white/5 text-white/30')}>
+                active ? 'bg-brand text-black' : done ? 'bg-brand/20 text-brand' : 'bg-white/5 text-white/65')}>
                 {done ? <Check className="w-4 h-4" /> : <span>{i + 1}</span>}
                 {s}
               </div>
-              {i < 2 && <ArrowRight className="w-4 h-4 text-white/20" />}
+              {i < 2 && <ArrowRight className="w-4 h-4 text-white/55" />}
             </React.Fragment>
           );
         })}
@@ -195,7 +195,7 @@ export default function BankImport() {
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-2">Default Account</label>
+              <label className="block text-sm font-medium text-white/90 mb-2">Default Account</label>
               <select value={defaultAccountId} onChange={e => setDefaultAccountId(e.target.value)}
                 className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl text-white focus:outline-none focus:border-brand/50 transition-colors appearance-none">
                 <option value="">Select account (optional)</option>
@@ -210,16 +210,16 @@ export default function BankImport() {
           )}>
             <input {...getInputProps()} />
             <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-6">
-              <Upload className="w-8 h-8 text-white/30" />
+              <Upload className="w-8 h-8 text-white/65" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Drop your CSV here</h3>
-            <p className="text-white/30 text-sm">or click to browse</p>
-            <p className="text-white/20 text-xs mt-4">Supports CSV files from most Ethiopian and international banks</p>
+            <p className="text-white/65 text-sm">or click to browse</p>
+            <p className="text-white/55 text-xs mt-4">Supports CSV files from most Ethiopian and international banks</p>
           </div>
 
           <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-            <h4 className="text-sm font-bold text-white/60 mb-3 flex items-center gap-2"><FileText className="w-4 h-4" /> Expected CSV format</h4>
-            <code className="text-xs text-white/40 font-mono block">
+            <h4 className="text-sm font-bold text-white/84 mb-3 flex items-center gap-2"><FileText className="w-4 h-4" /> Expected CSV format</h4>
+            <code className="text-xs text-white/72 font-mono block">
               Date, Description, Amount<br />
               2024-01-15, Supermarket, -250.00<br />
               2024-01-16, Salary, 15000.00
@@ -233,13 +233,13 @@ export default function BankImport() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-white">{rows.length} transactions found</h3>
-              <p className="text-white/30 text-sm">{selectedRows.length} selected for import</p>
+              <p className="text-white/65 text-sm">{selectedRows.length} selected for import</p>
             </div>
             <div className="flex gap-3">
               <button onClick={() => setRows(r => r.map(x => ({ ...x, selected: true })))}
-                className="px-4 py-2 rounded-xl bg-white/5 text-white/60 text-sm hover:text-white transition-colors">Select All</button>
+                className="px-4 py-2 rounded-xl bg-white/5 text-white/84 text-sm hover:text-white transition-colors">Select All</button>
               <button onClick={() => setRows(r => r.map(x => ({ ...x, selected: false })))}
-                className="px-4 py-2 rounded-xl bg-white/5 text-white/60 text-sm hover:text-white transition-colors">None</button>
+                className="px-4 py-2 rounded-xl bg-white/5 text-white/84 text-sm hover:text-white transition-colors">None</button>
             </div>
           </div>
 
@@ -251,9 +251,9 @@ export default function BankImport() {
                   className="w-4 h-4 accent-brand rounded" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-white truncate">{row.description}</p>
-                  <p className="text-xs text-white/30">{row.date}</p>
+                  <p className="text-xs text-white/65">{row.date}</p>
                 </div>
-                <span className={cn('text-sm font-bold tabular-nums', row.type === 'income' ? 'text-brand' : 'text-white/70')}>
+                <span className={cn('text-sm font-bold tabular-nums', row.type === 'income' ? 'text-brand' : 'text-white/90')}>
                   {row.type === 'income' ? '+' : '-'}{formatCurrencyShort(row.amount)}
                 </span>
                 <select value={row.accountId}
@@ -273,7 +273,7 @@ export default function BankImport() {
           </div>
 
           <div className="flex gap-4">
-            <button onClick={() => { setRows([]); setStep('upload'); }} className="flex-1 py-3 rounded-xl bg-white/5 text-white/60 font-medium hover:text-white transition-colors">
+            <button onClick={() => { setRows([]); setStep('upload'); }} className="flex-1 py-3 rounded-xl bg-white/5 text-white/84 font-medium hover:text-white transition-colors">
               Back
             </button>
             <button onClick={handleImport} disabled={importing || selectedRows.length === 0}
@@ -291,7 +291,7 @@ export default function BankImport() {
             <Check className="w-10 h-10 text-brand" />
           </div>
           <h3 className="text-3xl font-bold text-white mb-2">Import Complete!</h3>
-          <p className="text-white/40 mb-8">{selectedRows.length} transactions imported successfully.</p>
+          <p className="text-white/72 mb-8">{selectedRows.length} transactions imported successfully.</p>
           <button onClick={() => { setRows([]); setStep('upload'); setError(''); }}
             className="px-8 py-3 rounded-xl bg-brand text-black font-bold hover:bg-brand/90 transition-colors">
             Import More

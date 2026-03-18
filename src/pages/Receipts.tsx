@@ -41,7 +41,7 @@ export default function Receipts() {
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-[1px] bg-white/20" />
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Your Receipts</p>
+            <p className="text-[10px] font-bold text-white/72 uppercase tracking-[0.5em]">Your Receipts</p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <h1 className="text-6xl md:text-8xl font-display font-bold text-white tracking-tighter leading-[0.85] uppercase">
@@ -77,7 +77,7 @@ export default function Receipts() {
             <div className={cn("absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-700", stat.accent)} />
             <div className="relative z-10 flex justify-between items-start">
               <div className="space-y-4">
-                <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">{stat.label}</p>
+                <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.4em]">{stat.label}</p>
                 <h3 className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">
                   {stat.isCurrency === false ? stat.value : (typeof stat.value === 'number' ? formatCurrencyShort(stat.value) : stat.value)}
                 </h3>
@@ -93,14 +93,14 @@ export default function Receipts() {
       {/* Search and Filters */}
       <div className="relative group max-w-2xl">
         <div className="absolute inset-y-0 left-8 flex items-center pointer-events-none">
-          <Search className="w-5 h-5 text-white/10 group-focus-within:text-emerald-400 transition-colors duration-500" />
+          <Search className="w-5 h-5 text-white/45 group-focus-within:text-emerald-400 transition-colors duration-500" />
         </div>
         <input
           type="text"
           placeholder="Search by shop name, amount, date or category..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-16 pr-8 py-6 bg-white/[0.01] border border-white/[0.03] rounded-[32px] text-base text-white placeholder:text-white/10 focus:outline-none focus:border-emerald-500/30 focus:bg-white/[0.03] transition-all duration-500 shadow-2xl"
+          className="w-full pl-16 pr-8 py-6 bg-white/[0.01] border border-white/[0.03] rounded-[32px] text-base text-white placeholder:text-white/45 focus:outline-none focus:border-emerald-500/30 focus:bg-white/[0.03] transition-all duration-500 shadow-2xl"
         />
       </div>
 
@@ -109,10 +109,10 @@ export default function Receipts() {
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
           <div className="flex flex-col items-center justify-center relative z-10">
             <div className="w-28 h-28 rounded-[40px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-10 shadow-2xl">
-              <ReceiptIcon className="w-12 h-12 text-white/5" />
+              <ReceiptIcon className="w-12 h-12 text-white/35" />
             </div>
             <h3 className="text-3xl font-display font-bold text-white mb-4">No Receipts Yet</h3>
-            <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Upload your first receipt to start keeping track.</p>
+            <p className="text-sm text-white/55 max-w-xs mx-auto leading-relaxed">Upload your first receipt to start keeping track.</p>
           </div>
         </div>
       ) : (
@@ -130,14 +130,14 @@ export default function Receipts() {
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-12">
                   <div className="flex items-center gap-8">
-                    <div className="w-20 h-20 rounded-[32px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 group-hover:text-emerald-400 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-all duration-700 shadow-2xl">
+                    <div className="w-20 h-20 rounded-[32px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/55 group-hover:text-emerald-400 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-all duration-700 shadow-2xl">
                       <ReceiptIcon className="w-10 h-10" />
                     </div>
                     <div>
                       <h3 className="font-display font-bold text-white text-3xl tracking-tight group-hover:text-emerald-400 transition-colors duration-500">{receipt.merchant}</h3>
                       <div className="flex items-center gap-3 mt-2.5">
-                        <Calendar className="w-4 h-4 text-white/20" />
-                        <span className="text-[11px] font-bold text-white/20 uppercase tracking-[0.3em]">{receipt.date}</span>
+                        <Calendar className="w-4 h-4 text-white/55" />
+                        <span className="text-[11px] font-bold text-white/55 uppercase tracking-[0.3em]">{receipt.date}</span>
                       </div>
                     </div>
                   </div>
@@ -149,22 +149,22 @@ export default function Receipts() {
                 <div className="space-y-8">
                   <div className="flex justify-between items-end">
                     <div className="space-y-3">
-                      <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Amount</p>
+                      <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.4em]">Amount</p>
                       <p className="text-5xl font-display font-bold text-white tracking-tighter tabular-nums">
                         {formatCurrencyShort(receipt.amount)}
                       </p>
                     </div>
                     <div className="text-right space-y-2">
-                      <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Category</p>
+                      <p className="text-[10px] font-bold text-white/45 uppercase tracking-[0.3em]">Category</p>
                       <p className="text-[11px] font-bold text-emerald-400 uppercase tracking-[0.4em]">{receipt.category || 'General'}</p>
                     </div>
                   </div>
 
                   <div className="pt-8 border-t border-white/[0.03] flex justify-between items-center">
-                    <button className="text-[11px] font-bold text-white/30 uppercase tracking-[0.4em] hover:text-emerald-400 transition-colors duration-500">
+                    <button className="text-[11px] font-bold text-white/65 uppercase tracking-[0.4em] hover:text-emerald-400 transition-colors duration-500">
                       View Original Image
                     </button>
-                    <span className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em] italic">ID: {receipt.id.slice(0, 8)}</span>
+                    <span className="text-[10px] font-bold text-white/45 uppercase tracking-[0.3em] italic">ID: {receipt.id.slice(0, 8)}</span>
                   </div>
                 </div>
               </div>

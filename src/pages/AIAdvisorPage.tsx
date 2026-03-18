@@ -88,7 +88,7 @@ export default function AIAdvisorPage() {
           <h2 className="text-5xl md:text-6xl font-display font-bold text-white tracking-tighter leading-none">
             Your <span className="text-brand italic">AI Advisor</span>
           </h2>
-          <p className="text-sm text-white/40 max-w-md font-medium leading-relaxed">
+          <p className="text-sm text-white/72 max-w-md font-medium leading-relaxed">
             Ask questions about your money, spending habits, or savings goals and get simple, helpful advice.
           </p>
         </div>
@@ -103,8 +103,8 @@ export default function AIAdvisorPage() {
             ))}
           </div>
           <div>
-            <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Your Data Loaded</p>
-            <p className="text-xs font-bold text-white/60 tracking-tight">{transactions.length} transactions loaded</p>
+            <p className="text-[10px] font-bold text-white/55 uppercase tracking-widest">Your Data Loaded</p>
+            <p className="text-xs font-bold text-white/84 tracking-tight">{transactions.length} transactions loaded</p>
           </div>
         </div>
       </div>
@@ -120,11 +120,11 @@ export default function AIAdvisorPage() {
               <h3 className="font-display font-bold text-white text-lg tracking-tight">Chat</h3>
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
-                <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Ready</span>
+                <span className="text-[10px] font-bold text-white/55 uppercase tracking-widest">Ready</span>
               </div>
             </div>
           </div>
-          <Link to="/" className="p-3 text-white/10 hover:text-white hover:bg-white/5 rounded-2xl transition-all">
+          <Link to="/" className="p-3 text-white/45 hover:text-white hover:bg-white/5 rounded-2xl transition-all">
             <ArrowLeft className="w-5 h-5" />
           </Link>
         </div>
@@ -144,7 +144,7 @@ export default function AIAdvisorPage() {
                   <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-2xl ${
                     msg.role === 'user' 
                       ? 'bg-brand/10 border border-brand/20 text-brand' 
-                      : 'bg-white/[0.03] border border-white/[0.05] text-white/40'
+                      : 'bg-white/[0.03] border border-white/[0.05] text-white/72'
                   }`}>
                     {msg.role === 'user' ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                   </div>
@@ -203,7 +203,7 @@ export default function AIAdvisorPage() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
                 placeholder="Ask me anything about your money..."
-                className="w-full pl-8 pr-20 py-6 bg-[#0a0a0a] border border-white/[0.05] rounded-[24px] text-white placeholder:text-white/20 focus:outline-none focus:border-brand/30 transition-all shadow-2xl"
+                className="w-full pl-8 pr-20 py-6 bg-[#0a0a0a] border border-white/[0.05] rounded-[24px] text-white placeholder:text-white/55 focus:outline-none focus:border-brand/30 transition-all shadow-2xl"
               />
               <button
                 onClick={handleSend}
@@ -217,19 +217,19 @@ export default function AIAdvisorPage() {
           <div className="flex justify-center gap-8 mt-6">
             <button 
               onClick={() => setInput("How am I spending my money?")}
-              className="text-[10px] font-bold text-white/20 uppercase tracking-widest hover:text-brand transition-colors"
+              className="text-[10px] font-bold text-white/55 uppercase tracking-widest hover:text-brand transition-colors"
             >
               Spending Analysis
             </button>
             <button 
               onClick={() => setInput("How am I doing with my budgets?")}
-              className="text-[10px] font-bold text-white/20 uppercase tracking-widest hover:text-brand transition-colors"
+              className="text-[10px] font-bold text-white/55 uppercase tracking-widest hover:text-brand transition-colors"
             >
               Budget Audit
             </button>
             <button 
               onClick={() => setInput("Give me 3 tips to save more")}
-              className="text-[10px] font-bold text-white/20 uppercase tracking-widest hover:text-brand transition-colors"
+              className="text-[10px] font-bold text-white/55 uppercase tracking-widest hover:text-brand transition-colors"
             >
               Saving Strategy
             </button>

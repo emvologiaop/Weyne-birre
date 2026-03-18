@@ -75,7 +75,7 @@ export default function NetWorth() {
     if (!active || !payload?.length) return null;
     return (
       <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-4 shadow-2xl">
-        <p className="text-xs text-white/40 font-bold uppercase tracking-widest mb-2">{label}</p>
+        <p className="text-xs text-white/72 font-bold uppercase tracking-widest mb-2">{label}</p>
         <p className={cn('text-xl font-bold font-display', payload[0].value >= 0 ? 'text-brand' : 'text-rose-400')}>
           {formatCurrencyShort(payload[0].value)}
         </p>
@@ -87,7 +87,7 @@ export default function NetWorth() {
     <div className="space-y-10 pb-24">
       {/* Header */}
       <div className="pt-8">
-        <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.5em] mb-3">Net Worth Over Time</p>
+        <p className="text-[11px] font-bold text-white/65 uppercase tracking-[0.5em] mb-3">Net Worth Over Time</p>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="text-6xl md:text-8xl font-display font-bold text-white tracking-tighter leading-none">
@@ -100,7 +100,7 @@ export default function NetWorth() {
               <span className={cn('text-sm font-bold', isPositive ? 'text-brand' : 'text-rose-400')}>
                 {isPositive ? '+' : ''}{formatCurrencyShort(change)} ({changePct.toFixed(1)}%)
               </span>
-              <span className="text-white/30 text-sm">all time</span>
+              <span className="text-white/65 text-sm">all time</span>
             </div>
           </div>
 
@@ -108,7 +108,7 @@ export default function NetWorth() {
           <div className="grid grid-cols-3 gap-4">
             {accounts.map(acc => (
               <div key={acc.id} className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] min-w-[120px]">
-                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1 truncate">{acc.name}</p>
+                <p className="text-[10px] text-white/65 uppercase tracking-widest mb-1 truncate">{acc.name}</p>
                 <p className={cn('text-lg font-bold font-display', acc.balance < 0 ? 'text-rose-400' : 'text-white')}>
                   {formatCurrencyShort(acc.balance)}
                 </p>
@@ -123,16 +123,16 @@ export default function NetWorth() {
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-xl font-bold text-white">Net Worth Timeline</h3>
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-white/[0.05]">
-            <Calendar className="w-4 h-4 text-white/30" />
-            <span className="text-xs text-white/30 font-bold">All time</span>
+            <Calendar className="w-4 h-4 text-white/65" />
+            <span className="text-xs text-white/65 font-bold">All time</span>
           </div>
         </div>
 
         {timelineData.length < 2 ? (
           <div className="h-64 flex items-center justify-center">
             <div className="text-center">
-              <Wallet className="w-12 h-12 text-white/10 mx-auto mb-3" />
-              <p className="text-white/30 text-sm">Add transactions to see your net worth timeline</p>
+              <Wallet className="w-12 h-12 text-white/45 mx-auto mb-3" />
+              <p className="text-white/65 text-sm">Add transactions to see your net worth timeline</p>
             </div>
           </div>
         ) : (
@@ -177,7 +177,7 @@ export default function NetWorth() {
               return (
                 <motion.div key={row.key} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}
                   className="flex items-center justify-between px-8 py-4 hover:bg-white/[0.01] transition-colors">
-                  <span className="text-sm font-bold text-white/60">{row.label}</span>
+                  <span className="text-sm font-bold text-white/84">{row.label}</span>
                   <div className="flex items-center gap-6">
                     {delta !== 0 && (
                       <span className={cn('text-xs font-bold', delta > 0 ? 'text-brand' : 'text-rose-400')}>

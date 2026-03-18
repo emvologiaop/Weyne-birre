@@ -50,7 +50,7 @@ export default function Achievements() {
           <h2 className="text-5xl md:text-6xl font-display font-bold text-white tracking-tighter leading-none">
             Your <span className="text-brand italic">Achievements</span>
           </h2>
-          <p className="text-sm text-white/40 max-w-md font-medium leading-relaxed">
+          <p className="text-sm text-white/72 max-w-md font-medium leading-relaxed">
             Earn badges by hitting financial milestones. Keep going!
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function Achievements() {
                 <stat.icon className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mb-1">{stat.label}</p>
+                <p className="text-[10px] font-bold text-white/55 uppercase tracking-[0.2em] mb-1">{stat.label}</p>
                 <p className="text-3xl font-display font-bold text-white tracking-tight">
                   {stat.value}
                 </p>
@@ -123,7 +123,7 @@ export default function Achievements() {
                     "w-16 h-16 rounded-[24px] border flex items-center justify-center transition-all duration-700 shadow-2xl",
                     ach.isUnlocked 
                       ? 'bg-brand/10 border-brand/20 text-brand' 
-                      : 'bg-white/[0.03] border-white/[0.05] text-white/10'
+                      : 'bg-white/[0.03] border-white/[0.05] text-white/45'
                   )}>
                     {ach.isUnlocked ? <Trophy className="w-8 h-8" /> : <Lock className="w-8 h-8" />}
                   </div>
@@ -139,13 +139,13 @@ export default function Achievements() {
                   <div>
                     <h3 className={cn(
                       "font-display font-bold text-2xl tracking-tight transition-colors duration-500",
-                      ach.isUnlocked ? 'text-white' : 'text-white/30'
+                      ach.isUnlocked ? 'text-white' : 'text-white/65'
                     )}>
                       {ach.name}
                     </h3>
                     <p className={cn(
                       "text-sm mt-2 leading-relaxed font-medium",
-                      ach.isUnlocked ? 'text-white/40' : 'text-white/10'
+                      ach.isUnlocked ? 'text-white/72' : 'text-white/45'
                     )}>
                       {ach.description}
                     </p>
@@ -153,7 +153,7 @@ export default function Achievements() {
 
                   {ach.type === 'custom' && (
                     <div className="pt-6 border-t border-white/[0.03]">
-                      <span className="px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.05] text-[9px] font-bold text-white/20 uppercase tracking-widest">
+                      <span className="px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.05] text-[9px] font-bold text-white/55 uppercase tracking-widest">
                         Custom Achievement
                       </span>
                     </div>

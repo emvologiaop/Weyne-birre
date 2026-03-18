@@ -178,7 +178,7 @@ export default function Settings() {
             <div className="w-1.5 h-8 bg-brand rounded-full shadow-[0_0_15px_rgba(16,185,129,0.4)]" />
             <h2 className="text-4xl font-display font-bold text-white tracking-tight">Settings</h2>
           </div>
-          <p className="text-[10px] text-white/20 uppercase tracking-[0.4em] font-bold ml-4">Manage your account and app settings</p>
+          <p className="text-[10px] text-white/55 uppercase tracking-[0.4em] font-bold ml-4">Manage your account and app settings</p>
         </div>
         <button 
           onClick={handleSave}
@@ -211,7 +211,7 @@ export default function Settings() {
                     "w-full flex items-center justify-between px-6 py-4 rounded-[22px] text-[10px] font-bold uppercase tracking-[0.25em] transition-all duration-500 group relative overflow-hidden",
                     isActive 
                       ? "text-brand" 
-                      : "text-white/20 hover:text-white/60"
+                      : "text-white/55 hover:text-white/84"
                   )}
                 >
                   {isActive && (
@@ -223,7 +223,7 @@ export default function Settings() {
                     />
                   )}
                   <div className="relative z-10 flex items-center gap-5">
-                    <tab.icon className={cn("w-5 h-5 transition-all duration-500", isActive ? "text-brand scale-110" : "text-white/10 group-hover:text-white/30")} />
+                    <tab.icon className={cn("w-5 h-5 transition-all duration-500", isActive ? "text-brand scale-110" : "text-white/45 group-hover:text-white/65")} />
                     {tab.label}
                   </div>
                   {isActive && <ChevronRight className="relative z-10 w-4 h-4 opacity-50" />}
@@ -267,47 +267,47 @@ export default function Settings() {
                     </div>
                     <div className="text-center md:text-left pt-4">
                       <h3 className="text-3xl font-display font-bold text-white tracking-tight mb-2">Personal Identity</h3>
-                      <p className="text-sm text-white/30 leading-relaxed max-w-md">Your identity is securely managed through your Google Account. Update your display name and preferences below.</p>
+                      <p className="text-sm text-white/65 leading-relaxed max-w-md">Your identity is securely managed through your Google Account. Update your display name and preferences below.</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
                     <div className="space-y-4 group">
-                      <label className="text-[10px] font-bold text-white/10 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Full Name</label>
+                      <label className="text-[10px] font-bold text-white/45 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Full Name</label>
                       <input 
                         type="text" 
                         name="name"
                         value={formData.name} 
                         onChange={handleChange}
                         placeholder="Enter your full name"
-                        className="w-full px-8 py-5 bg-white/[0.01] border border-white/[0.05] rounded-[24px] text-white font-medium focus:outline-none focus:border-brand/40 focus:bg-white/[0.03] transition-all duration-500 shadow-inner placeholder:text-white/10" 
+                        className="w-full px-8 py-5 bg-white/[0.01] border border-white/[0.05] rounded-[24px] text-white font-medium focus:outline-none focus:border-brand/40 focus:bg-white/[0.03] transition-all duration-500 shadow-inner placeholder:text-white/45" 
                       />
                     </div>
                     <div className="space-y-4 group">
-                      <label className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em] ml-1">Email Address</label>
+                      <label className="text-[10px] font-bold text-white/45 uppercase tracking-[0.3em] ml-1">Email Address</label>
                       <div className="relative">
                         <input 
                           type="email" 
                           value={profile?.email || user?.email || ""} 
-                          className="w-full px-8 py-5 bg-white/[0.01] border border-white/[0.03] rounded-[24px] text-white/20 cursor-not-allowed focus:outline-none placeholder:text-white/10" 
+                          className="w-full px-8 py-5 bg-white/[0.01] border border-white/[0.03] rounded-[24px] text-white/55 cursor-not-allowed focus:outline-none placeholder:text-white/45" 
                           disabled 
                         />
-                        <Shield className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/5" />
+                        <Shield className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/35" />
                       </div>
                     </div>
                     <div className="space-y-4 group">
-                      <label className="text-[10px] font-bold text-white/10 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Username</label>
+                      <label className="text-[10px] font-bold text-white/45 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Username</label>
                       <input 
                         type="text" 
                         name="username"
                         value={formData.username} 
                         onChange={handleChange}
                         placeholder="@username"
-                        className="w-full px-8 py-5 bg-white/[0.01] border border-white/[0.05] rounded-[24px] text-white font-medium focus:outline-none focus:border-brand/40 focus:bg-white/[0.03] transition-all duration-500 shadow-inner placeholder:text-white/10" 
+                        className="w-full px-8 py-5 bg-white/[0.01] border border-white/[0.05] rounded-[24px] text-white font-medium focus:outline-none focus:border-brand/40 focus:bg-white/[0.03] transition-all duration-500 shadow-inner placeholder:text-white/45" 
                       />
                     </div>
                     <div className="space-y-4 group">
-                      <label className="text-[10px] font-bold text-white/10 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Gender Identity</label>
+                      <label className="text-[10px] font-bold text-white/45 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Gender Identity</label>
                       <div className="relative">
                         <select 
                           name="gender"
@@ -319,13 +319,13 @@ export default function Settings() {
                           <option value="Female">Female</option>
                           <option value="Other">Other</option>
                         </select>
-                        <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 rotate-90 pointer-events-none" />
+                        <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/55 rotate-90 pointer-events-none" />
                       </div>
                     </div>
                     <div className="space-y-4 group">
-                      <label className="text-[10px] font-bold text-white/10 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Monthly Income Goal</label>
+                      <label className="text-[10px] font-bold text-white/45 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Monthly Income Goal</label>
                       <div className="relative">
-                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-white/10 font-bold text-xs">ETB</span>
+                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-white/45 font-bold text-xs">ETB</span>
                         <input 
                           type="number" 
                           name="monthlyIncomeGoal"
@@ -336,9 +336,9 @@ export default function Settings() {
                       </div>
                     </div>
                     <div className="space-y-4 group">
-                      <label className="text-[10px] font-bold text-white/10 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Net Worth Target</label>
+                      <label className="text-[10px] font-bold text-white/45 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Net Worth Target</label>
                       <div className="relative">
-                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-white/10 font-bold text-xs">Br</span>
+                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-white/45 font-bold text-xs">Br</span>
                         <input 
                           type="number" 
                           name="netWorthTarget"
@@ -357,12 +357,12 @@ export default function Settings() {
                   <div className="space-y-10">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-10 border-b border-white/[0.03]">
                       <div className="flex items-center gap-8">
-                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 shadow-xl">
+                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/55 shadow-xl">
                           <Globe className="w-8 h-8" />
                         </div>
                         <div>
                           <h4 className="text-2xl font-display font-bold text-white tracking-tight">Currency & Region</h4>
-                          <p className="text-sm text-white/30 mt-1">Primary currency for global calculations</p>
+                          <p className="text-sm text-white/65 mt-1">Primary currency for global calculations</p>
                         </div>
                       </div>
                       <div className="relative w-full sm:w-auto">
@@ -374,30 +374,53 @@ export default function Settings() {
                         >
                           <option value="ETB">ETB (Br)</option>
                         </select>
-                        <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 rotate-90 pointer-events-none" />
+                        <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/55 rotate-90 pointer-events-none" />
                       </div>
                     </div>
 
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-10 border-b border-white/[0.03]">
                       <div className="flex items-center gap-8">
-                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 shadow-xl">
+                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/55 shadow-xl">
                           <Palette className="w-8 h-8" />
                         </div>
                         <div>
                           <h4 className="text-2xl font-display font-bold text-white tracking-tight">Interface Theme</h4>
-                          <p className="text-sm text-white/30 mt-1">Visual aesthetic of the platform</p>
+                          <p className="text-sm text-white/65 mt-1">Visual aesthetic of the platform</p>
                         </div>
                       </div>
                       <div className="flex bg-white/[0.01] border border-white/[0.05] rounded-[20px] p-1.5 shadow-inner w-full sm:w-auto">
                         {(['dark', 'light', 'system'] as const).map((t) => (
                           <button 
                             key={t}
-                            onClick={() => setFormData(prev => ({ ...prev, theme: t as any }))}
+                            onClick={() => {
+                              setFormData(prev => ({ ...prev, theme: t as any }));
+                              // Fire the global theme event so ThemeProvider picks it up instantly
+                              const fakeProfile = { theme: t };
+                              const root = document.documentElement;
+                              const resolved = t === 'system'
+                                ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                                : t;
+                              root.setAttribute('data-theme', resolved);
+                              root.classList.toggle('light', resolved === 'light');
+                              root.classList.toggle('dark', resolved === 'dark');
+                              if (resolved === 'light') {
+                                document.body.style.backgroundColor = '#f0f2f5';
+                                document.body.style.color = '#0f0f1a';
+                                // Inject light style if not present
+                                if (!document.getElementById('weyne-light-theme')) {
+                                  window.dispatchEvent(new CustomEvent('apply-theme', { detail: 'light' }));
+                                }
+                              } else {
+                                document.body.style.backgroundColor = '#050505';
+                                document.body.style.color = '#f2f2f2';
+                                document.getElementById('weyne-light-theme')?.remove();
+                              }
+                            }}
                             className={cn(
                               "flex-1 sm:flex-none px-8 py-3 rounded-[16px] text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500 capitalize",
                               formData.theme === t 
                                 ? "bg-white/[0.05] text-white shadow-[0_10px_20px_rgba(0,0,0,0.2)]" 
-                                : "text-white/10 hover:text-white/30"
+                                : "text-white/45 hover:text-white/65"
                             )}
                           >
                             {t}
@@ -414,12 +437,12 @@ export default function Settings() {
                   <div className="space-y-10">
                     <div className="flex items-center justify-between pb-10 border-b border-white/[0.03]">
                       <div className="flex items-center gap-8">
-                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 shadow-xl">
+                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/55 shadow-xl">
                           <Bell className="w-8 h-8" />
                         </div>
                         <div>
                           <h4 className="text-2xl font-display font-bold text-white tracking-tight">Email Summaries</h4>
-                          <p className="text-sm text-white/30 mt-1">Get a summary of your spending each month</p>
+                          <p className="text-sm text-white/65 mt-1">Get a summary of your spending each month</p>
                         </div>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer group">
@@ -430,12 +453,12 @@ export default function Settings() {
 
                     <div className="flex items-center justify-between pb-10 border-b border-white/[0.03]">
                       <div className="flex items-center gap-8">
-                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 shadow-xl">
+                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/55 shadow-xl">
                           <Shield className="w-8 h-8" />
                         </div>
                         <div>
                           <h4 className="text-2xl font-display font-bold text-white tracking-tight">Budget Thresholds</h4>
-                          <p className="text-sm text-white/30 mt-1">Get alerted when you are close to your budget limit</p>
+                          <p className="text-sm text-white/65 mt-1">Get alerted when you are close to your budget limit</p>
                         </div>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer group">
@@ -459,10 +482,10 @@ export default function Settings() {
                         </div>
                         <div>
                           <h4 className="text-3xl font-display font-bold text-white tracking-tight">Load Default Categories & Accounts</h4>
-                          <p className="text-sm text-white/30 mt-1">Quickly fill in standard categories and accounts</p>
+                          <p className="text-sm text-white/65 mt-1">Quickly fill in standard categories and accounts</p>
                         </div>
                       </div>
-                      <p className="text-base text-white/40 mb-12 leading-relaxed max-w-2xl">
+                      <p className="text-base text-white/72 mb-12 leading-relaxed max-w-2xl">
                         Starting fresh? Use this to quickly set up standard financial categories like "Food", "Transportation", and "Housing". This process is additive and won't delete your existing records.
                       </p>
                       <button 
@@ -494,10 +517,10 @@ export default function Settings() {
                         </div>
                         <div>
                           <h4 className="text-3xl font-display font-bold text-white tracking-tight">Install the App</h4>
-                          <p className="text-sm text-white/30 mt-1">Add ወይኔ ብሬ to your home screen</p>
+                          <p className="text-sm text-white/65 mt-1">Add ወይኔ ብሬ to your home screen</p>
                         </div>
                       </div>
-                      <p className="text-base text-white/40 mb-12 leading-relaxed max-w-2xl">
+                      <p className="text-base text-white/72 mb-12 leading-relaxed max-w-2xl">
                         Install the app on your phone or desktop for a better experience and quick access.
                       </p>
                       <button 
@@ -514,7 +537,7 @@ export default function Settings() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div className="p-10 rounded-[40px] bg-white/[0.01] border border-white/[0.03] shadow-inner group">
                       <div className="flex items-center justify-between mb-8">
-                        <h5 className="text-[10px] font-bold text-white/10 uppercase tracking-[0.4em]">Offline Status</h5>
+                        <h5 className="text-[10px] font-bold text-white/45 uppercase tracking-[0.4em]">Offline Status</h5>
                         <div className={cn(
                           "w-3 h-3 rounded-full transition-all duration-500",
                           isOfflineReady ? "bg-brand shadow-[0_0_20px_rgba(16,185,129,0.6)]" : "bg-amber-500 animate-pulse shadow-[0_0_20px_rgba(245,158,11,0.4)]"
@@ -523,15 +546,15 @@ export default function Settings() {
                       <p className="text-2xl font-display font-bold text-white mb-3">
                         {isOfflineReady ? 'Ready for Offline' : 'Syncing Data...'}
                       </p>
-                      <p className="text-sm text-white/30 leading-relaxed">
+                      <p className="text-sm text-white/65 leading-relaxed">
                         Your data is saved on this device so you can access it without internet.
                       </p>
                     </div>
 
                     <div className="p-10 rounded-[40px] bg-white/[0.01] border border-white/[0.03] shadow-inner group">
                       <div className="flex items-center justify-between mb-8">
-                        <h5 className="text-[10px] font-bold text-white/10 uppercase tracking-[0.4em]">App Version</h5>
-                        <RefreshCw className={cn("w-5 h-5 text-white/10 transition-all duration-500", isNeedUpdate && "text-brand animate-spin")} />
+                        <h5 className="text-[10px] font-bold text-white/45 uppercase tracking-[0.4em]">App Version</h5>
+                        <RefreshCw className={cn("w-5 h-5 text-white/45 transition-all duration-500", isNeedUpdate && "text-brand animate-spin")} />
                       </div>
                       <p className="text-2xl font-display font-bold text-white mb-3">
                         {isNeedUpdate ? 'Update Available' : 'Up to Date'}
@@ -544,7 +567,7 @@ export default function Settings() {
                           Install Update Now
                         </button>
                       ) : (
-                        <p className="text-sm text-white/30 leading-relaxed">
+                        <p className="text-sm text-white/65 leading-relaxed">
                           You are on the latest version.
                         </p>
                       )}
@@ -558,15 +581,15 @@ export default function Settings() {
                   <div className="space-y-10">
                     <div className="flex items-center justify-between pb-10 border-b border-white/[0.03]">
                       <div className="flex items-center gap-8">
-                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/20 shadow-xl">
+                        <div className="w-16 h-16 rounded-[24px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/55 shadow-xl">
                           <Shield className="w-8 h-8" />
                         </div>
                         <div>
                           <h4 className="text-2xl font-display font-bold text-white tracking-tight">Two-Factor Auth</h4>
-                          <p className="text-sm text-white/30 mt-1">Add an extra layer of protection</p>
+                          <p className="text-sm text-white/65 mt-1">Add an extra layer of protection</p>
                         </div>
                       </div>
-                      <button className="px-8 py-4 rounded-[18px] bg-white/[0.03] border border-white/[0.05] text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 hover:bg-white/[0.08] hover:text-white transition-all duration-500">
+                      <button className="px-8 py-4 rounded-[18px] bg-white/[0.03] border border-white/[0.05] text-[10px] font-bold uppercase tracking-[0.2em] text-white/84 hover:bg-white/[0.08] hover:text-white transition-all duration-500">
                         Enable 2FA
                       </button>
                     </div>

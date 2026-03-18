@@ -70,7 +70,7 @@ export default function Transactions() {
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-[1px] bg-white/20" />
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Your Transactions</p>
+            <p className="text-[10px] font-bold text-white/72 uppercase tracking-[0.5em]">Your Transactions</p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <h1 className="text-6xl md:text-8xl font-display font-bold text-white tracking-tighter leading-[0.85] uppercase">
@@ -79,10 +79,10 @@ export default function Transactions() {
             </h1>
             <div className="flex flex-col items-start md:items-end gap-4">
               <div className="px-6 py-3 rounded-2xl bg-white/[0.03] border border-white/[0.05] backdrop-blur-xl">
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mb-1">Total Count</p>
+                <p className="text-[10px] font-bold text-white/55 uppercase tracking-[0.2em] mb-1">Total Count</p>
                 <div className="flex items-center gap-3">
                   <span className="text-2xl font-display font-bold text-white">{transactions.length}</span>
-                  <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Transactions</span>
+                  <span className="text-[10px] text-white/65 font-bold uppercase tracking-widest">Transactions</span>
                 </div>
               </div>
             </div>
@@ -94,13 +94,13 @@ export default function Transactions() {
       <div className="flex flex-col lg:flex-row gap-6 justify-between items-stretch lg:items-center">
         <div className="flex items-center gap-4 flex-1">
           <div className="relative flex-1 group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-brand transition-colors" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/55 group-focus-within:text-brand transition-colors" />
             <input 
               type="text" 
               placeholder="Search transactions..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-14 pr-6 py-4 bg-white/[0.02] border border-white/[0.05] rounded-[24px] text-sm text-white placeholder:text-white/10 focus:outline-none focus:border-brand/30 focus:bg-white/[0.04] transition-all shadow-2xl"
+              className="w-full pl-14 pr-6 py-4 bg-white/[0.02] border border-white/[0.05] rounded-[24px] text-sm text-white placeholder:text-white/45 focus:outline-none focus:border-brand/30 focus:bg-white/[0.04] transition-all shadow-2xl"
             />
           </div>
           <button 
@@ -109,7 +109,7 @@ export default function Transactions() {
               "flex items-center justify-center gap-3 px-6 py-4 rounded-[24px] border transition-all font-bold text-[10px] uppercase tracking-[0.2em] shadow-xl",
               showFilters 
                 ? "bg-brand/10 text-brand border-brand/20" 
-                : "bg-white/[0.02] text-white/40 border-white/[0.05] hover:border-white/10 hover:text-white"
+                : "bg-white/[0.02] text-white/72 border-white/[0.05] hover:border-white/10 hover:text-white"
             )}
           >
             <Filter className="w-4 h-4" />
@@ -164,7 +164,7 @@ export default function Transactions() {
             <div className={cn("absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-700", stat.accent)} />
             <div className="relative z-10 flex justify-between items-start">
               <div className="space-y-4">
-                <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">{stat.label}</p>
+                <p className="text-[11px] font-bold text-white/55 uppercase tracking-[0.4em]">{stat.label}</p>
                 <h3 className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">
                   {formatCurrencyShort(Math.abs(stat.value))}
                 </h3>
@@ -187,7 +187,7 @@ export default function Transactions() {
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 p-10 rounded-[40px] bg-white/[0.01] border border-white/[0.03] shadow-2xl backdrop-blur-xl">
               <div className="space-y-3">
-                <label className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em] ml-1">Category</label>
+                <label className="text-[10px] font-bold text-white/45 uppercase tracking-[0.3em] ml-1">Category</label>
                 <div className="relative">
                   <select 
                     value={filters.category}
@@ -197,12 +197,12 @@ export default function Transactions() {
                     <option value="all">All Categories</option>
                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
-                  <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
+                  <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/55 pointer-events-none" />
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em] ml-1">Account</label>
+                <label className="text-[10px] font-bold text-white/45 uppercase tracking-[0.3em] ml-1">Account</label>
                 <div className="relative">
                   <select 
                     value={filters.account}
@@ -212,12 +212,12 @@ export default function Transactions() {
                     <option value="all">All Accounts</option>
                     {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                   </select>
-                  <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
+                  <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/55 pointer-events-none" />
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em] ml-1">From Date</label>
+                <label className="text-[10px] font-bold text-white/45 uppercase tracking-[0.3em] ml-1">From Date</label>
                 <input 
                   type="date"
                   value={filters.startDate}
@@ -227,7 +227,7 @@ export default function Transactions() {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em] ml-1">To Date</label>
+                <label className="text-[10px] font-bold text-white/45 uppercase tracking-[0.3em] ml-1">To Date</label>
                 <input 
                   type="date"
                   value={filters.endDate}
@@ -242,7 +242,7 @@ export default function Transactions() {
 
       {/* Transactions List */}
       <div className="space-y-6">
-        <div className="hidden md:grid grid-cols-[1fr_2fr_1.2fr_1.2fr_1fr_80px] gap-8 px-12 py-4 text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">
+        <div className="hidden md:grid grid-cols-[1fr_2fr_1.2fr_1.2fr_1fr_80px] gap-8 px-12 py-4 text-[11px] font-bold text-white/45 uppercase tracking-[0.4em]">
           <div>Date</div>
           <div>Description</div>
           <div>Category</div>
@@ -260,10 +260,10 @@ export default function Transactions() {
             ) : filteredTransactions.length === 0 ? (
               <div className="py-48 flex flex-col items-center justify-center text-center">
                 <div className="w-24 h-24 rounded-[40px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-8 shadow-2xl">
-                  <Receipt className="w-10 h-10 text-white/5" />
+                  <Receipt className="w-10 h-10 text-white/35" />
                 </div>
                 <h3 className="text-3xl font-display font-bold text-white mb-4">No Transactions Yet</h3>
-                <p className="text-sm text-white/20 max-w-xs leading-relaxed">Try a different search or add a new transaction.</p>
+                <p className="text-sm text-white/55 max-w-xs leading-relaxed">Try a different search or add a new transaction.</p>
               </div>
             ) : (
               filteredTransactions.map((tx) => (
@@ -279,25 +279,25 @@ export default function Transactions() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1.2fr_1.2fr_1fr_80px] gap-8 items-center relative z-10">
                     <div className="flex items-center gap-6">
-                      <div className="w-14 h-14 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/10 group-hover:text-brand group-hover:bg-brand/10 transition-all duration-700">
+                      <div className="w-14 h-14 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-white/45 group-hover:text-brand group-hover:bg-brand/10 transition-all duration-700">
                         <Calendar className="w-6 h-6" />
                       </div>
                       <div className="space-y-1">
                         <p className="text-base font-bold text-white">{new Date(tx.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
-                        <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">{new Date(tx.date).getFullYear()}</p>
+                        <p className="text-[10px] text-white/55 font-bold uppercase tracking-widest">{new Date(tx.date).getFullYear()}</p>
                       </div>
                     </div>
 
                     <div className="space-y-1.5">
                       <p className="text-lg font-bold text-white group-hover:text-brand transition-colors duration-500">{tx.description || tx.name || "Unnamed"}</p>
-                      <div className="flex items-center gap-2 text-[10px] text-white/20 font-bold uppercase tracking-[0.2em]">
+                      <div className="flex items-center gap-2 text-[10px] text-white/55 font-bold uppercase tracking-[0.2em]">
                         <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
                         ID: {tx.id.slice(0, 8).toUpperCase()}
                       </div>
                     </div>
 
                     <div>
-                      <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-[11px] font-bold text-white/30 uppercase tracking-widest group-hover:text-white group-hover:border-white/10 transition-all duration-500">
+                      <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-[11px] font-bold text-white/65 uppercase tracking-widest group-hover:text-white group-hover:border-white/10 transition-all duration-500">
                         <Tag className="w-3.5 h-3.5" />
                         {getCategoryName(tx.categoryId)}
                       </div>
@@ -306,9 +306,9 @@ export default function Transactions() {
                     <div>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center">
-                          <WalletIcon className="w-4.5 h-4.5 text-white/10" />
+                          <WalletIcon className="w-4.5 h-4.5 text-white/45" />
                         </div>
-                        <span className="text-xs font-bold text-white/30 group-hover:text-white/50 transition-colors">{getAccountName(tx.accountId)}</span>
+                        <span className="text-xs font-bold text-white/65 group-hover:text-white/78 transition-colors">{getAccountName(tx.accountId)}</span>
                       </div>
                     </div>
 
