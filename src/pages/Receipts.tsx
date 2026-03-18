@@ -4,7 +4,7 @@ import { useAuth } from '../components/AuthProvider';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { AddReceiptModal } from '../components/modals/AddReceiptModal';
-import { formatCurrency, cn } from '../lib/utils';
+import { cn, formatCurrency, formatCurrencyShort } from "../lib/utils";
 import { motion } from 'framer-motion';
 
 export default function Receipts() {
@@ -22,9 +22,15 @@ export default function Receipts() {
     return () => unsubscribe();
   }, [user]);
 
-  const filteredReceipts = receipts.filter(r => 
-    r.merchant?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredReceipts = receipts.filter(r => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r.merchant?.toLowerCase().includes(q) ||
+      String(r.amount || '').includes(q) ||
+      (r.date || '').toLowerCase().includes(q) ||
+      (r.category || '').toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="space-y-24 pb-32">
@@ -35,12 +41,12 @@ export default function Receipts() {
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-[1px] bg-white/20" />
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Digital Archive</p>
+            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Your Receipts</p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <h1 className="text-6xl md:text-8xl font-display font-bold text-white tracking-tighter leading-[0.85] uppercase">
               Expense<br />
-              <span className="text-emerald-400">Ledger</span>
+              <span className="text-emerald-400">Transactions</span>
             </h1>
             <button 
               onClick={() => setIsModalOpen(true)}
@@ -48,7 +54,7 @@ export default function Receipts() {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
               <Camera className="w-4 h-4" />
-              Capture Receipt
+              Upload Receipt
             </button>
           </div>
         </div>
@@ -57,9 +63,9 @@ export default function Receipts() {
       {/* Summary Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         {[
-          { label: 'Total Scanned', value: receipts.reduce((sum, r) => sum + r.amount, 0), icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-500/10', accent: 'bg-emerald-500' },
-          { label: 'Monthly Volume', value: receipts.length, icon: FileText, color: 'text-blue-400', bg: 'bg-blue-500/10', accent: 'bg-blue-500', isCurrency: false },
-          { label: 'Audit Readiness', value: '100%', icon: ReceiptIcon, color: 'text-brand', bg: 'bg-brand/10', accent: 'bg-brand', isCurrency: false },
+          { label: 'Total Amount', value: filteredReceipts.reduce((sum, r) => sum + (r.amount || 0), 0), icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-500/10', accent: 'bg-emerald-500' },
+          { label: 'This Month', value: receipts.filter(r => { const d = new Date(r.date); const now = new Date(); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); }).length, icon: FileText, color: 'text-blue-400', bg: 'bg-blue-500/10', accent: 'bg-blue-500', isCurrency: false },
+          { label: 'Matching Receipts', value: filteredReceipts.length, icon: ReceiptIcon, color: 'text-brand', bg: 'bg-brand/10', accent: 'bg-brand', isCurrency: false },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -73,7 +79,7 @@ export default function Receipts() {
               <div className="space-y-4">
                 <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">{stat.label}</p>
                 <h3 className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">
-                  {stat.isCurrency === false ? stat.value : (typeof stat.value === 'number' ? formatCurrency(stat.value) : stat.value)}
+                  {stat.isCurrency === false ? stat.value : (typeof stat.value === 'number' ? formatCurrencyShort(stat.value) : stat.value)}
                 </h3>
               </div>
               <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border border-white/[0.05] shadow-2xl transition-all duration-500 group-hover:scale-110", stat.bg, stat.color)}>
@@ -91,7 +97,7 @@ export default function Receipts() {
         </div>
         <input
           type="text"
-          placeholder="Search merchants, dates, or amounts..."
+          placeholder="Search by shop name, amount, date or category..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-16 pr-8 py-6 bg-white/[0.01] border border-white/[0.03] rounded-[32px] text-base text-white placeholder:text-white/10 focus:outline-none focus:border-emerald-500/30 focus:bg-white/[0.03] transition-all duration-500 shadow-2xl"
@@ -105,8 +111,8 @@ export default function Receipts() {
             <div className="w-28 h-28 rounded-[40px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-10 shadow-2xl">
               <ReceiptIcon className="w-12 h-12 text-white/5" />
             </div>
-            <h3 className="text-3xl font-display font-bold text-white mb-4">No Records Found</h3>
-            <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Your digital archive is currently empty. Capture your first receipt to begin building your financial history.</p>
+            <h3 className="text-3xl font-display font-bold text-white mb-4">No Receipts Yet</h3>
+            <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Upload your first receipt to start keeping track.</p>
           </div>
         </div>
       ) : (
@@ -143,9 +149,9 @@ export default function Receipts() {
                 <div className="space-y-8">
                   <div className="flex justify-between items-end">
                     <div className="space-y-3">
-                      <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Transaction Amount</p>
+                      <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Amount</p>
                       <p className="text-5xl font-display font-bold text-white tracking-tighter tabular-nums">
-                        {formatCurrency(receipt.amount)}
+                        {formatCurrencyShort(receipt.amount)}
                       </p>
                     </div>
                     <div className="text-right space-y-2">

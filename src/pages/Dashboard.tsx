@@ -1,12 +1,12 @@
 import React from "react";
 import { ArrowUpRight, ArrowDownRight, Wallet, Loader2, CreditCard, Trophy, TrendingUp, Receipt, TrendingDown, PieChart } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
-import { formatCurrency, cn } from "../lib/utils";
+import { cn, formatCurrency, formatCurrencyShort } from "../lib/utils";
 import { motion } from "framer-motion";
 import { useTransactions, useAccounts, useCategories, useSubscriptions, useAchievements } from "../lib/hooks/useFinanceData";
 import { Link } from "react-router-dom";
 
-function SummaryCard({ title, amount, icon: Icon, trend, color, trendLabel }: { title: string, amount: number, icon: any, trend?: number, color: string, trendLabel?: string }) {
+function SummaryCard({ title, amount, icon: Icon, trend, color, trendLabel }: { title: string, amount: number, icon: any, trend?: number | null, color: string, trendLabel?: string }) {
   return (
     <motion.div 
       whileHover={{ y: -5, scale: 1.02 }}
@@ -26,10 +26,10 @@ function SummaryCard({ title, amount, icon: Icon, trend, color, trendLabel }: { 
                 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
                 : "bg-rose-500/10 text-rose-400 border-rose-500/20"
             )}>
-              {trend >= 0 ? 'â†‘' : 'â†“'} {Math.abs(trend)}%
+              {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%
             </div>
           )}
-          {trendLabel && !trend && (
+          {trendLabel && (trend === undefined || trend === null) && (
              <div className="px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest bg-white/5 text-white/40 border border-white/10">
                {trendLabel}
              </div>
@@ -39,7 +39,7 @@ function SummaryCard({ title, amount, icon: Icon, trend, color, trendLabel }: { 
         <div className="space-y-1">
           <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.2em]">{title}</p>
           <h3 className="text-3xl font-display font-bold text-white tracking-tight">
-            {formatCurrency(amount)}
+            {formatCurrencyShort(amount)}
           </h3>
         </div>
       </div>
@@ -67,7 +67,7 @@ export default function Dashboard() {
 
   const monthlyIncome = currentMonthTx
     .filter(tx => tx.type === 'income')
-    .reduce((sum, tx) => sum + tx.amount, 0);
+    .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
 
   const monthlyExpenses = currentMonthTx
     .filter(tx => tx.type === 'expense')
@@ -83,36 +83,42 @@ export default function Dashboard() {
 
   const prevMonthlyIncome = prevMonthTx
     .filter(tx => tx.type === 'income')
-    .reduce((sum, tx) => sum + tx.amount, 0);
+    .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
 
   const prevMonthlyExpenses = prevMonthTx
     .filter(tx => tx.type === 'expense')
     .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
 
-  const incomeTrend = prevMonthlyIncome === 0 ? 0 : Math.round(((monthlyIncome - prevMonthlyIncome) / prevMonthlyIncome) * 100);
-  const expenseTrend = prevMonthlyExpenses === 0 ? 0 : Math.round(((monthlyExpenses - prevMonthlyExpenses) / prevMonthlyExpenses) * 100);
+  // Only compute trend when there IS previous data; null = no prev data
+  const incomeTrend = prevMonthlyIncome === 0 ? null : Math.round(((monthlyIncome - prevMonthlyIncome) / prevMonthlyIncome) * 100);
+  const expenseTrend = prevMonthlyExpenses === 0 ? null : Math.round(((monthlyExpenses - prevMonthlyExpenses) / prevMonthlyExpenses) * 100);
   
   // Calculate a mock efficiency based on budget adherence if budgets existed, 
   // but for now let's use a ratio of income to expenses
-  const efficiency = monthlyIncome > 0 ? Math.min(Math.round((1 - (monthlyExpenses / monthlyIncome)) * 100), 100) : 0;
-  const liquidityIndex = totalBalance > 0 ? Math.min(Math.round((monthlyIncome / (monthlyExpenses || 1)) * 20 + 50), 100) : 0;
+  const efficiency = monthlyIncome > 0 ? Math.max(0, Math.min(Math.round((1 - (monthlyExpenses / monthlyIncome)) * 100), 100)) : 0;
+  // Score 0-100: ratio of income to expenses. 0 = no income or all spent, 100 = saving a lot.
+  const liquidityIndex = (monthlyIncome === 0 && monthlyExpenses === 0)
+    ? 0
+    : monthlyIncome === 0
+      ? 0  // spending with no income = worst score
+      : Math.min(100, Math.max(0, Math.round(((monthlyIncome - monthlyExpenses) / monthlyIncome) * 100)));
   const activeBars = Math.round((efficiency / 100) * 8);
 
   const last6Months = Array.from({ length: 6 }, (_, i) => {
     const d = new Date();
     d.setMonth(d.getMonth() - (5 - i));
-    return d.toLocaleString('default', { month: 'short' });
+    return { label: d.toLocaleString('default', { month: 'short' }), month: d.getMonth(), year: d.getFullYear() };
   });
 
-  const chartData = last6Months.map(month => {
+  const chartData = last6Months.map(({ label, month, year }) => {
     const monthTxs = transactions.filter(tx => {
       const d = new Date(tx.date);
-      return d.toLocaleString('default', { month: 'short' }) === month;
+      return d.getMonth() === month && d.getFullYear() === year;
     });
     
     return {
-      name: month,
-      income: monthTxs.filter(tx => tx.type === 'income').reduce((sum, tx) => sum + tx.amount, 0),
+      name: label,
+      income: monthTxs.filter(tx => tx.type === 'income').reduce((sum, tx) => sum + Math.abs(tx.amount), 0),
       expenses: monthTxs.filter(tx => tx.type === 'expense').reduce((sum, tx) => sum + Math.abs(tx.amount), 0),
     };
   });
@@ -135,17 +141,17 @@ export default function Dashboard() {
         <div className="relative z-10 space-y-10">
           <div className="flex items-center gap-6">
             <div className="w-16 h-[1px] bg-white/10" />
-            <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.6em]">Executive Intelligence</p>
+            <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.6em]">Your Money Overview</p>
           </div>
           
           <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-12">
             <div className="space-y-4">
               <h1 className="text-7xl md:text-9xl font-display font-bold text-white tracking-tighter leading-[0.8] uppercase">
-                Financial<br />
-                <span className="text-brand italic serif">Architecture</span>
+                Your<br />
+                <span className="text-brand italic serif">Dashboard</span>
               </h1>
               <p className="text-lg text-white/40 font-light max-w-xl leading-relaxed tracking-tight">
-                A comprehensive overview of your global capital allocation, liquidity velocity, and strategic asset distribution.
+                See all your money in one place — what you have, spend, and earn.
               </p>
             </div>
 
@@ -153,7 +159,7 @@ export default function Dashboard() {
               <div className="p-8 rounded-[40px] bg-white/[0.02] border border-white/[0.05] backdrop-blur-3xl shadow-2xl relative group overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-brand/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="relative z-10">
-                  <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.3em] mb-4">Portfolio Integrity</p>
+                  <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.3em] mb-4">Your Finances</p>
                   <div className="flex items-center gap-6">
                     <div className="flex gap-1.5">
                       {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
@@ -186,13 +192,13 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7 space-y-8">
             <div className="space-y-2">
-              <p className="text-[11px] font-bold text-brand uppercase tracking-[0.4em]">Consolidated Net Worth</p>
+              <p className="text-[11px] font-bold text-brand uppercase tracking-[0.4em]">Total Balance</p>
               <h2 className="text-7xl md:text-8xl font-display font-bold text-white tracking-tighter tabular-nums">
-                {formatCurrency(totalBalance)}
+                {formatCurrencyShort(totalBalance)}
               </h2>
             </div>
             <div className="flex flex-wrap gap-4">
-              {transactions.length > 0 && (
+              {incomeTrend !== null && (
                 <div className={cn(
                   "px-6 py-3 rounded-2xl border flex items-center gap-3",
                   incomeTrend >= 0 ? "bg-emerald-500/10 border-emerald-500/20" : "bg-rose-500/10 border-rose-500/20"
@@ -205,7 +211,7 @@ export default function Dashboard() {
               )}
               <div className="px-6 py-3 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center gap-3">
                 <TrendingUp className="w-5 h-5 text-white/40" />
-                <span className="text-sm font-bold text-white/60">Peak: <span className="text-white ml-1">{formatCurrency(totalBalance)}</span></span>
+                <span className="text-sm font-bold text-white/60">Net this month: <span className="text-white ml-1">{formatCurrencyShort(monthlyIncome - monthlyExpenses)}</span></span>
               </div>
             </div>
           </div>
@@ -214,14 +220,14 @@ export default function Dashboard() {
               <div className="absolute top-0 right-0 w-64 h-64 bg-brand/10 rounded-full blur-[100px] -mr-32 -mt-32" />
               <div className="relative z-10 space-y-8">
                 <div className="flex justify-between items-center">
-                  <h4 className="text-[11px] font-bold text-white/30 uppercase tracking-[0.3em]">Liquidity Index</h4>
+                  <h4 className="text-[11px] font-bold text-white/30 uppercase tracking-[0.3em]">Spending Health</h4>
                   <CreditCard className="w-5 h-5 text-white/20" />
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-end">
                     <span className="text-4xl font-display font-bold text-white">{liquidityIndex}</span>
                     <span className="text-[10px] font-bold text-brand uppercase tracking-widest mb-1">
-                      {liquidityIndex > 70 ? 'High Liquidity' : liquidityIndex > 40 ? 'Moderate' : 'Low Liquidity'}
+                      {liquidityIndex > 70 ? 'Healthy' : liquidityIndex > 40 ? 'Moderate' : 'Watch Out'}
                     </span>
                   </div>
                   <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
@@ -234,7 +240,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <p className="text-xs text-white/30 leading-relaxed">
-                  Your current cash-to-asset ratio allows for immediate strategic deployment into emerging market opportunities.
+                  {liquidityIndex > 70 ? 'Your spending looks healthy. Keep it up!' : liquidityIndex > 40 ? 'Watch your spending — it is getting close to your income.' : liquidityIndex === 0 ? 'Add transactions to see your spending health.' : 'You are spending more than you earn. Try to cut back.'}
                 </p>
               </div>
             </div>
@@ -245,24 +251,24 @@ export default function Dashboard() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         <SummaryCard 
-          title="Consolidated Assets" 
+          title="Total Balance" 
           amount={totalBalance} 
           icon={Wallet} 
           trend={undefined}
           color="bg-emerald-500"
         />
         <SummaryCard 
-          title="Monthly Inflow" 
+          title="Money In This Month" 
           amount={monthlyIncome} 
           icon={TrendingUp} 
-          trend={incomeTrend || undefined}
+          trend={incomeTrend}
           color="bg-blue-500"
         />
         <SummaryCard 
-          title="Monthly Outflow" 
+          title="Money Out This Month" 
           amount={monthlyExpenses} 
           icon={TrendingDown} 
-          trend={expenseTrend || undefined}
+          trend={expenseTrend}
           color="bg-rose-500"
         />
       </div>
@@ -274,17 +280,17 @@ export default function Dashboard() {
           <div className="relative z-10">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8 mb-16">
               <div>
-                <h3 className="text-3xl font-display font-bold text-white tracking-tight">Capital Velocity</h3>
-                <p className="text-[11px] text-white/20 mt-2 uppercase tracking-[0.4em] font-bold">6-Month Strategic Analysis</p>
+                <h3 className="text-3xl font-display font-bold text-white tracking-tight">Monthly Overview</h3>
+                <p className="text-[11px] text-white/20 mt-2 uppercase tracking-[0.4em] font-bold">Last 6 Months</p>
               </div>
               <div className="flex gap-8 p-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-xl">
                 <div className="flex items-center gap-3 px-4 py-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-brand shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-                  <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Inflow</span>
+                  <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Money In</span>
                 </div>
                 <div className="flex items-center gap-3 px-4 py-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
-                  <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Outflow</span>
+                  <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Money Out</span>
                 </div>
               </div>
             </div>
@@ -352,17 +358,25 @@ export default function Dashboard() {
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[100px] -ml-32 -mb-32" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-12">
-              <h3 className="text-3xl font-display font-bold text-white tracking-tight">Sector Allocation</h3>
+              <h3 className="text-3xl font-display font-bold text-white tracking-tight">Spending by Category</h3>
               <div className="w-12 h-12 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center group-hover:bg-white/5 transition-colors">
                 <PieChart className="w-6 h-6 text-white/30" />
               </div>
             </div>
           <div className="space-y-8">
             {monthlyExpenses > 0 ? (
-              categories.slice(0, 5).map((cat, i) => {
-                const amount = transactions
-                  .filter(tx => tx.categoryId === cat.id && tx.type === 'expense')
-                  .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+              [...categories]
+                .map(cat => ({
+                  ...cat,
+                  amount: currentMonthTx
+                    .filter(tx => tx.categoryId === cat.id && tx.type === 'expense')
+                    .reduce((sum, tx) => sum + Math.abs(tx.amount), 0)
+                }))
+                .filter(cat => cat.amount > 0)
+                .sort((a, b) => b.amount - a.amount)
+                .slice(0, 5)
+                .map((cat, i) => {
+                const amount = cat.amount;
                 const total = monthlyExpenses || 1;
                 const percentage = Math.round((amount / total) * 100);
                 
@@ -389,7 +403,7 @@ export default function Dashboard() {
               })
             ) : (
               <div className="py-12 text-center border border-dashed border-white/5 rounded-3xl">
-                <p className="text-xs text-white/10 font-bold uppercase tracking-[0.2em]">No Allocation Data</p>
+                <p className="text-xs text-white/10 font-bold uppercase tracking-[0.2em]">No Data Yet</p>
               </div>
             )}
           </div>
@@ -397,11 +411,11 @@ export default function Dashboard() {
           <div className="mt-12 p-8 rounded-3xl bg-white/[0.01] border border-white/[0.03] relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-brand/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             <div className="relative z-10">
-              <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em] mb-3">Strategic Insight</p>
+              <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em] mb-3">Tip</p>
               <p className="text-xs text-white/40 leading-relaxed italic">
                 {transactions.length > 0 
-                  ? `"Your capital velocity is currently ${efficiency > 70 ? 'optimized' : 'stabilizing'}. Maintaining this trajectory will accelerate your long-term wealth accumulation goals."`
-                  : '"Begin recording your financial movements to generate personalized strategic insights and capital velocity analysis."'
+                  ? `Your spending is ${efficiency > 70 ? 'under control' : 'a bit high this month'}. Keep tracking to reach your goals.`
+                  : 'Add your first transaction to see tips here.'
                 }
               </p>
             </div>
@@ -416,7 +430,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-center mb-10">
             <div>
               <h3 className="text-2xl font-display font-bold text-white tracking-tight">Recent Activity</h3>
-              <p className="text-[10px] text-white/20 mt-1 uppercase tracking-[0.3em] font-bold">Latest Ledger Entries</p>
+              <p className="text-[10px] text-white/20 mt-1 uppercase tracking-[0.3em] font-bold">Recent Transactions</p>
             </div>
             <Link to="/transactions" className="px-6 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] hover:bg-white/[0.05] hover:text-white transition-all duration-500">View All</Link>
           </div>
@@ -441,7 +455,7 @@ export default function Dashboard() {
                   "text-base font-mono font-bold tracking-tight",
                   tx.type === 'income' ? "text-brand" : "text-white/60 group-hover:text-white/90 transition-all duration-500"
                 )}>
-                  {tx.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(tx.amount))}
+                  {tx.type === 'income' ? '+' : '-'}{formatCurrencyShort(Math.abs(tx.amount))}
                 </p>
               </div>
             ))}
@@ -453,8 +467,8 @@ export default function Dashboard() {
           <div className="p-10 rounded-[48px] bg-gradient-to-br from-[#0f0f0f] to-[#050505] border border-white/[0.03] shadow-[0_30px_60px_rgba(0,0,0,0.3)]">
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h3 className="text-2xl font-display font-bold text-white tracking-tight">Upcoming Obligations</h3>
-                <p className="text-[10px] text-white/20 mt-1 uppercase tracking-[0.3em] font-bold">Subscription Management</p>
+                <h3 className="text-2xl font-display font-bold text-white tracking-tight">Upcoming Charges</h3>
+                <p className="text-[10px] text-white/20 mt-1 uppercase tracking-[0.3em] font-bold">Subscriptions</p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center">
                 <CreditCard className="w-5 h-5 text-white/20" />
@@ -469,15 +483,29 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <p className="text-sm font-bold text-white/80 group-hover:text-white transition-all duration-500">{sub.name}</p>
-                      <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.2em] mt-1.5">Due in {Math.ceil((new Date(sub.nextBillingDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days</p>
+                      <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.2em] mt-1.5">{(() => {
+  const start = new Date(sub.startDate);
+  const origDay = start.getDate();
+  const now = new Date(); now.setHours(0,0,0,0);
+  let s = new Date(start);
+  while(s <= now) {
+    if(sub.frequency === 'yearly') { s.setFullYear(s.getFullYear()+1); }
+    else if(sub.frequency === 'weekly') { s.setDate(s.getDate()+7); }
+    else { s.setMonth(s.getMonth()+1); }
+    const maxD = new Date(s.getFullYear(), s.getMonth()+1, 0).getDate();
+    s.setDate(Math.min(origDay, maxD));
+  }
+  const days = Math.ceil((s.getTime() - now.getTime())/(1000*60*60*24));
+  return days <= 0 ? 'Due today' : `Due in ${days} day${days===1?'':'s'}`;
+})()}</p>
                     </div>
                   </div>
-                  <p className="text-base font-mono font-bold text-white/60 group-hover:text-white transition-all duration-500 tracking-tight">{formatCurrency(sub.amount)}</p>
+                  <p className="text-base font-mono font-bold text-white/60 group-hover:text-white transition-all duration-500 tracking-tight">{formatCurrencyShort(sub.amount)}</p>
                 </div>
               ))}
               {subscriptions.length === 0 && (
                 <div className="text-center py-12 border border-dashed border-white/5 rounded-3xl">
-                  <p className="text-xs text-white/10 font-bold uppercase tracking-[0.2em]">No Obligations Detected</p>
+                  <p className="text-xs text-white/10 font-bold uppercase tracking-[0.2em]">No subscriptions yet</p>
                 </div>
               )}
             </div>
@@ -489,7 +517,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between mb-10">
                 <div>
                   <h3 className="text-2xl font-display font-bold text-white tracking-tight">Milestones</h3>
-                  <p className="text-[10px] text-white/20 mt-1 uppercase tracking-[0.3em] font-bold">Financial Achievements</p>
+                  <p className="text-[10px] text-white/20 mt-1 uppercase tracking-[0.3em] font-bold">Achievements</p>
                 </div>
                 <Trophy className="w-8 h-8 text-brand/40 group-hover:text-brand transition-colors duration-700" />
               </div>
@@ -508,7 +536,7 @@ export default function Dashboard() {
                   </motion.div>
                 ))}
                 {achievements.length === 0 && (
-                  <p className="text-xs text-white/10 font-bold uppercase tracking-[0.2em] italic py-4">Begin your journey to earn recognition</p>
+                  <p className="text-xs text-white/10 font-bold uppercase tracking-[0.2em] italic py-4">Complete goals to earn badges</p>
                 )}
               </div>
             </div>

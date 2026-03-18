@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Wallet, Plus, Loader2, Trash2, Building2, CreditCard, Landmark, Coins } from "lucide-react";
-import { formatCurrency, cn } from "../lib/utils";
+import { cn, formatCurrency, formatCurrencyShort } from "../lib/utils";
 import { useAccounts } from "../lib/hooks/useFinanceData";
 import { AddAccountModal } from "../components/modals/AddAccountModal";
 import { doc, deleteDoc } from "firebase/firestore";
@@ -42,12 +42,12 @@ export default function Accounts() {
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-[1px] bg-white/20" />
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Portfolio Management</p>
+            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Your Accounts</p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <h1 className="text-6xl md:text-8xl font-display font-bold text-white tracking-tighter leading-[0.85] uppercase">
               Financial<br />
-              <span className="text-brand">Ecosystem</span>
+              <span className="text-brand">Accounts</span>
             </h1>
             <button 
               onClick={() => setIsModalOpen(true)}
@@ -55,7 +55,7 @@ export default function Accounts() {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
               <Plus className="w-4 h-4" />
-              Establish Account
+              Add Account
             </button>
           </div>
         </div>
@@ -64,9 +64,25 @@ export default function Accounts() {
       {/* Portfolio Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         {[
-          { label: 'Total Net Worth', value: accounts.reduce((sum, acc) => sum + acc.balance, 0), icon: Landmark, color: 'text-brand', bg: 'bg-brand/10', accent: 'bg-brand' },
-          { label: 'Liquid Assets', value: accounts.filter(a => a.type !== 'investment').reduce((sum, acc) => sum + acc.balance, 0), icon: Coins, color: 'text-blue-400', bg: 'bg-blue-400/10', accent: 'bg-blue-500' },
-          { label: 'Total Liabilities', value: accounts.filter(a => a.balance < 0).reduce((sum, acc) => sum + Math.abs(acc.balance), 0), icon: CreditCard, color: 'text-rose-400', bg: 'bg-rose-400/10', accent: 'bg-rose-500' },
+          { label: 'Total Balance', value: accounts.reduce((sum, acc) => sum + acc.balance, 0), icon: Landmark, color: 'text-brand', bg: 'bg-brand/10', accent: 'bg-brand' },
+          {
+            // Available Money = cash/checking/savings/bank with positive balance only
+            label: 'Available Money',
+            value: accounts
+              .filter(a => ['cash', 'checking', 'savings', 'bank'].includes(a.type) && a.balance > 0)
+              .reduce((sum, acc) => sum + acc.balance, 0),
+            icon: Coins, color: 'text-blue-400', bg: 'bg-blue-400/10', accent: 'bg-blue-500'
+          },
+          {
+            // Money Owed = debt accounts (balance = amount owed) + any negative-balance accounts
+            label: 'Money Owed',
+            value: accounts.reduce((sum, acc) => {
+              if (acc.type === 'debt') return sum + Math.max(0, acc.balance); // debt: positive balance = owed
+              if (acc.balance < 0) return sum + Math.abs(acc.balance); // overdraft / credit card in debt
+              return sum;
+            }, 0),
+            icon: CreditCard, color: 'text-rose-400', bg: 'bg-rose-400/10', accent: 'bg-rose-500'
+          },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -80,7 +96,7 @@ export default function Accounts() {
               <div className="space-y-4">
                 <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">{stat.label}</p>
                 <h3 className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">
-                  {formatCurrency(stat.value)}
+                  {formatCurrencyShort(stat.value)}
                 </h3>
               </div>
               <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border border-white/[0.05] shadow-2xl transition-all duration-500 group-hover:scale-110", stat.bg, stat.color)}>
@@ -102,8 +118,8 @@ export default function Accounts() {
             <div className="w-28 h-28 rounded-[40px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-10 shadow-2xl">
               <Wallet className="w-12 h-12 text-white/5" />
             </div>
-            <h3 className="text-3xl font-display font-bold text-white mb-4">No Accounts Found</h3>
-            <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Add your first account to start tracking your net worth and cash flow.</p>
+            <h3 className="text-3xl font-display font-bold text-white mb-4">No Accounts Yet</h3>
+            <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Add your first account to start tracking your money.</p>
           </div>
         </div>
       ) : (
@@ -145,17 +161,17 @@ export default function Accounts() {
                   <div className="space-y-8">
                     <div className="flex justify-between items-end">
                       <div className="space-y-3">
-                        <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Available Balance</p>
+                        <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Current Balance</p>
                         <p className={cn(
                           "text-5xl font-display font-bold tracking-tighter tabular-nums",
                           account.balance < 0 ? 'text-rose-400' : 'text-white'
                         )}>
-                          {formatCurrency(account.balance)}
+                          {formatCurrencyShort(account.balance)}
                         </p>
                       </div>
                       <div className="text-right space-y-2">
                         <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Account ID</p>
-                        <p className="text-[11px] font-mono text-white/30 tracking-widest">•••• {Math.floor(Math.random() * 9000) + 1000}</p>
+                        <p className="text-[11px] font-mono text-white/30 tracking-widest">•••• {account.id.slice(-4).toUpperCase()}</p>
                       </div>
                     </div>
 
@@ -164,7 +180,7 @@ export default function Accounts() {
                         <div className="w-2 h-2 rounded-full bg-brand animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                         <span className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Active</span>
                       </div>
-                      <span className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em] italic">Last Sync: Just now</span>
+                      <span className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em] italic">Active</span>
                     </div>
                   </div>
                 </div>

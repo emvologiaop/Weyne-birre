@@ -72,7 +72,9 @@ export default function Settings() {
     monthlyIncomeGoal: 0,
     netWorthTarget: 0,
     currency: "ETB",
-    theme: "dark"
+    theme: "dark",
+    emailNotifications: true,
+    budgetAlerts: true,
   });
 
   useEffect(() => {
@@ -84,7 +86,9 @@ export default function Settings() {
         monthlyIncomeGoal: profile.monthlyIncomeGoal || 0,
         netWorthTarget: profile.netWorthTarget || 0,
         currency: profile.currency || "ETB",
-        theme: profile.theme || "dark"
+        theme: profile.theme || "dark",
+        emailNotifications: profile.emailNotifications !== false,
+        budgetAlerts: profile.budgetAlerts !== false,
       });
     }
   }, [profile]);
@@ -110,7 +114,9 @@ export default function Settings() {
         monthlyIncomeGoal: formData.monthlyIncomeGoal,
         netWorthTarget: formData.netWorthTarget,
         currency: formData.currency,
-        theme: formData.theme
+        theme: formData.theme,
+        emailNotifications: formData.emailNotifications,
+        budgetAlerts: formData.budgetAlerts,
       });
       toast.success("Settings saved successfully");
     } catch (error) {
@@ -172,12 +178,12 @@ export default function Settings() {
             <div className="w-1.5 h-8 bg-brand rounded-full shadow-[0_0_15px_rgba(16,185,129,0.4)]" />
             <h2 className="text-4xl font-display font-bold text-white tracking-tight">Settings</h2>
           </div>
-          <p className="text-[10px] text-white/20 uppercase tracking-[0.4em] font-bold ml-4">System Configuration & Identity</p>
+          <p className="text-[10px] text-white/20 uppercase tracking-[0.4em] font-bold ml-4">Manage your account and app settings</p>
         </div>
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="group relative flex items-center justify-center gap-3 px-10 py-4.5 rounded-[24px] bg-white text-black text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-brand hover:text-white transition-all duration-500 shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 overflow-hidden"
+          className="group relative flex items-center justify-center gap-3 px-10 py-4 rounded-[24px] bg-white text-black text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-brand hover:text-white transition-all duration-500 shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 overflow-hidden"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-brand/20 to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="relative z-10 flex items-center gap-3">
@@ -202,7 +208,7 @@ export default function Settings() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "w-full flex items-center justify-between px-6 py-4.5 rounded-[22px] text-[10px] font-bold uppercase tracking-[0.25em] transition-all duration-500 group relative overflow-hidden",
+                    "w-full flex items-center justify-between px-6 py-4 rounded-[22px] text-[10px] font-bold uppercase tracking-[0.25em] transition-all duration-500 group relative overflow-hidden",
                     isActive 
                       ? "text-brand" 
                       : "text-white/20 hover:text-white/60"
@@ -332,7 +338,7 @@ export default function Settings() {
                     <div className="space-y-4 group">
                       <label className="text-[10px] font-bold text-white/10 group-focus-within:text-brand uppercase tracking-[0.3em] ml-1 transition-colors">Net Worth Target</label>
                       <div className="relative">
-                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-white/10 font-bold text-xs">$</span>
+                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-white/10 font-bold text-xs">Br</span>
                         <input 
                           type="number" 
                           name="netWorthTarget"
@@ -367,9 +373,6 @@ export default function Settings() {
                           className="w-full sm:w-48 px-8 py-4 bg-white/[0.02] border border-white/[0.05] rounded-[20px] text-white font-bold text-xs focus:outline-none focus:border-brand/40 transition-all shadow-2xl appearance-none"
                         >
                           <option value="ETB">ETB (Br)</option>
-                          <option value="USD">USD ($)</option>
-                          <option value="EUR">EUR (€)</option>
-                          <option value="GBP">GBP (£)</option>
                         </select>
                         <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 rotate-90 pointer-events-none" />
                       </div>
@@ -386,12 +389,12 @@ export default function Settings() {
                         </div>
                       </div>
                       <div className="flex bg-white/[0.01] border border-white/[0.05] rounded-[20px] p-1.5 shadow-inner w-full sm:w-auto">
-                        {['dark', 'light', 'system'].map((t) => (
+                        {(['dark', 'light', 'system'] as const).map((t) => (
                           <button 
                             key={t}
                             onClick={() => setFormData(prev => ({ ...prev, theme: t as any }))}
                             className={cn(
-                              "flex-1 sm:flex-none px-8 py-3 rounded-[16px] text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500",
+                              "flex-1 sm:flex-none px-8 py-3 rounded-[16px] text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500 capitalize",
                               formData.theme === t 
                                 ? "bg-white/[0.05] text-white shadow-[0_10px_20px_rgba(0,0,0,0.2)]" 
                                 : "text-white/10 hover:text-white/30"
@@ -416,11 +419,11 @@ export default function Settings() {
                         </div>
                         <div>
                           <h4 className="text-2xl font-display font-bold text-white tracking-tight">Email Summaries</h4>
-                          <p className="text-sm text-white/30 mt-1">Monthly financial performance reports</p>
+                          <p className="text-sm text-white/30 mt-1">Get a summary of your spending each month</p>
                         </div>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer group">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                        <input type="checkbox" className="sr-only peer" checked={formData.emailNotifications} onChange={(e) => setFormData(f => ({...f, emailNotifications: e.target.checked}))} />
                         <div className="w-16 h-8 bg-white/[0.03] border border-white/[0.05] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-8 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/10 after:rounded-full after:h-[24px] after:w-[24px] after:transition-all duration-500 peer-checked:bg-brand peer-checked:after:bg-black peer-checked:after:opacity-100 shadow-inner"></div>
                       </label>
                     </div>
@@ -432,11 +435,11 @@ export default function Settings() {
                         </div>
                         <div>
                           <h4 className="text-2xl font-display font-bold text-white tracking-tight">Budget Thresholds</h4>
-                          <p className="text-sm text-white/30 mt-1">Alerts when spending exceeds 80%</p>
+                          <p className="text-sm text-white/30 mt-1">Get alerted when you are close to your budget limit</p>
                         </div>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer group">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                        <input type="checkbox" className="sr-only peer" checked={formData.budgetAlerts} onChange={(e) => setFormData(f => ({...f, budgetAlerts: e.target.checked}))} />
                         <div className="w-16 h-8 bg-white/[0.03] border border-white/[0.05] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-8 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/10 after:rounded-full after:h-[24px] after:w-[24px] after:transition-all duration-500 peer-checked:bg-brand peer-checked:after:bg-black peer-checked:after:opacity-100 shadow-inner"></div>
                       </label>
                     </div>
@@ -455,8 +458,8 @@ export default function Settings() {
                           <RefreshCw className="w-10 h-10" />
                         </div>
                         <div>
-                          <h4 className="text-3xl font-display font-bold text-white tracking-tight">Initialize Defaults</h4>
-                          <p className="text-sm text-white/30 mt-1">Populate account with standard categories</p>
+                          <h4 className="text-3xl font-display font-bold text-white tracking-tight">Load Default Categories & Accounts</h4>
+                          <p className="text-sm text-white/30 mt-1">Quickly fill in standard categories and accounts</p>
                         </div>
                       </div>
                       <p className="text-base text-white/40 mb-12 leading-relaxed max-w-2xl">
@@ -472,7 +475,7 @@ export default function Settings() {
                         ) : (
                           <Database className="w-4 h-4" />
                         )}
-                        Initialize Data Ecosystem
+                        Load Default Categories
                       </button>
                     </div>
                   </div>
@@ -490,12 +493,12 @@ export default function Settings() {
                           <Smartphone className="w-10 h-10" />
                         </div>
                         <div>
-                          <h4 className="text-3xl font-display font-bold text-white tracking-tight">Native Experience</h4>
-                          <p className="text-sm text-white/30 mt-1">Install ወይኔ ብሬ as a standalone application</p>
+                          <h4 className="text-3xl font-display font-bold text-white tracking-tight">Install the App</h4>
+                          <p className="text-sm text-white/30 mt-1">Add ወይኔ ብሬ to your home screen</p>
                         </div>
                       </div>
                       <p className="text-base text-white/40 mb-12 leading-relaxed max-w-2xl">
-                        Elevate your financial tracking by installing the application directly on your device. Experience full-screen immersion, instant offline access, and optimized performance.
+                        Install the app on your phone or desktop for a better experience and quick access.
                       </p>
                       <button 
                         onClick={handleInstall}
@@ -521,7 +524,7 @@ export default function Settings() {
                         {isOfflineReady ? 'Ready for Offline' : 'Syncing Data...'}
                       </p>
                       <p className="text-sm text-white/30 leading-relaxed">
-                        Your financial records are cached locally for seamless access even without an active connection.
+                        Your data is saved on this device so you can access it without internet.
                       </p>
                     </div>
 
@@ -542,7 +545,7 @@ export default function Settings() {
                         </button>
                       ) : (
                         <p className="text-sm text-white/30 leading-relaxed">
-                          You are currently running the latest version of the application ecosystem.
+                          You are on the latest version.
                         </p>
                       )}
                     </div>
@@ -574,7 +577,7 @@ export default function Settings() {
                         
                         <h4 className="text-2xl font-display font-bold text-rose-400 tracking-tight mb-4">Danger Zone</h4>
                         <p className="text-base text-rose-400/40 mb-10 leading-relaxed max-w-2xl">
-                          Permanently delete your account and all associated financial data. This action is irreversible and will purge all records from our secure servers.
+                          Permanently delete your account and all associated financial data. This action is irreversible and will delete all records from our our system.
                         </p>
                         <button className="px-10 py-5 rounded-[24px] bg-rose-500/10 text-rose-400 text-[11px] font-bold uppercase tracking-[0.25em] hover:bg-rose-500/20 transition-all duration-500 border border-rose-500/20 active:scale-95 shadow-2xl">
                           Delete Account

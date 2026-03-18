@@ -36,14 +36,14 @@ export default function Categories() {
         <div className="space-y-2">
           <div className="flex items-center gap-3 mb-2">
             <span className="px-3 py-1 rounded-full bg-brand/10 text-brand text-[10px] font-bold uppercase tracking-widest border border-brand/20">
-              Taxonomy & Organization
+              Categories
             </span>
           </div>
           <h2 className="text-5xl md:text-6xl font-display font-bold text-white tracking-tighter leading-none">
-            Financial <span className="text-brand italic">Categories</span>
+            Your <span className="text-brand italic">Categories</span>
           </h2>
           <p className="text-sm text-white/40 max-w-md font-medium leading-relaxed">
-            Define the structure of your financial universe. Organize every transaction with precision and clarity.
+            Group your transactions into categories to keep things organised.
           </p>
         </div>
         <button 
@@ -52,16 +52,16 @@ export default function Categories() {
         >
           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
           <Plus className="w-4 h-4" />
-          Define Category
+          Add Category
         </button>
       </div>
 
       {/* Summary Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: 'Total Classifications', value: categories.length, icon: Tag, color: 'brand' },
-          { label: 'Income Streams', value: incomeCategories, icon: Tag, color: 'brand' },
-          { label: 'Expense Channels', value: expenseCategories, icon: Tag, color: 'brand' },
+          { label: 'Total Categories', value: categories.length, icon: Tag, color: 'brand' },
+          { label: 'Income Types', value: incomeCategories, icon: Tag, color: 'brand' },
+          { label: 'Expense Types', value: expenseCategories, icon: Tag, color: 'brand' },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -96,8 +96,8 @@ export default function Categories() {
             <div className="w-20 h-20 rounded-3xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-6">
               <Tag className="w-10 h-10 opacity-20" />
             </div>
-            <p className="text-lg font-display font-bold text-white/40">No Classifications Found</p>
-            <p className="text-sm mt-2 font-medium">Initialize your first category to begin organization.</p>
+            <p className="text-lg font-display font-bold text-white/40">No Categories Yet</p>
+            <p className="text-sm mt-2 font-medium">Add your first category to get started.</p>
           </div>
         </div>
       ) : (

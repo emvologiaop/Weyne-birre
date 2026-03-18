@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Plus, Search, Filter, Loader2, Receipt, Trash2, Calendar, Tag, Wallet as WalletIcon, ChevronDown, X, TrendingUp, TrendingDown } from "lucide-react";
-import { formatCurrency, cn } from "../lib/utils";
+import { cn, formatCurrency, formatCurrencyShort } from "../lib/utils";
 import { useTransactions, useCategories, useAccounts } from "../lib/hooks/useFinanceData";
 import { AddTransactionModal } from "../components/modals/AddTransactionModal";
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc, increment } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { toast } from "sonner";
 import { handleFirestoreError, OperationType } from "../lib/firestore-errors";
@@ -23,28 +23,33 @@ export default function Transactions() {
     endDate: ""
   });
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
+  const handleDelete = async (id: string, tx: any, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
       await deleteDoc(doc(db, 'transactions', id));
-      toast.success('Transaction deleted successfully');
+      // Reverse the balance effect on the account
+      await updateDoc(doc(db, 'accounts', tx.accountId), {
+        balance: increment(-tx.amount)
+      });
+      toast.success('Transaction deleted');
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, 'transactions');
       toast.error('Failed to delete transaction');
     }
   };
 
-  const filteredTransactions = transactions.filter(tx => {
-    const matchesSearch = tx.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filters.category === "all" || tx.categoryId === filters.category;
-    const matchesAccount = filters.account === "all" || tx.accountId === filters.account;
-    const txDate = new Date(tx.date);
-    const matchesDate = 
-      (!filters.startDate || txDate >= new Date(filters.startDate)) &&
-      (!filters.endDate || txDate <= new Date(filters.endDate));
-      
-    return matchesSearch && matchesCategory && matchesAccount && matchesDate;
-  });
+  const filteredTransactions = transactions
+    .filter(tx => {
+      const matchesSearch = (tx.description || '').toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = filters.category === "all" || tx.categoryId === filters.category;
+      const matchesAccount = filters.account === "all" || tx.accountId === filters.account;
+      const txDate = new Date(tx.date);
+      const matchesDate =
+        (!filters.startDate || txDate >= new Date(filters.startDate)) &&
+        (!filters.endDate || txDate <= new Date(filters.endDate));
+      return matchesSearch && matchesCategory && matchesAccount && matchesDate;
+    })
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const getCategoryName = (categoryId: string) => {
     const cat = categories.find(c => c.id === categoryId);
@@ -65,19 +70,19 @@ export default function Transactions() {
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-[1px] bg-white/20" />
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Financial Records</p>
+            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Your Transactions</p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <h1 className="text-6xl md:text-8xl font-display font-bold text-white tracking-tighter leading-[0.85] uppercase">
               The<br />
-              <span className="text-brand">Ledger</span>
+              <span className="text-brand">Transactions</span>
             </h1>
             <div className="flex flex-col items-start md:items-end gap-4">
               <div className="px-6 py-3 rounded-2xl bg-white/[0.03] border border-white/[0.05] backdrop-blur-xl">
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mb-1">Total Volume</p>
+                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mb-1">Total Count</p>
                 <div className="flex items-center gap-3">
                   <span className="text-2xl font-display font-bold text-white">{transactions.length}</span>
-                  <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Entries</span>
+                  <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Transactions</span>
                 </div>
               </div>
             </div>
@@ -92,7 +97,7 @@ export default function Transactions() {
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-brand transition-colors" />
             <input 
               type="text" 
-              placeholder="Search ledger..." 
+              placeholder="Search transactions..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-14 pr-6 py-4 bg-white/[0.02] border border-white/[0.05] rounded-[24px] text-sm text-white placeholder:text-white/10 focus:outline-none focus:border-brand/30 focus:bg-white/[0.04] transition-all shadow-2xl"
@@ -117,7 +122,7 @@ export default function Transactions() {
           className="flex items-center justify-center gap-3 px-10 py-4 rounded-[24px] bg-white text-black text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-brand hover:text-white transition-all duration-500 shadow-[0_20px_40px_rgba(0,0,0,0.3)] active:scale-95"
         >
           <Plus className="w-4 h-4" />
-          New Entry
+          Add Transaction
         </button>
       </div>
 
@@ -125,24 +130,24 @@ export default function Transactions() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {[
           { 
-            label: "Period Inflow", 
-            value: filteredTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0), 
+            label: "Money In", 
+            value: filteredTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + Math.abs(t.amount), 0), 
             icon: TrendingUp, 
             color: "text-brand", 
             bg: "bg-brand/10",
             accent: "bg-brand"
           },
           { 
-            label: "Period Outflow", 
-            value: filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0), 
+            label: "Money Out", 
+            value: filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + Math.abs(t.amount), 0), 
             icon: TrendingDown, 
             color: "text-rose-400", 
             bg: "bg-rose-400/10",
             accent: "bg-rose-500"
           },
           { 
-            label: "Net Cash Flow", 
-            value: filteredTransactions.reduce((sum, t) => sum + (t.type === 'income' ? t.amount : -t.amount), 0), 
+            label: "Balance Change", 
+            value: filteredTransactions.reduce((sum, t) => sum + (t.type === 'income' ? Math.abs(t.amount) : -Math.abs(t.amount)), 0), 
             icon: WalletIcon, 
             color: "text-blue-400", 
             bg: "bg-blue-400/10",
@@ -161,7 +166,7 @@ export default function Transactions() {
               <div className="space-y-4">
                 <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">{stat.label}</p>
                 <h3 className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">
-                  {formatCurrency(Math.abs(stat.value))}
+                  {formatCurrencyShort(Math.abs(stat.value))}
                 </h3>
               </div>
               <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border border-white/[0.05] shadow-2xl transition-all duration-500 group-hover:scale-110", stat.bg, stat.color)}>
@@ -257,8 +262,8 @@ export default function Transactions() {
                 <div className="w-24 h-24 rounded-[40px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-8 shadow-2xl">
                   <Receipt className="w-10 h-10 text-white/5" />
                 </div>
-                <h3 className="text-3xl font-display font-bold text-white mb-4">No Records Found</h3>
-                <p className="text-sm text-white/20 max-w-xs leading-relaxed">Refine your search parameters or add a new entry to the ledger.</p>
+                <h3 className="text-3xl font-display font-bold text-white mb-4">No Transactions Yet</h3>
+                <p className="text-sm text-white/20 max-w-xs leading-relaxed">Try a different search or add a new transaction.</p>
               </div>
             ) : (
               filteredTransactions.map((tx) => (
@@ -284,10 +289,10 @@ export default function Transactions() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <p className="text-lg font-bold text-white group-hover:text-brand transition-colors duration-500">{tx.description}</p>
+                      <p className="text-lg font-bold text-white group-hover:text-brand transition-colors duration-500">{tx.description || tx.name || "Unnamed"}</p>
                       <div className="flex items-center gap-2 text-[10px] text-white/20 font-bold uppercase tracking-[0.2em]">
                         <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
-                        Reference ID: {tx.id.slice(0, 8).toUpperCase()}
+                        ID: {tx.id.slice(0, 8).toUpperCase()}
                       </div>
                     </div>
 
@@ -312,13 +317,13 @@ export default function Transactions() {
                         "text-2xl font-display font-bold tracking-tight tabular-nums",
                         tx.type === 'income' ? "text-brand" : "text-white/80 group-hover:text-white"
                       )}>
-                        {tx.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(tx.amount))}
+                        {tx.type === 'income' ? '+' : '-'}{formatCurrencyShort(Math.abs(tx.amount))}
                       </p>
                     </div>
 
                     <div className="flex justify-end">
                       <button
-                        onClick={(e) => handleDelete(tx.id, e)}
+                        onClick={(e) => handleDelete(tx.id, tx, e)}
                         className="p-4 rounded-2xl bg-rose-500/0 text-rose-500/0 hover:bg-rose-500/10 hover:text-rose-500 transition-all duration-500 opacity-0 group-hover:opacity-100"
                       >
                         <Trash2 className="w-5 h-5" />

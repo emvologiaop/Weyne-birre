@@ -4,7 +4,7 @@ import { useAuth } from '../components/AuthProvider';
 import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { toast } from 'sonner';
-import { formatCurrency, cn } from '../lib/utils';
+import { cn, formatCurrency, formatCurrencyShort } from "../lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
 import { AddSubscriptionModal } from '../components/modals/AddSubscriptionModal';
 
@@ -35,8 +35,36 @@ export default function Subscriptions() {
 
   const monthlyTotal = subscriptions.reduce((sum, sub) => {
     const amount = sub.amount || 0;
-    return sum + (sub.frequency === 'yearly' ? amount / 12 : amount);
+    if (sub.frequency === 'yearly') return sum + amount / 12;
+    if (sub.frequency === 'weekly') return sum + amount * 52 / 12;  // exact: 52 weeks / 12 months
+    return sum + amount; // monthly
   }, 0);
+
+  // Helper: compute the next billing date from a start date and frequency
+  const getNextBillingDate = (startDate: string, frequency: string): Date => {
+    const start = new Date(startDate);
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const originalDay = start.getDate(); // preserve original day-of-month
+    let next = new Date(start);
+    if (frequency === 'monthly') {
+      while (next <= now) {
+        next.setMonth(next.getMonth() + 1);
+        // Re-clamp to original day to prevent month-end drift (Jan 31 -> Feb 28 -> Mar 28 bug)
+        const maxDay = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
+        next.setDate(Math.min(originalDay, maxDay));
+      }
+    } else if (frequency === 'yearly') {
+      while (next <= now) {
+        next.setFullYear(next.getFullYear() + 1);
+        const maxDay = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
+        next.setDate(Math.min(originalDay, maxDay));
+      }
+    } else if (frequency === 'weekly') {
+      while (next <= now) next.setDate(next.getDate() + 7);
+    }
+    return next;
+  };
 
   return (
     <div className="space-y-24 pb-32">
@@ -47,12 +75,12 @@ export default function Subscriptions() {
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-[1px] bg-white/20" />
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Recurring Services</p>
+            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Your Subscriptions</p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <h1 className="text-6xl md:text-8xl font-display font-bold text-white tracking-tighter leading-[0.85] uppercase">
               Digital<br />
-              <span className="text-blue-400">Commitments</span>
+              <span className="text-blue-400">Subscriptions</span>
             </h1>
             <button 
               onClick={() => setIsModalOpen(true)}
@@ -60,7 +88,7 @@ export default function Subscriptions() {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
               <Plus className="w-4 h-4" />
-              Register Service
+              Add Subscription
             </button>
           </div>
         </div>
@@ -69,9 +97,9 @@ export default function Subscriptions() {
       {/* Subscription Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         {[
-          { label: 'Monthly Recurring', value: monthlyTotal, icon: TrendingUp, color: 'text-blue-400', bg: 'bg-blue-500/10', accent: 'bg-blue-500' },
-          { label: 'Annual Projected', value: monthlyTotal * 12, icon: Zap, color: 'text-brand', bg: 'bg-brand/10', accent: 'bg-brand' },
-          { label: 'Active Services', value: subscriptions.length, icon: CreditCard, color: 'text-rose-400', bg: 'bg-rose-500/10', accent: 'bg-rose-500', isCurrency: false },
+          { label: 'Monthly Cost', value: monthlyTotal, icon: TrendingUp, color: 'text-blue-400', bg: 'bg-blue-500/10', accent: 'bg-blue-500' },
+          { label: 'Yearly Cost', value: monthlyTotal * 12, icon: Zap, color: 'text-brand', bg: 'bg-brand/10', accent: 'bg-brand' },
+          { label: 'Total Active', value: subscriptions.length, icon: CreditCard, color: 'text-rose-400', bg: 'bg-rose-500/10', accent: 'bg-rose-500', isCurrency: false },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -85,7 +113,7 @@ export default function Subscriptions() {
               <div className="space-y-4">
                 <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">{stat.label}</p>
                 <h3 className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">
-                  {stat.isCurrency === false ? stat.value : formatCurrency(stat.value as number)}
+                  {stat.isCurrency === false ? stat.value : formatCurrencyShort(stat.value as number)}
                 </h3>
               </div>
               <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border border-white/[0.05] shadow-2xl transition-all duration-500 group-hover:scale-110", stat.bg, stat.color)}>
@@ -107,8 +135,8 @@ export default function Subscriptions() {
             <div className="w-28 h-28 rounded-[40px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-10 shadow-2xl">
               <CreditCard className="w-12 h-12 text-white/5" />
             </div>
-            <h3 className="text-3xl font-display font-bold text-white mb-4">No Subscriptions Found</h3>
-            <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Add your recurring services to start tracking your monthly overhead and identify optimization opportunities.</p>
+            <h3 className="text-3xl font-display font-bold text-white mb-4">No Subscriptions Yet</h3>
+            <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Add your recurring payments like Netflix, Spotify, or rent.</p>
           </div>
         </div>
       ) : (
@@ -151,14 +179,14 @@ export default function Subscriptions() {
                 <div className="space-y-8">
                   <div className="flex justify-between items-end">
                     <div className="space-y-3">
-                      <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Recurring Amount</p>
+                      <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Amount</p>
                       <p className="text-5xl font-display font-bold text-white tracking-tighter tabular-nums">
-                        {formatCurrency(sub.amount)}
+                        {formatCurrencyShort(sub.amount)}
                       </p>
                     </div>
                     <div className="text-right space-y-2">
-                      <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Billing Cycle</p>
-                      <p className="text-[11px] font-bold text-blue-400 uppercase tracking-[0.4em]">{sub.frequency === 'yearly' ? 'Annual' : 'Monthly'}</p>
+                      <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Billing</p>
+                      <p className="text-[11px] font-bold text-blue-400 uppercase tracking-[0.4em]">{sub.frequency === 'yearly' ? 'Yearly' : sub.frequency === 'weekly' ? 'Weekly' : 'Monthly'}</p>
                     </div>
                   </div>
 
@@ -166,7 +194,7 @@ export default function Subscriptions() {
                     <div className="flex items-center gap-3">
                       <Calendar className="w-4 h-4 text-white/20" />
                       <span className="text-[11px] font-bold text-white/30 uppercase tracking-[0.4em]">
-                        Next: {new Date(sub.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        Next: {getNextBillingDate(sub.startDate, sub.frequency).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">

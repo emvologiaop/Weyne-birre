@@ -6,7 +6,7 @@ import { db } from '../lib/firebase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PREDEFINED_ACHIEVEMENTS } from '../lib/constants';
 import { AddAchievementModal } from '../components/modals/AddAchievementModal';
-import { cn } from '../lib/utils';
+import { cn } from "../lib/utils";
 
 export default function Achievements() {
   const { user } = useAuth();
@@ -27,10 +27,10 @@ export default function Achievements() {
   const allAchievements = [
     ...PREDEFINED_ACHIEVEMENTS.map(ach => ({
       ...ach,
-      isUnlocked: unlockedAchievements.some(u => u.name === ach.name || u.id === ach.id),
+      isUnlocked: unlockedAchievements.some(u => u.name === ach.name || u.id === ach.id || u.achievementId === ach.id),
       type: 'predefined'
     })),
-    ...unlockedAchievements.filter(u => !PREDEFINED_ACHIEVEMENTS.some(p => p.name === u.name || p.id === u.id))
+    ...unlockedAchievements.filter(u => !PREDEFINED_ACHIEVEMENTS.some(p => p.name === u.name || p.id === u.id || p.id === u.achievementId))
       .map(u => ({ ...u, isUnlocked: true, type: 'custom' }))
   ];
 
@@ -44,14 +44,14 @@ export default function Achievements() {
         <div className="space-y-2">
           <div className="flex items-center gap-3 mb-2">
             <span className="px-3 py-1 rounded-full bg-brand/10 text-brand text-[10px] font-bold uppercase tracking-widest border border-brand/20">
-              Personal Milestones
+              Achievements
             </span>
           </div>
           <h2 className="text-5xl md:text-6xl font-display font-bold text-white tracking-tighter leading-none">
-            Your <span className="text-brand italic">Legacy</span>
+            Your <span className="text-brand italic">Achievements</span>
           </h2>
           <p className="text-sm text-white/40 max-w-md font-medium leading-relaxed">
-            A chronicle of your financial discipline and strategic victories. Every milestone is a testament to your progress.
+            Earn badges by hitting financial milestones. Keep going!
           </p>
         </div>
         <button 
@@ -60,16 +60,16 @@ export default function Achievements() {
         >
           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
           <Plus className="w-4 h-4" />
-          Record Milestone
+          Add Achievement
         </button>
       </div>
 
       {/* Summary Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: 'Milestones Unlocked', value: unlockedCount, icon: Trophy, color: 'brand', isCurrency: false },
+          { label: 'Achievements Unlocked', value: unlockedCount, icon: Trophy, color: 'brand', isCurrency: false },
           { label: 'Completion Rate', value: `${completionRate}%`, icon: Star, color: 'brand', isCurrency: false },
-          { label: 'Rarity Index', value: 'Elite', icon: CheckCircle2, color: 'brand', isCurrency: false },
+          { label: 'Level', value: completionRate >= 75 ? 'Expert' : completionRate >= 50 ? 'Advanced' : completionRate >= 25 ? 'Beginner' : 'Starter', icon: CheckCircle2, color: 'brand', isCurrency: false },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -154,7 +154,7 @@ export default function Achievements() {
                   {ach.type === 'custom' && (
                     <div className="pt-6 border-t border-white/[0.03]">
                       <span className="px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.05] text-[9px] font-bold text-white/20 uppercase tracking-widest">
-                        Custom Milestone
+                        Custom Achievement
                       </span>
                     </div>
                   )}

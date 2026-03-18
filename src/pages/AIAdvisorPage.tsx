@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import { Send, Loader2, Sparkles, User, Bot, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions, useAccounts, useCategories, useBudgets } from '../lib/hooks/useFinanceData';
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency, formatCurrencyShort } from "../lib/utils";
 import { Link } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -12,7 +12,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
 export default function AIAdvisorPage() {
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([
-    { role: 'assistant', content: "Welcome to your **Financial Intelligence Command**. I am your AI Advisor, ready to analyze your portfolio and provide strategic insights. How shall we proceed today?" }
+    { role: 'assistant', content: "Hi! I'm your AI money advisor. Ask me anything about your spending, budgets, or savings and I'll help you out." }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,16 +45,16 @@ export default function AIAdvisorPage() {
       const context = `
         Current Financial Context:
         - Total Accounts: ${accounts.length}
-        - Total Balance: ${formatCurrency(totalBalance)}
-        - Recent Transactions: ${transactions.slice(0, 10).map(tx => `${tx.name}: ${formatCurrency(tx.amount)} (${tx.type})`).join(', ')}
+        - Total Balance: ${formatCurrencyShort(totalBalance)}
+        - Recent Transactions: ${transactions.slice(0, 10).map(tx => `${tx.description}: ${formatCurrencyShort(Math.abs(tx.amount))} (${tx.type})`).join(', ')}
         - Active Budgets: ${budgets.length}
         - Categories: ${categories.map(c => c.name).join(', ')}
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.0-flash",
         config: {
-          systemInstruction: "You are a high-level financial strategist for 'ወይኔ ብሬ'. Provide sophisticated, data-driven advice. Use bold text for key figures. Use Markdown for structure. Be professional, concise, and insightful.",
+          systemInstruction: "You are a friendly and helpful financial advisor for an app called 'ወይኔ ብሬ'. Give simple, clear, practical advice. Use plain language. Use Markdown for structure. Be encouraging and honest.",
         },
         contents: [
           { role: 'user', parts: [{ text: `Context: ${context}. Question: ${userMessage}` }] }
@@ -82,14 +82,14 @@ export default function AIAdvisorPage() {
         <div className="space-y-2">
           <div className="flex items-center gap-3 mb-2">
             <span className="px-3 py-1 rounded-full bg-brand/10 text-brand text-[10px] font-bold uppercase tracking-widest border border-brand/20">
-              Artificial Intelligence
+              AI Powered
             </span>
           </div>
           <h2 className="text-5xl md:text-6xl font-display font-bold text-white tracking-tighter leading-none">
-            Financial <span className="text-brand italic">Advisor</span>
+            Your <span className="text-brand italic">AI Advisor</span>
           </h2>
           <p className="text-sm text-white/40 max-w-md font-medium leading-relaxed">
-            Leverage advanced neural processing to uncover hidden patterns in your financial data and receive strategic guidance.
+            Ask questions about your money, spending habits, or savings goals and get simple, helpful advice.
           </p>
         </div>
         
@@ -103,8 +103,8 @@ export default function AIAdvisorPage() {
             ))}
           </div>
           <div>
-            <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Context Active</p>
-            <p className="text-xs font-bold text-white/60 tracking-tight">Analyzing {transactions.length} Data Points</p>
+            <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Your Data Loaded</p>
+            <p className="text-xs font-bold text-white/60 tracking-tight">{transactions.length} transactions loaded</p>
           </div>
         </div>
       </div>
@@ -117,10 +117,10 @@ export default function AIAdvisorPage() {
               <Bot className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-display font-bold text-white text-lg tracking-tight">Intelligence Stream</h3>
+              <h3 className="font-display font-bold text-white text-lg tracking-tight">Chat</h3>
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
-                <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Neural Link Active</span>
+                <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Ready</span>
               </div>
             </div>
           </div>
@@ -201,8 +201,8 @@ export default function AIAdvisorPage() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Inquire about your financial trajectory..."
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                placeholder="Ask me anything about your money..."
                 className="w-full pl-8 pr-20 py-6 bg-[#0a0a0a] border border-white/[0.05] rounded-[24px] text-white placeholder:text-white/20 focus:outline-none focus:border-brand/30 transition-all shadow-2xl"
               />
               <button
@@ -216,7 +216,7 @@ export default function AIAdvisorPage() {
           </div>
           <div className="flex justify-center gap-8 mt-6">
             <button 
-              onClick={() => setInput("Analyze my spending patterns")}
+              onClick={() => setInput("How am I spending my money?")}
               className="text-[10px] font-bold text-white/20 uppercase tracking-widest hover:text-brand transition-colors"
             >
               Spending Analysis

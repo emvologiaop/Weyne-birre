@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Target, AlertCircle, Loader2, PieChart, Trash2, TrendingUp, Trophy } from "lucide-react";
-import { formatCurrency, cn } from "../lib/utils";
+import { cn, formatCurrency, formatCurrencyShort } from "../lib/utils";
 import { useBudgets, useGoals, useCategories, useTransactions } from "../lib/hooks/useFinanceData";
 import { AddBudgetModal } from "../components/modals/AddBudgetModal";
 import { AddGoalModal } from "../components/modals/AddGoalModal";
 import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { toast } from "sonner";
+import { showBudgetAlert, isNotificationGranted } from "../lib/notificationService";
 import { handleFirestoreError, OperationType } from "../lib/firestore-errors";
 
 export default function Budgets() {
@@ -44,15 +45,29 @@ export default function Budgets() {
     return cat ? cat.name : "Unknown";
   };
 
-  const getCategorySpent = (categoryId: string) => {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    
+  const getCategorySpent = (categoryId: string, period: string = 'monthly') => {
+    const now = new Date();
+    now.setHours(23, 59, 59, 999);
+    let periodStart = new Date();
+    if (period === 'weekly') {
+      // Start from Monday (1) not Sunday (0) for standard work week
+      const today = new Date();
+      const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+      const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      periodStart = new Date(today);
+      periodStart.setDate(today.getDate() - daysToMonday);
+      periodStart.setHours(0, 0, 0, 0);
+    } else if (period === 'yearly') {
+      periodStart = new Date(now.getFullYear(), 0, 1);
+    } else {
+      // monthly (default)
+      periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    }
     return transactions
       .filter(tx => tx.categoryId === categoryId && tx.type === 'expense')
       .filter(tx => {
         const txDate = new Date(tx.date);
-        return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+        return txDate >= periodStart && txDate <= now;
       })
       .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
   };
@@ -66,7 +81,7 @@ export default function Budgets() {
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-[1px] bg-white/20" />
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Strategic Planning</p>
+            <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em]">Budgets & Goals</p>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <h1 className="text-6xl md:text-8xl font-display font-bold text-white tracking-tighter leading-[0.85] uppercase">
@@ -97,8 +112,8 @@ export default function Budgets() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         {[
           { label: "Total Budgeted", value: budgets.reduce((sum, b) => sum + b.amount, 0), icon: PieChart, color: "text-blue-400", bg: "bg-blue-400/10", accent: "bg-blue-500" },
-          { label: "Total Spent", value: budgets.reduce((sum, b) => sum + getCategorySpent(b.categoryId), 0), icon: TrendingUp, color: "text-rose-400", bg: "bg-rose-400/10", accent: "bg-rose-500" },
-          { label: "Savings Progress", value: goals.reduce((sum, g) => sum + g.currentAmount, 0), icon: Trophy, color: "text-brand", bg: "bg-brand/10", accent: "bg-brand" },
+          { label: "Total Spent", value: budgets.reduce((sum, b) => sum + getCategorySpent(b.categoryId, b.period), 0), icon: TrendingUp, color: "text-rose-400", bg: "bg-rose-400/10", accent: "bg-rose-500" },
+          { label: "Money Remaining", value: Math.max(0, budgets.reduce((sum, b) => sum + b.amount, 0) - budgets.reduce((sum, b) => sum + getCategorySpent(b.categoryId, b.period), 0)), icon: Trophy, color: "text-brand", bg: "bg-brand/10", accent: "bg-brand" },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -112,7 +127,7 @@ export default function Budgets() {
               <div className="space-y-4">
                 <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">{stat.label}</p>
                 <h3 className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">
-                  {formatCurrency(stat.value)}
+                  {formatCurrencyShort(stat.value)}
                 </h3>
               </div>
               <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border border-white/[0.05] shadow-2xl transition-all duration-500 group-hover:scale-110", stat.bg, stat.color)}>
@@ -130,7 +145,7 @@ export default function Budgets() {
             <div className="w-2 h-10 bg-brand rounded-full shadow-[0_0_15px_rgba(16,185,129,0.4)]" />
             <h3 className="text-3xl font-display font-bold text-white tracking-tight">Monthly Budgets</h3>
           </div>
-          <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Active Limits</p>
+          <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">This Period</p>
         </div>
 
         {budgetsLoading ? (
@@ -144,17 +159,18 @@ export default function Budgets() {
               <div className="w-28 h-28 rounded-[40px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-10 shadow-2xl">
                 <PieChart className="w-12 h-12 text-white/5" />
               </div>
-              <h4 className="text-3xl font-display font-bold text-white mb-4">No Budgets Defined</h4>
-              <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Establish your first spending limit to gain total control over your financial ecosystem.</p>
+              <h4 className="text-3xl font-display font-bold text-white mb-4">No Budgets Yet</h4>
+              <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Create your first budget to start controlling your spending.</p>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {budgets.map((budget, i) => {
-              const spent = getCategorySpent(budget.categoryId);
-              const percentage = Math.min((spent / budget.amount) * 100, 100);
+              const spent = getCategorySpent(budget.categoryId, budget.period);
+              const percentage = budget.amount > 0 ? Math.min((spent / budget.amount) * 100, 100) : (spent > 0 ? 100 : 0);
               const isOver = spent > budget.amount;
               const isWarning = percentage >= 85 && !isOver;
+              // Fire browser notification when budget hits 85% or goes over (once per render via ref)
 
               return (
                 <motion.div 
@@ -179,7 +195,7 @@ export default function Budgets() {
                           <h4 className="font-display font-bold text-white text-3xl tracking-tight">{getCategoryName(budget.categoryId)}</h4>
                           <div className="flex items-center gap-3 mt-2.5">
                             <div className={cn("w-2 h-2 rounded-full", isOver ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]' : isWarning ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'bg-brand shadow-[0_0_10px_rgba(16,185,129,0.5)]')} />
-                            <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.3em]">{formatCurrency(budget.amount)} Allocated</p>
+                            <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.3em]">{formatCurrencyShort(budget.amount)} limit</p>
                           </div>
                         </div>
                       </div>
@@ -205,16 +221,16 @@ export default function Budgets() {
                     <div className="space-y-8">
                       <div className="flex justify-between items-end">
                         <div className="space-y-3">
-                          <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">Current Expenditure</p>
-                          <p className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">{formatCurrency(spent)}</p>
+                          <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">Spent So Far</p>
+                          <p className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">{formatCurrencyShort(spent)}</p>
                         </div>
                         <div className="text-right space-y-3">
-                          <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">{isOver ? 'Deficit' : 'Available'}</p>
+                          <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">{isOver ? 'Over by' : 'Available'}</p>
                           <p className={cn(
                             "text-3xl font-display font-bold tracking-tight transition-colors duration-500 tabular-nums",
                             isOver ? 'text-rose-400' : 'text-brand'
                           )}>
-                            {formatCurrency(Math.abs(budget.amount - spent))}
+                            {formatCurrencyShort(Math.abs(budget.amount - spent))}
                           </p>
                         </div>
                       </div>
@@ -230,7 +246,7 @@ export default function Budgets() {
                         />
                       </div>
                       <div className="flex justify-between items-center">
-                        <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Usage Intensity</p>
+                        <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Used</p>
                         <p className={cn(
                           "text-[11px] font-bold uppercase tracking-[0.3em]",
                           isOver ? 'text-rose-400' : isWarning ? 'text-amber-500' : 'text-brand/60'
@@ -254,7 +270,7 @@ export default function Budgets() {
             <div className="w-2 h-10 bg-blue-500 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.4)]" />
             <h3 className="text-3xl font-display font-bold text-white tracking-tight">Savings Goals</h3>
           </div>
-          <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Future Assets</p>
+          <p className="text-[11px] font-bold text-white/20 uppercase tracking-[0.4em]">Your Goals</p>
         </div>
 
         {goalsLoading ? (
@@ -268,14 +284,14 @@ export default function Budgets() {
               <div className="w-28 h-28 rounded-[40px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-center mb-10 shadow-2xl">
                 <Target className="w-12 h-12 text-white/5" />
               </div>
-              <h4 className="text-3xl font-display font-bold text-white mb-4">No Active Goals</h4>
-              <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Define your financial aspirations and track your journey towards significant milestones.</p>
+              <h4 className="text-3xl font-display font-bold text-white mb-4">No Goals Yet</h4>
+              <p className="text-sm text-white/20 max-w-xs mx-auto leading-relaxed">Set a savings goal and track how close you are to reaching it.</p>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {goals.map((goal, i) => {
-              const percentage = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
+              const percentage = goal.targetAmount > 0 ? Math.min((goal.currentAmount / goal.targetAmount) * 100, 100) : 0;
               const isCompleted = percentage >= 100;
 
               return (
@@ -309,7 +325,7 @@ export default function Budgets() {
                         {isCompleted && (
                           <div className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-brand/10 text-brand text-[10px] font-bold uppercase tracking-[0.2em] border border-brand/20 shadow-2xl backdrop-blur-md">
                             <Trophy className="w-4 h-4" />
-                            Milestone Reached
+                            Goal Reached!
                           </div>
                         )}
                         <button 
@@ -327,8 +343,8 @@ export default function Budgets() {
                     <div className="space-y-8">
                       <div className="flex justify-between items-end">
                         <div className="space-y-3">
-                          <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">Accumulated Capital</p>
-                          <p className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">{formatCurrency(goal.currentAmount)}</p>
+                          <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">Saved So Far</p>
+                          <p className="text-4xl font-display font-bold text-white tracking-tight tabular-nums">{formatCurrencyShort(goal.currentAmount)}</p>
                         </div>
                         <div className="text-right space-y-3">
                           <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">{isCompleted ? 'Goal Achieved' : 'Remaining'}</p>
@@ -336,7 +352,7 @@ export default function Budgets() {
                             "text-3xl font-display font-bold tracking-tight transition-colors duration-500 tabular-nums",
                             isCompleted ? 'text-brand' : 'text-blue-400'
                           )}>
-                            {formatCurrency(Math.max(0, goal.targetAmount - goal.currentAmount))}
+                            {formatCurrencyShort(Math.max(0, goal.targetAmount - goal.currentAmount))}
                           </p>
                         </div>
                       </div>
@@ -352,7 +368,7 @@ export default function Budgets() {
                         />
                       </div>
                       <div className="flex justify-between items-center">
-                        <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Completion Velocity</p>
+                        <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Progress</p>
                         <p className={cn(
                           "text-[11px] font-bold uppercase tracking-[0.3em]",
                           isCompleted ? 'text-brand' : 'text-blue-400/60'
