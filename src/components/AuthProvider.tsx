@@ -53,24 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               profileCompleted: false
             });
 
-            const defaultCategories = [
-              { name: 'Housing', type: 'expense', color: '#3b82f6', icon: 'Home' },
-              { name: 'Food', type: 'expense', color: '#f59e0b', icon: 'Coffee' },
-              { name: 'Transportation', type: 'expense', color: '#10b981', icon: 'Car' },
-              { name: 'Utilities', type: 'expense', color: '#8b5cf6', icon: 'Zap' },
-              { name: 'Entertainment', type: 'expense', color: '#ec4899', icon: 'Film' },
-              { name: 'Salary', type: 'income', color: '#10b981', icon: 'Briefcase' },
-              { name: 'Investments', type: 'income', color: '#6366f1', icon: 'TrendingUp' },
-              { name: 'Other', type: 'income', color: '#94a3b8', icon: 'Plus' }
-            ];
-
-            const { collection, addDoc } = await import('firebase/firestore');
-            for (const cat of defaultCategories) {
-              await addDoc(collection(db, 'categories'), {
-                ...cat,
-                userId: firebaseUser.uid
-              });
-            }
+            // Categories and accounts are created in ProfileSetupModal after setup
             setProfileCompleted(false);
           } catch (error) {
             console.error("Error creating user document or categories:", error);
@@ -117,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
-          <p className="text-white/50 text-sm font-medium">Loading WealthTracker...</p>
+          <p className="text-white/50 text-sm font-medium">Loading ወይኔ ብሬ...</p>
         </div>
       </div>
     );
@@ -133,8 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             </svg>
           </div>
           <div>
-            <h1 className="text-2xl font-semibold text-white mb-2">Welcome to WealthTracker</h1>
-            <p className="text-white/50 text-sm">Sign in to manage your finances securely.</p>
+            <h1 className="text-2xl font-semibold text-white mb-2">Welcome to ወይኔ ብሬ</h1>
+            <p className="text-white/50 text-sm">Sign in to start tracking your money.</p>
           </div>
           <button
             onClick={signIn}

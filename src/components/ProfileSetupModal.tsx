@@ -33,23 +33,22 @@ export default function ProfileSetupModal({ isOpen, onComplete }: ProfileSetupMo
         profileCompleted: true
       });
 
-      // Create default categories
-      const categoriesRef = collection(db, 'categories');
-      await Promise.all(DEFAULT_CATEGORIES.map(cat => 
-        addDoc(categoriesRef, {
-          ...cat,
-          userId: user.uid
-        })
-      ));
+      // Check if categories already exist before creating defaults
+      const { getDocs, query, where } = await import('firebase/firestore');
+      const existingCats = await getDocs(query(collection(db, 'categories'), where('userId', '==', user.uid)));
+      if (existingCats.empty) {
+        await Promise.all(DEFAULT_CATEGORIES.map(cat =>
+          addDoc(collection(db, 'categories'), { ...cat, userId: user.uid })
+        ));
+      }
 
-      // Create default accounts
-      const accountsRef = collection(db, 'accounts');
-      await Promise.all(DEFAULT_ACCOUNTS.map(acc => 
-        addDoc(accountsRef, {
-          ...acc,
-          userId: user.uid
-        })
-      ));
+      // Check if accounts already exist before creating defaults
+      const existingAccs = await getDocs(query(collection(db, 'accounts'), where('userId', '==', user.uid)));
+      if (existingAccs.empty) {
+        await Promise.all(DEFAULT_ACCOUNTS.map(acc =>
+          addDoc(collection(db, 'accounts'), { ...acc, userId: user.uid })
+        ));
+      }
 
       onComplete();
     } catch (error) {

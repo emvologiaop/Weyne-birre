@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import { MessageSquare, Send, X, Loader2, Sparkles, User, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions, useAccounts, useCategories, useBudgets } from '../lib/hooks/useFinanceData';
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency, formatCurrencyShort } from "../lib/utils";
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -44,14 +44,14 @@ export function AIAdvisor() {
       const context = `
         Current Financial Context:
         - Total Accounts: ${accounts.length}
-        - Total Balance: ${formatCurrency(accounts.reduce((sum, acc) => sum + acc.balance, 0))}
-        - Recent Transactions: ${transactions.slice(0, 5).map(tx => `${tx.name}: ${formatCurrency(tx.amount)} (${tx.type})`).join(', ')}
+        - Total Balance: ${formatCurrencyShort(accounts.reduce((sum, acc) => sum + acc.balance, 0))}
+        - Recent Transactions: ${transactions.slice(0, 5).map(tx => `${tx.description}: ${formatCurrencyShort(Math.abs(tx.amount))} (${tx.type})`).join(', ')}
         - Active Budgets: ${budgets.length}
         - Categories: ${categories.map(c => c.name).join(', ')}
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.0-flash",
         config: {
           systemInstruction: "You are a professional financial advisor for an app called 'ወይኔ ብሬ'. Always provide structured, easy-to-read advice. Use bold text for key figures and important points. Use bullet points for lists. Be encouraging and professional.",
         },
@@ -144,7 +144,7 @@ export function AIAdvisor() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
                   placeholder="Ask about your spending..."
                   className="w-full pl-4 pr-12 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500/50 transition-colors"
                 />
