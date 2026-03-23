@@ -132,7 +132,7 @@ export default function DashboardLayout() {
             <div className="w-8 h-8 rounded-xl bg-brand/15 border border-brand/25 flex items-center justify-center shrink-0">
               <img src="https://img.icons8.com/fluency/512/money-bag.png" alt="Logo" className="w-5 h-5 object-contain" />
             </div>
-            <span className="font-display font-bold text-base text-primary tracking-tight">ወይኔ ብሬ</span>
+            <span className="font-display font-bold text-base text-primary tracking-tight">Birr Tracker</span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-muted hover:text-primary transition-colors p-1">
             <X className="w-5 h-5" />

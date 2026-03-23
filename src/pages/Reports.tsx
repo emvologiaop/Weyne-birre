@@ -42,7 +42,7 @@ function exportCSV(transactions: any[], categories: any[], accounts: any[], peri
   const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.href = url; link.download = `weyne-birre-report-${period}-${new Date().toISOString().split('T')[0]}.csv`;
+  link.href = url; link.download = `birr-tracker-report-${period}-${new Date().toISOString().split('T')[0]}.csv`;
   link.click(); URL.revokeObjectURL(url);
 }
 
@@ -50,7 +50,7 @@ function exportPDF(transactions: any[], categories: any[], accounts: any[], peri
   const doc = new jsPDF();
   
   doc.setFontSize(18);
-  doc.text(`Weyne Birre Report: ${period}`, 14, 22);
+  doc.text(`Birr Tracker Report: ${period}`, 14, 22);
   
   doc.setFontSize(11);
   doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
@@ -73,7 +73,7 @@ function exportPDF(transactions: any[], categories: any[], accounts: any[], peri
     headStyles: { fillColor: [16, 185, 129] } // Brand color
   });
 
-  doc.save(`weyne-birre-${period}-report.pdf`);
+  doc.save(`birr-tracker-${period}-report.pdf`);
 }
 
 export default function Reports() {

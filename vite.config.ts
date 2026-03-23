@@ -14,8 +14,8 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         includeAssets: ['robots.txt', 'apple-touch-icon.png', 'sw-notifications.js'],
         manifest: {
-          name: 'ወይኔ ብሬ — Personal Finance',
-          short_name: 'ወይኔ ብሬ',
+          name: 'Birr Tracker — Personal Finance',
+          short_name: 'Birr Tracker',
           description: 'Track your money, budgets, and savings — works offline too.',
           theme_color: '#10b981',
           background_color: '#050505',

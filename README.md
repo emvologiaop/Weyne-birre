@@ -1,5 +1,5 @@
 
-# Weyne Birre (ወይኔ ብሬ)
+# Birr Tracker
 
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -10,7 +10,7 @@
 
 A modern personal finance web app built with React, TypeScript, Vite, and Firebase.
 
-Weyne Birre helps users track income, expenses, accounts, budgets, subscriptions, receipts, net worth, and AI-assisted financial insights from a single dashboard.
+Birr Tracker helps users track income, expenses, accounts, budgets, subscriptions, receipts, net worth, and AI-assisted financial insights from a single dashboard.
 
 ## Highlights
 

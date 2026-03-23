@@ -1,6 +1,6 @@
 {
-  "name": "ወይኔ ብሬ",
-  "short_name": "ወይኔ ብሬ",
+  "name": "Birr Tracker",
+  "short_name": "Birr Tracker",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#050505",
