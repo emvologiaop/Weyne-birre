@@ -5,9 +5,8 @@ import { useTransactions, useAccounts, useCategories, useBudgets } from '../lib/
 import { formatCurrency, formatCurrencyShort } from "../lib/utils";
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 
 export function AIAdvisor() {
@@ -51,18 +50,16 @@ export function AIAdvisor() {
         - Categories: ${categories.map(c => c.name).join(', ')}
       `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
-        config: {
-          systemInstruction: "You are a professional financial advisor for an app called 'ወይኔ ብሬ'. Always provide structured, easy-to-read advice. Use bold text for key figures and important points. Use bullet points for lists. Be encouraging and professional.",
-        },
-        contents: [
-          { role: 'user', parts: [{ text: `Context: ${context}. Question: ${userMessage}` }] }
-        ]
+      const response = await fetch(`${API_URL}/api/ai/advisor`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context, message: userMessage })
       });
 
-      const responseText = response.text;
-      setMessages(prev => [...prev, { role: 'assistant', content: responseText || "I'm sorry, I couldn't generate a response." }]);
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+
+      setMessages(prev => [...prev, { role: 'assistant', content: data.text || "I'm sorry, I couldn't generate a response." }]);
     } catch (error) {
       console.error('AI Error:', error);
       setMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I encountered an error. Please try again later." }]);

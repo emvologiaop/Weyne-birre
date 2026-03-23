@@ -68,6 +68,17 @@ service cloud.firestore {
     //   - targetDate: string (optional)
     //   - color: string (optional)
     //   - icon: string (optional)
+    // Collection: debts
+    // Document ID: {debtId}
+    // Fields:
+    //   - userId: string (required)
+    //   - type: string (required) - 'borrowed' or 'lent'
+    //   - contact: string (required)
+    //   - amount: number (required)
+    //   - remaining: number (required)
+    //   - dueDate: string (optional)
+    //   - description: string (optional)
+    //   - status: string (required) - 'active', 'paid'
     // ===============================================================
 
     // ===============================================================
@@ -196,6 +207,19 @@ service cloud.firestore {
              (!('startDate' in data) || isValidDateString(data.startDate));
     }
 
+    function isValidGoal(data) {
+      let allowedFields = ['userId', 'name', 'targetAmount', 'currentAmount', 'targetDate', 'color', 'icon'];
+      return hasOnlyAllowedFields(allowedFields) &&
+             hasRequiredFields(['userId', 'name', 'targetAmount']) &&
+             data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 128 &&
+             data.targetAmount is number && data.targetAmount > 0 &&
+             (!('currentAmount' in data) || (data.currentAmount is number && data.currentAmount >= 0)) &&
+             (!('targetDate' in data) || isValidDateString(data.targetDate)) &&
+             (!('color' in data) || (data.color is string && data.color.size() <= 16)) &&
+             (!('icon' in data) || (data.icon is string && data.icon.size() <= 32));
+    }
+
     function isValidReceipt(data) {
       let allowedFields = ['userId', 'merchant', 'amount', 'date', 'category', 'imageUrl', 'rawText'];
       return hasOnlyAllowedFields(allowedFields) &&
@@ -228,6 +252,20 @@ service cloud.firestore {
              data.name is string && data.name.size() > 0 && data.name.size() <= 128 &&
              (!('description' in data) || (data.description is string && data.description.size() <= 500)) &&
              isValidDateString(data.earnedAt);
+    }
+
+    function isValidDebt(data) {
+      let allowedFields = ['userId', 'type', 'contact', 'amount', 'remaining', 'dueDate', 'description', 'status'];
+      return hasOnlyAllowedFields(allowedFields) &&
+             hasRequiredFields(['userId', 'type', 'contact', 'amount', 'remaining', 'status']) &&
+             data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.type in ['borrowed', 'lent'] &&
+             data.contact is string && data.contact.size() > 0 && data.contact.size() <= 128 &&
+             data.amount is number && data.amount > 0 &&
+             data.remaining is number && data.remaining >= 0 &&
+             (!('dueDate' in data) || isValidDateString(data.dueDate)) &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 500)) &&
+             data.status in ['active', 'paid'];
     }
 
     // ===============================================================
@@ -313,6 +351,15 @@ service cloud.firestore {
       allow create: if isAuthenticated() && isValidAchievement(request.resource.data) &&
                     isNewDocOwner() && userIdUnchanged();
       allow update: if isAuthenticated() && isValidAchievement(request.resource.data) &&
+                    isDocOwner() && userIdNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    match /debts/{debtId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidDebt(request.resource.data) &&
+                    isNewDocOwner() && userIdUnchanged();
+      allow update: if isAuthenticated() && isValidDebt(request.resource.data) &&
                     isDocOwner() && userIdNotModified();
       allow delete: if isDocOwner();
     }

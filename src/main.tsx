@@ -33,6 +33,7 @@ registerSW({
   },
   onOfflineReady() {
     console.log('[PWA] App ready for offline use');
+    window.dispatchEvent(new CustomEvent('pwa-offline-ready'));
   },
 });
 

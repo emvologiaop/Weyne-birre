@@ -44,3 +44,17 @@ export const CategorySchema = z.object({
 });
 
 export type Category = z.infer<typeof CategorySchema>;
+
+export const DebtSchema = z.object({
+  id: z.string().optional(),
+  userId: z.string(),
+  type: z.enum(["borrowed", "lent"]),
+  contact: z.string().min(1, "Contact name is required"),
+  amount: z.number().min(0.01),
+  remaining: z.number().min(0),
+  dueDate: z.string().optional(),
+  description: z.string().optional(),
+  status: z.enum(["active", "paid"]).default("active"),
+});
+
+export type Debt = z.infer<typeof DebtSchema>;

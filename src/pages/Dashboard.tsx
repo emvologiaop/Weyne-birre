@@ -377,8 +377,9 @@ export default function Dashboard() {
                 .slice(0, 5)
                 .map((cat, i) => {
                 const amount = cat.amount;
-                const total = monthlyExpenses || 1;
-                const percentage = Math.round((amount / total) * 100);
+                const total = monthlyExpenses || 0;
+                const rawPercentage = total > 0 ? (amount / total) * 100 : 0;
+                const percentageDisplay = Number(rawPercentage.toFixed(1));
                 
                 return (
                   <div key={cat.id} className="group cursor-pointer">
@@ -387,12 +388,12 @@ export default function Dashboard() {
                         <div className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.1)]" style={{ backgroundColor: cat.color }} />
                         <span className="text-sm font-bold text-white/72 group-hover:text-white transition-all duration-500 tracking-tight">{cat.name}</span>
                       </div>
-                      <span className="text-[10px] font-bold text-white/45 tracking-[0.2em] uppercase">{percentage}%</span>
+                      <span className="text-[10px] font-bold text-white/45 tracking-[0.2em] uppercase">{percentageDisplay}%</span>
                     </div>
                     <div className="h-1.5 w-full bg-white/[0.01] rounded-full overflow-hidden border border-white/[0.03]">
                       <motion.div 
                         initial={{ width: 0 }}
-                        animate={{ width: `${percentage}%` }}
+                        animate={{ width: `${Math.min(100, Math.max(0, rawPercentage))}%` }}
                         transition={{ duration: 1.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
                         className="h-full rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)]"
                         style={{ backgroundColor: cat.color }}

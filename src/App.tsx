@@ -16,6 +16,7 @@ import AIAdvisorPage from './pages/AIAdvisorPage';
 import NetWorth from './pages/NetWorth';
 import Reports from './pages/Reports';
 import BankImport from './pages/BankImport';
+import DebtManager from './pages/DebtManager';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AuthProvider } from './components/AuthProvider';
 import {
@@ -212,6 +213,7 @@ export default function App() {
                   <Route path="settings" element={<Settings />} />
                   <Route path="net-worth" element={<NetWorth />} />
                   <Route path="reports" element={<Reports />} />
+                  <Route path="debts" element={<DebtManager />} />
                   <Route path="bank-import" element={<BankImport />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Route>

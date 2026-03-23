@@ -6,9 +6,10 @@ import { formatCurrencyCompact, formatCurrencyShort, formatDate } from "../lib/u
 import { cn } from '../lib/utils';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { GoogleGenAI } from "@google/genai";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 
 type ReportPeriod = 'week' | 'month' | 'year';
@@ -45,12 +46,34 @@ function exportCSV(transactions: any[], categories: any[], accounts: any[], peri
   link.click(); URL.revokeObjectURL(url);
 }
 
-function exportTextReport(content: string, period: string) {
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url; link.download = `weyne-birre-ai-report-${period}-${new Date().toISOString().split('T')[0]}.txt`;
-  link.click(); URL.revokeObjectURL(url);
+function exportPDF(transactions: any[], categories: any[], accounts: any[], period: string) {
+  const doc = new jsPDF();
+  
+  doc.setFontSize(18);
+  doc.text(`Weyne Birre Report: ${period}`, 14, 22);
+  
+  doc.setFontSize(11);
+  doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+
+  const tableData = transactions.map(tx => [
+    formatDate(tx.date),
+    tx.description,
+    tx.type,
+    categories.find(c => c.id === tx.categoryId)?.name ?? 'Uncategorized',
+    accounts.find(a => a.id === tx.accountId)?.name ?? 'Unknown',
+    tx.amount.toString()
+  ]);
+
+  autoTable(doc, {
+    startY: 40,
+    head: [['Date', 'Description', 'Type', 'Category', 'Account', 'Amount (ETB)']],
+    body: tableData,
+    theme: 'grid',
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [16, 185, 129] } // Brand color
+  });
+
+  doc.save(`weyne-birre-${period}-report.pdf`);
 }
 
 export default function Reports() {
@@ -73,7 +96,8 @@ export default function Reports() {
   const income = periodTx.filter(t => t.type === 'income').reduce((s, t) => s + Math.abs(t.amount), 0);
   const expenses = periodTx.filter(t => t.type === 'expense').reduce((s, t) => s + Math.abs(t.amount), 0);
   const net = income - expenses;
-  const savingsRate = income > 0 ? ((net / income) * 100).toFixed(1) : '0';
+  const savingsRate = income > 0 ? (net / income) * 100 : 0;
+  const savingsRateDisplay = savingsRate.toFixed(1);
 
   // Top categories
   const catSpend = useMemo(() => {
@@ -81,10 +105,16 @@ export default function Reports() {
     periodTx.filter(t => t.type === 'expense').forEach(t => {
       map[t.categoryId] = (map[t.categoryId] || 0) + Math.abs(t.amount);
     });
+    const totalExpenses = expenses || 0;
     return Object.entries(map)
-      .map(([id, amount]) => ({ name: categories.find(c => c.id === id)?.name ?? 'Other', amount, color: categories.find(c => c.id === id)?.color ?? '#94a3b8' }))
+      .map(([id, amount]) => ({
+        name: categories.find(c => c.id === id)?.name ?? 'Other',
+        amount,
+        color: categories.find(c => c.id === id)?.color ?? '#94a3b8',
+        percent: totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0,
+      }))
       .sort((a, b) => b.amount - a.amount).slice(0, 5);
-  }, [periodTx, categories]);
+  }, [periodTx, categories, expenses]);
 
   const generateAIReport = async () => {
     setLoadingAI(true);
@@ -95,23 +125,21 @@ export default function Reports() {
         totalIncome: income,
         totalExpenses: expenses,
         netSavings: net,
-        savingsRate: `${savingsRate}%`,
+        savingsRate: `${savingsRateDisplay}%`,
         totalBalance: accounts.reduce((s, a) => s + (a.balance || 0), 0),
         topExpenseCategories: catSpend.map(c => `${c.name}: ETB ${c.amount.toLocaleString()}`),
         transactionCount: periodTx.length,
         budgetsCount: budgets.length,
       };
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
-        config: {
-          systemInstruction: `You are a friendly personal finance advisor for 'ወይኔ ብሬ', an Ethiopian personal finance app. 
-          All amounts are in Ethiopian Birr (ETB). Generate a clear, practical, encouraging financial report in plain English. 
-          Use Markdown formatting. Include: 1) Executive summary (2-3 sentences), 2) Key highlights (what went well), 
-          3) Areas to improve, 4) Specific actionable tips for next period. Keep it under 400 words.`,
-        },
-        contents: [{ role: 'user', parts: [{ text: `Generate a financial report for: ${JSON.stringify(context, null, 2)}` }] }],
+      const response = await fetch(`${API_URL}/api/ai/report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context })
       });
-      setAiReport(response.text ?? '');
+      
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      setAiReport(data.text ?? '');
     } catch (err: any) {
       const msg = err?.message || String(err);
       console.error('AI report error:', msg);
@@ -164,7 +192,7 @@ export default function Reports() {
               <stat.icon className="w-6 h-6" />
             </div>
             <p className="text-[11px] font-bold text-white/65 uppercase tracking-widest mb-2">{stat.label}</p>
-            <p className={cn('text-3xl font-display font-bold tabular-nums', stat.color)}>{formatCurrencyCompact(Math.abs(stat.value))}</p>
+            <p className={cn('text-3xl font-display font-bold tabular-nums', stat.color)}>{formatCurrencyCompact(stat.value)}</p>
           </motion.div>
         ))}
       </div>
@@ -173,13 +201,13 @@ export default function Reports() {
       <div className="p-6 rounded-2xl bg-white/[0.01] border border-white/[0.03] flex items-center justify-between">
         <div>
           <p className="text-sm font-bold text-white/72">Savings Rate</p>
-          <p className={cn('text-4xl font-display font-bold mt-1', parseFloat(savingsRate) >= 20 ? 'text-brand' : parseFloat(savingsRate) >= 0 ? 'text-amber-400' : 'text-rose-400')}>
-            {savingsRate}%
+          <p className={cn('text-4xl font-display font-bold mt-1', savingsRate >= 20 ? 'text-brand' : savingsRate >= 0 ? 'text-amber-400' : 'text-rose-400')}>
+            {savingsRateDisplay}%
           </p>
         </div>
         <div className="w-40 bg-white/5 rounded-full h-3 overflow-hidden">
-          <div className={cn('h-full rounded-full transition-all duration-1000', parseFloat(savingsRate) >= 20 ? 'bg-brand' : parseFloat(savingsRate) >= 0 ? 'bg-amber-400' : 'bg-rose-400')}
-            style={{ width: `${Math.min(100, Math.max(0, parseFloat(savingsRate)))}%` }} />
+          <div className={cn('h-full rounded-full transition-all duration-1000', savingsRate >= 20 ? 'bg-brand' : savingsRate >= 0 ? 'bg-amber-400' : 'bg-rose-400')}
+            style={{ width: `${Math.min(100, Math.max(0, savingsRate))}%` }} />
         </div>
       </div>
 
@@ -193,8 +221,14 @@ export default function Reports() {
                 <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
                 <span className="text-sm text-white/84 flex-1">{cat.name}</span>
                 <span className="text-sm font-bold text-white tabular-nums">{formatCurrencyShort(cat.amount)}</span>
+                <span className="text-xs font-bold text-white/65 w-14 text-right tabular-nums">
+                  {cat.percent.toFixed(1)}%
+                </span>
                 <div className="w-24 bg-white/5 rounded-full h-1.5 overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${(cat.amount / expenses) * 100}%`, backgroundColor: cat.color }} />
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${Math.min(100, Math.max(0, cat.percent))}%`, backgroundColor: cat.color }}
+                  />
                 </div>
               </div>
             ))}
@@ -204,12 +238,12 @@ export default function Reports() {
 
       {/* Export buttons */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <button onClick={() => exportCSV(periodTx, categories, accounts, period)}
+        <button onClick={() => exportPDF(periodTx, categories, accounts, period)}
           className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] hover:border-brand/20 transition-all group">
           <Download className="w-5 h-5 text-white/72 group-hover:text-brand transition-colors" />
           <div className="text-left">
-            <p className="text-sm font-bold text-white">Export CSV</p>
-            <p className="text-xs text-white/65">Download as spreadsheet</p>
+            <p className="text-sm font-bold text-white">Export PDF</p>
+            <p className="text-xs text-white/65">Download beautiful PDF statement</p>
           </div>
         </button>
         <button onClick={generateAIReport} disabled={loadingAI}

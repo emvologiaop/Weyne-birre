@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, Check, X, Loader2, AlertCircle, ArrowRight } from 'lucide-react';
+import { Upload, FileText, Check, X, Loader2, AlertCircle, ArrowRight, Table, Settings2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { addDoc, collection, doc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -20,81 +20,70 @@ interface ParsedRow {
   accountId: string;
 }
 
-function parseCSV(text: string): ParsedRow[] {
-  const lines = text.trim().split('\n').filter(l => l.trim());
-  if (lines.length < 2) return [];
-
-  // Try to detect header row
-  const header = lines[0].toLowerCase();
-  const hasHeader = /date|amount|description|debit|credit/.test(header);
-  const dataLines = hasHeader ? lines.slice(1) : lines;
-
-  const rows: ParsedRow[] = [];
-  for (const line of dataLines) {
-    // Handle quoted CSV
-    const cols = line.match(/(".*?"|[^,]+)(?=,|$)/g)?.map(c => c.replace(/^"|"$/g, '').trim()) ?? line.split(',').map(c => c.trim());
-    if (cols.length < 2) continue;
-
-    // Try multiple column orderings: date, description, amount OR date, amount, description
-    let date = '', description = '', amount = 0;
-
-    // Detect date column
-    for (let i = 0; i < Math.min(cols.length, 3); i++) {
-      if (/\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d{2}-\d{2}-\d{4}/.test(cols[i])) {
-        date = cols[i];
-        break;
+// Simple robust CSV parser handling quotes
+function parseSimpleCSV(text: string): string[][] {
+  const result: string[][] = [];
+  let row: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+    
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
       }
+    } else if (char === ',' && !inQuotes) {
+      row.push(current.trim());
+      current = '';
+    } else if ((char === '\n' || (char === '\r' && nextChar === '\n')) && !inQuotes) {
+      if (char === '\r') i++;
+      row.push(current.trim());
+      if (row.some(c => c)) result.push(row);
+      row = [];
+      current = '';
+    } else {
+      if (char !== '\r') current += char;
     }
-
-    // Detect amount column (numeric, possibly with commas or parentheses for negatives)
-    for (const col of cols) {
-      const cleaned = col.replace(/,/g, '').replace(/[()]/g, match => match === '(' ? '-' : '');
-      const num = parseFloat(cleaned);
-      if (!isNaN(num) && Math.abs(num) > 0 && col !== date) {
-        amount = num;
-        break;
-      }
-    }
-
-    // Description = remaining non-date, non-amount column
-    for (const col of cols) {
-      if (col !== date && isNaN(parseFloat(col.replace(/,/g, '')))) {
-        description = col;
-        break;
-      }
-    }
-
-    if (!date || amount === 0) continue;
-
-    // Normalize date
-    let parsedDate: Date;
-    try {
-      parsedDate = new Date(date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$1-$2'));
-      if (isNaN(parsedDate.getTime())) continue;
-    } catch { continue; }
-
-    rows.push({
-      date: parsedDate.toISOString().split('T')[0],
-      description: description || 'Bank transaction',
-      amount: Math.abs(amount),
-      type: amount < 0 ? 'expense' : 'income',
-      selected: true,
-      categoryId: '',
-      accountId: '',
-    });
   }
-  return rows;
+  if (current || row.length > 0) {
+    row.push(current.trim());
+    if (row.some(c => c)) result.push(row);
+  }
+  return result;
 }
+
 
 export default function BankImport() {
   const { user } = useAuth();
   const { accounts } = useAccounts();
   const { categories } = useCategories();
+  
+  const [csvData, setCsvData] = useState<string[][]>([]);
+  const [headers, setHeaders] = useState<string[]>([]);
+  const [mappings, setMappings] = useState<Record<string, number>>({});
+  
   const [rows, setRows] = useState<ParsedRow[]>([]);
-  const [step, setStep] = useState<'upload' | 'review' | 'done'>('upload');
+  const [step, setStep] = useState<'upload' | 'mapping' | 'review' | 'done'>('upload');
   const [importing, setImporting] = useState(false);
   const [defaultAccountId, setDefaultAccountId] = useState('');
   const [error, setError] = useState('');
+
+  const autoMapHeaders = (detectedHeaders: string[]) => {
+    const newMappings: Record<string, number> = {};
+    detectedHeaders.forEach((h, i) => {
+      const lower = h.toLowerCase();
+      if (lower.includes('date')) newMappings['date'] = i;
+      else if (lower.includes('amount') || lower.includes('value')) newMappings['amount'] = i;
+      else if (lower.includes('desc') || lower.includes('memo') || lower.includes('narrative')) newMappings['description'] = i;
+    });
+    setMappings(newMappings);
+  };
 
   const onDrop = useCallback((files: File[]) => {
     const file = files[0];
@@ -103,22 +92,73 @@ export default function BankImport() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
-      const parsed = parseCSV(text);
-      if (parsed.length === 0) {
-        setError('Could not parse any transactions. Make sure your CSV has date, description, and amount columns.');
+      const parsed = parseSimpleCSV(text);
+      if (parsed.length < 2) {
+        setError('Could not parse any transactions. Make sure your CSV has rows.');
         return;
       }
-      setRows(parsed.map(r => ({ ...r, accountId: defaultAccountId })));
-      setStep('review');
+      
+      const potentialHeaders = parsed[0];
+      setHeaders(potentialHeaders);
+      setCsvData(parsed.slice(1));
+      autoMapHeaders(potentialHeaders);
+      setStep('mapping');
     };
     reader.readAsText(file);
-  }, [defaultAccountId]);
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { 'text/csv': ['.csv'], 'text/plain': ['.txt'] },
     multiple: false,
   });
+
+  const handleMappingComplete = () => {
+    if (mappings.date === undefined || mappings.amount === undefined || mappings.description === undefined) {
+      setError('Please map Date, Amount, and Description columns.');
+      return;
+    }
+    setError('');
+
+    const parsedRows: ParsedRow[] = [];
+    csvData.forEach(row => {
+      if (row.length < 3) return;
+      
+      const dateStr = row[mappings.date];
+      const descStr = row[mappings.description];
+      const amountStr = row[mappings.amount] || '';
+
+      if (!dateStr || !amountStr) return;
+
+      const cleanedAmount = amountStr.replace(/,/g, '').replace(/[()"]/g, match => match === '(' ? '-' : '');
+      const amount = parseFloat(cleanedAmount);
+      if (isNaN(amount) || amount === 0) return;
+
+      let parsedDate: Date;
+      try {
+        parsedDate = new Date(dateStr.replace(/(\d{2})[\/\-](\d{2})[\/\-](\d{4})/, '$3-$1-$2'));
+        if (isNaN(parsedDate.getTime())) return;
+      } catch { return; }
+
+      parsedRows.push({
+        date: parsedDate.toISOString().split('T')[0],
+        description: descStr || 'Bank transaction',
+        amount: Math.abs(amount),
+        type: amount < 0 ? 'expense' : 'income',
+        selected: true,
+        categoryId: '',
+        accountId: defaultAccountId,
+      });
+    });
+
+    if (parsedRows.length === 0) {
+      setError('No valid transactions found with the current mapping. Check your date/amount formats.');
+      return;
+    }
+
+    setRows(parsedRows);
+    setStep('review');
+  };
 
   const selectedRows = rows.filter(r => r.selected);
 
@@ -167,10 +207,10 @@ export default function BankImport() {
 
       {/* Steps */}
       <div className="flex items-center gap-3">
-        {['Upload', 'Review', 'Done'].map((s, i) => {
-          const stepKey = ['upload', 'review', 'done'][i];
+        {['Upload', 'Map Columns', 'Review', 'Done'].map((s, i) => {
+          const stepKey = ['upload', 'mapping', 'review', 'done'][i];
           const active = step === stepKey;
-          const done = ['upload', 'review', 'done'].indexOf(step) > i;
+          const done = ['upload', 'mapping', 'review', 'done'].indexOf(step) > i;
           return (
             <React.Fragment key={s}>
               <div className={cn('flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all',
@@ -178,7 +218,7 @@ export default function BankImport() {
                 {done ? <Check className="w-4 h-4" /> : <span>{i + 1}</span>}
                 {s}
               </div>
-              {i < 2 && <ArrowRight className="w-4 h-4 text-white/55" />}
+              {i < 3 && <ArrowRight className="w-4 h-4 text-white/55" />}
             </React.Fragment>
           );
         })}
@@ -224,6 +264,51 @@ export default function BankImport() {
               2024-01-15, Supermarket, -250.00<br />
               2024-01-16, Salary, 15000.00
             </code>
+          </div>
+        </div>
+      )}
+
+      {step === 'mapping' && (
+        <div className="space-y-6">
+          <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><Settings2 className="w-5 h-5"/> Map CSV Columns</h3>
+            <p className="text-sm text-white/60 mb-6">Select which column corresponds to our required fields.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {['Date', 'Description', 'Amount'].map((field) => (
+                <div key={field} className="bg-black/20 p-4 border border-white/10 rounded-xl">
+                  <label className="block text-sm font-bold text-white mb-2">{field} *</label>
+                  <select 
+                    value={mappings[field.toLowerCase()] !== undefined ? mappings[field.toLowerCase()] : ''}
+                    onChange={(e) => setMappings({ ...mappings, [field.toLowerCase()]: parseInt(e.target.value) })}
+                    className="w-full px-4 py-2 bg-white/[0.05] border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-brand/50">
+                    <option value="" disabled>Select column...</option>
+                    {headers.map((h, i) => <option key={i} value={i}>{h || `Column ${i+1}`}</option>)}
+                  </select>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-8">
+              <h4 className="text-sm font-bold text-white/80 mb-3 flex items-center gap-2"><Table className="w-4 h-4"/> Data Preview (first 3 rows)</h4>
+              <div className="overflow-x-auto border border-white/10 rounded-xl">
+                <table className="w-full text-left text-sm text-white/70">
+                  <thead className="bg-white/5 border-b border-white/10">
+                    <tr>{headers.map((h, i) => <th key={i} className="p-3 font-semibold">{h || `Col ${i+1}`}</th>)}</tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5 bg-black/20">
+                    {csvData.slice(0, 3).map((row, i) => (
+                      <tr key={i}>{row.map((col, j) => <td key={j} className="p-3 truncate max-w-[150px]">{col}</td>)}</tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <button onClick={() => setStep('upload')} className="flex-1 py-3 rounded-xl bg-white/5 text-white/84 font-medium hover:text-white transition-colors">Back</button>
+            <button onClick={handleMappingComplete} className="flex-1 py-3 rounded-xl bg-brand text-black font-bold hover:bg-brand/90 transition-colors">Continue to Review</button>
           </div>
         </div>
       )}

@@ -1,6 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export interface ReceiptData {
   merchant: string;
@@ -10,35 +8,12 @@ export interface ReceiptData {
 }
 
 export async function processReceipt(base64Image: string, mimeType: string): Promise<ReceiptData> {
-  const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
-    contents: {
-      parts: [
-        {
-          inlineData: {
-            data: base64Image,
-            mimeType: mimeType,
-          },
-        },
-        {
-          text: "Extract the merchant name, total amount, date (in YYYY-MM-DD format), and a suggested category from this receipt.",
-        },
-      ],
-    },
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          merchant: { type: Type.STRING },
-          amount: { type: Type.NUMBER },
-          date: { type: Type.STRING },
-          category: { type: Type.STRING },
-        },
-        required: ["merchant", "amount", "date", "category"],
-      },
-    },
+  const response = await fetch(`${API_URL}/api/ai/receipt`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ base64Image, mimeType })
   });
 
-  return JSON.parse(response.text || "{}");
+  if (!response.ok) throw new Error('Failed to process receipt');
+  return await response.json();
 }
