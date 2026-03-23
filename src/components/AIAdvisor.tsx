@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Send, X, Loader2, Sparkles, User, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions, useAccounts, useCategories, useBudgets } from '../lib/hooks/useFinanceData';
-import { formatCurrency, formatCurrencyShort } from "../lib/utils";
+import { formatCurrencyShort } from "../lib/utils";
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -56,13 +56,25 @@ export function AIAdvisor() {
         body: JSON.stringify({ context, message: userMessage })
       });
 
-      if (!response.ok) throw new Error('Network response was not ok');
+      if (!response.ok) {
+        let errorMessage = 'Unable to reach AI service right now.';
+        try {
+          const errorData = await response.json();
+          if (errorData?.error) {
+            errorMessage = String(errorData.error);
+          }
+        } catch {
+          // Ignore JSON parsing failures and keep the default message.
+        }
+        throw new Error(errorMessage);
+      }
       const data = await response.json();
 
       setMessages(prev => [...prev, { role: 'assistant', content: data.text || "I'm sorry, I couldn't generate a response." }]);
     } catch (error) {
       console.error('AI Error:', error);
-      setMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I encountered an error. Please try again later." }]);
+      const errorMessage = error instanceof Error ? error.message : "I'm sorry, I encountered an error. Please try again later.";
+      setMessages(prev => [...prev, { role: 'assistant', content: errorMessage }]);
     } finally {
       setLoading(false);
     }

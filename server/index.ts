@@ -9,8 +9,14 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Use the API key securely from the environment
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY });
+function createAiClient() {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+  if (!apiKey) {
+    return null;
+  }
+
+  return new GoogleGenAI({ apiKey });
+}
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -18,9 +24,14 @@ app.use(express.json({ limit: '10mb' }));
 app.post('/api/ai/advisor', async (req, res) => {
   try {
     const { context, message } = req.body;
+    const ai = createAiClient();
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
+    }
+
+    if (!ai) {
+      return res.status(503).json({ error: 'AI service is not configured. Set GEMINI_API_KEY in the server environment.' });
     }
 
     const response = await ai.models.generateContent({
@@ -36,16 +47,22 @@ app.post('/api/ai/advisor', async (req, res) => {
     res.json({ text: response.text });
   } catch (error) {
     console.error('AI Advisor Error:', error);
-    res.status(500).json({ error: 'Failed to generate AI response.' });
+    const message = error instanceof Error ? error.message : 'Failed to generate AI response.';
+    res.status(500).json({ error: message });
   }
 });
 
 app.post('/api/ai/report', async (req, res) => {
   try {
     const { context } = req.body;
+    const ai = createAiClient();
 
     if (!context) {
       return res.status(400).json({ error: 'Context is required' });
+    }
+
+    if (!ai) {
+      return res.status(503).json({ error: 'AI service is not configured. Set GEMINI_API_KEY in the server environment.' });
     }
 
     const response = await ai.models.generateContent({
@@ -62,16 +79,22 @@ app.post('/api/ai/report', async (req, res) => {
     res.json({ text: response.text });
   } catch (error) {
     console.error('AI Report Error:', error);
-    res.status(500).json({ error: 'Failed to generate AI report.' });
+    const message = error instanceof Error ? error.message : 'Failed to generate AI report.';
+    res.status(500).json({ error: message });
   }
 });
 
 app.post('/api/ai/receipt', async (req, res) => {
   try {
     const { base64Image, mimeType } = req.body;
+    const ai = createAiClient();
 
     if (!base64Image || !mimeType) {
       return res.status(400).json({ error: 'Image data and mimeType are required' });
+    }
+
+    if (!ai) {
+      return res.status(503).json({ error: 'AI service is not configured. Set GEMINI_API_KEY in the server environment.' });
     }
 
     const response = await ai.models.generateContent({
@@ -107,7 +130,8 @@ app.post('/api/ai/receipt', async (req, res) => {
     res.json(JSON.parse(response.text || "{}"));
   } catch (error) {
     console.error('Receipt Scan Error:', error);
-    res.status(500).json({ error: 'Failed to scan receipt.' });
+    const message = error instanceof Error ? error.message : 'Failed to scan receipt.';
+    res.status(500).json({ error: message });
   }
 });
 
