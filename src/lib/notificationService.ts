@@ -2,6 +2,7 @@
 // Uses the Page Visibility API to fire reminders smartly (not while user is active)
 
 let reminderInterval: ReturnType<typeof setInterval> | null = null;
+type NotificationOptionsWithRenotify = NotificationOptions & { renotify?: boolean };
 
 export const requestNotificationPermission = async (): Promise<boolean> => {
   if (!('Notification' in window)) return false;
@@ -14,7 +15,7 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
 export const isNotificationGranted = (): boolean =>
   'Notification' in window && Notification.permission === 'granted';
 
-export const showNotification = (title: string, body: string, options?: NotificationOptions) => {
+export const showNotification = (title: string, body: string, options?: NotificationOptionsWithRenotify) => {
   if (!isNotificationGranted()) return;
   try {
     // Prefer service worker notifications (work when tab is backgrounded)
