@@ -14,7 +14,7 @@ export function ReportBugButton() {
   const handleSubmit = () => {
     if (!bugText.trim()) return;
     const encoded = encodeURIComponent(
-      `🐛 Bug Report from ወይኔ ብሬ\n\nUser: ${user?.email ?? 'unknown'}\n\nDescription:\n${bugText}`
+      `🐛 Bug Report from Birr Tracker\n\nUser: ${user?.email ?? 'unknown'}\n\nDescription:\n${bugText}`
     );
     window.open(`https://t.me/envologia?text=${encoded}`, '_blank');
     setBugText('');
@@ -68,7 +68,7 @@ export function ReportBugButton() {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-white light:text-black">Report a Bug</p>
-                    <p className="text-[10px] text-white/65 light:text-black/40">Help us improve ወይኔ ብሬ</p>
+                    <p className="text-[10px] text-white/65 light:text-black/40">Help us improve Birr Tracker</p>
                   </div>
                 </div>
                 <button onClick={handleClose} className="p-1.5 rounded-lg hover:bg-white/5 light:hover:bg-black/5 text-white/65 light:text-black/30 hover:text-white light:hover:text-black transition-colors">
@@ -112,7 +112,7 @@ export function ReportBugButton() {
                     </a>
 
                     <p className="text-[10px] text-white/55 light:text-black/30 text-center px-2 leading-relaxed">
-                      Your feedback helps make ወይኔ ብሬ better for everyone.
+                      Your feedback helps make Birr Tracker better for everyone.
                     </p>
                   </motion.div>
                 ) : (

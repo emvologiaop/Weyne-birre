@@ -419,13 +419,13 @@ export default function Settings() {
                                 document.body.style.backgroundColor = '#f0f2f5';
                                 document.body.style.color = '#0f0f1a';
                                 // Inject light style if not present
-                                if (!document.getElementById('weyne-light-theme')) {
+                                if (!document.getElementById('birr-tracker-light-theme')) {
                                   window.dispatchEvent(new CustomEvent('apply-theme', { detail: 'light' }));
                                 }
                               } else {
                                 document.body.style.backgroundColor = '#050505';
                                 document.body.style.color = '#f2f2f2';
-                                document.getElementById('weyne-light-theme')?.remove();
+                                document.getElementById('birr-tracker-light-theme')?.remove();
                               }
                             }}
                             className={cn(
@@ -529,7 +529,7 @@ export default function Settings() {
                         </div>
                         <div>
                           <h4 className="text-3xl font-display font-bold text-white tracking-tight">Install the App</h4>
-                          <p className="text-sm text-white/65 mt-1">Add ወይኔ ብሬ to your home screen</p>
+                          <p className="text-sm text-white/65 mt-1">Add Birr Tracker to your home screen</p>
                         </div>
                       </div>
                       <p className="text-base text-white/72 mb-12 leading-relaxed max-w-2xl">

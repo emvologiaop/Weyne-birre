@@ -109,17 +109,17 @@ const LIGHT_MODE_CSS = `
 `;
 
 function injectLightStyle() {
-  let el = document.getElementById('weyne-light-theme');
+  let el = document.getElementById('birr-tracker-light-theme');
   if (!el) {
     el = document.createElement('style');
-    el.id = 'weyne-light-theme';
+    el.id = 'birr-tracker-light-theme';
     document.head.appendChild(el);
   }
   el.textContent = LIGHT_MODE_CSS;
 }
 
 function removeLightStyle() {
-  document.getElementById('weyne-light-theme')?.remove();
+  document.getElementById('birr-tracker-light-theme')?.remove();
 }
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -180,7 +180,7 @@ export default function App() {
 
     const handleUpdate = () => {
       toast('Update available', {
-        description: 'A new version of ወይኔ ብሬ is ready.',
+        description: 'A new version of Birr Tracker is ready.',
         action: { label: 'Reload', onClick: () => window.location.reload() },
         duration: 12000,
       });

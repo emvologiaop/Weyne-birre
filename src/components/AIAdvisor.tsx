@@ -12,7 +12,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 export function AIAdvisor() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([
-    { role: 'assistant', content: "Hello! I'm your ወይኔ ብሬ AI Advisor. How can I help you with your finances today?" }
+    { role: 'assistant', content: "Hello! I'm your Birr Tracker AI Advisor. How can I help you with your finances today?" }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);

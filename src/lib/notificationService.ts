@@ -42,7 +42,7 @@ export const showNotification = (title: string, body: string, options?: Notifica
 };
 
 const SIX_HOURS = 6 * 60 * 60 * 1000;
-const REMINDER_KEY = 'weyne_last_reminder';
+const REMINDER_KEY = 'birr_tracker_last_reminder';
 
 export const startReminderSchedule = () => {
   if (reminderInterval) return; // already running
@@ -56,7 +56,7 @@ export const startReminderSchedule = () => {
     const now = Date.now();
     if (now - last >= SIX_HOURS) {
       localStorage.setItem(REMINDER_KEY, String(now));
-      showNotification('ወይኔ ብሬ — Time to check in', "Don't forget to log today's expenses!");
+      showNotification('Birr Tracker — Time to check in', "Don't forget to log today's expenses!");
     }
   };
 

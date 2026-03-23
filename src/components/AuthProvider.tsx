@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
-          <p className="text-white/78 text-sm font-medium">Loading ወይኔ ብሬ...</p>
+          <p className="text-white/78 text-sm font-medium">Loading Birr Tracker...</p>
         </div>
       </div>
     );
@@ -116,7 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             </svg>
           </div>
           <div>
-            <h1 className="text-2xl font-semibold text-white mb-2">Welcome to ወይኔ ብሬ</h1>
+            <h1 className="text-2xl font-semibold text-white mb-2">Welcome to Birr Tracker</h1>
             <p className="text-white/78 text-sm">Sign in to start tracking your money.</p>
           </div>
           <button

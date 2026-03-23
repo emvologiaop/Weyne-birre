@@ -26,7 +26,7 @@ app.post('/api/ai/advisor', async (req, res) => {
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
       config: {
-        systemInstruction: "You are a professional financial advisor for an app called 'ወይኔ ብሬ'. Always provide structured, easy-to-read advice. Use bold text for key figures and important points. Use bullet points for lists. Be encouraging and professional.",
+        systemInstruction: "You are a professional financial advisor for an app called 'Birr Tracker'. Always provide structured, easy-to-read advice. Use bold text for key figures and important points. Use bullet points for lists. Be encouraging and professional.",
       },
       contents: [
         { role: 'user', parts: [{ text: `Context: ${context}. Question: ${message}` }] }
@@ -51,7 +51,7 @@ app.post('/api/ai/report', async (req, res) => {
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
       config: {
-        systemInstruction: `You are a friendly personal finance advisor for 'ወይኔ ብሬ', an Ethiopian personal finance app. 
+        systemInstruction: `You are a friendly personal finance advisor for 'Birr Tracker', an Ethiopian personal finance app. 
           All amounts are in Ethiopian Birr (ETB). Generate a clear, practical, encouraging financial report in plain English. 
           Use Markdown formatting. Include: 1) Executive summary (2-3 sentences), 2) Key highlights (what went well), 
           3) Areas to improve, 4) Specific actionable tips for next period. Keep it under 400 words.`,
@@ -112,5 +112,5 @@ app.post('/api/ai/receipt', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Weyne Birre API server running on port ${port}`);
+  console.log(`Birr Tracker API server running on port ${port}`);
 });
