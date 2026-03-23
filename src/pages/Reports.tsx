@@ -6,9 +6,10 @@ import { formatCurrencyCompact, formatCurrencyShort, formatDate } from "../lib/u
 import { cn } from '../lib/utils';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { GoogleGenAI } from "@google/genai";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY! });
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 
 type ReportPeriod = 'week' | 'month' | 'year';
@@ -45,12 +46,34 @@ function exportCSV(transactions: any[], categories: any[], accounts: any[], peri
   link.click(); URL.revokeObjectURL(url);
 }
 
-function exportTextReport(content: string, period: string) {
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url; link.download = `weyne-birre-ai-report-${period}-${new Date().toISOString().split('T')[0]}.txt`;
-  link.click(); URL.revokeObjectURL(url);
+function exportPDF(transactions: any[], categories: any[], accounts: any[], period: string) {
+  const doc = new jsPDF();
+  
+  doc.setFontSize(18);
+  doc.text(`Weyne Birre Report: ${period}`, 14, 22);
+  
+  doc.setFontSize(11);
+  doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+
+  const tableData = transactions.map(tx => [
+    formatDate(tx.date),
+    tx.description,
+    tx.type,
+    categories.find(c => c.id === tx.categoryId)?.name ?? 'Uncategorized',
+    accounts.find(a => a.id === tx.accountId)?.name ?? 'Unknown',
+    tx.amount.toString()
+  ]);
+
+  autoTable(doc, {
+    startY: 40,
+    head: [['Date', 'Description', 'Type', 'Category', 'Account', 'Amount (ETB)']],
+    body: tableData,
+    theme: 'grid',
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [16, 185, 129] } // Brand color
+  });
+
+  doc.save(`weyne-birre-${period}-report.pdf`);
 }
 
 export default function Reports() {
@@ -108,17 +131,15 @@ export default function Reports() {
         transactionCount: periodTx.length,
         budgetsCount: budgets.length,
       };
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
-        config: {
-          systemInstruction: `You are a friendly personal finance advisor for 'ወይኔ ብሬ', an Ethiopian personal finance app. 
-          All amounts are in Ethiopian Birr (ETB). Generate a clear, practical, encouraging financial report in plain English. 
-          Use Markdown formatting. Include: 1) Executive summary (2-3 sentences), 2) Key highlights (what went well), 
-          3) Areas to improve, 4) Specific actionable tips for next period. Keep it under 400 words.`,
-        },
-        contents: [{ role: 'user', parts: [{ text: `Generate a financial report for: ${JSON.stringify(context, null, 2)}` }] }],
+      const response = await fetch(`${API_URL}/api/ai/report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context })
       });
-      setAiReport(response.text ?? '');
+      
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      setAiReport(data.text ?? '');
     } catch (err: any) {
       const msg = err?.message || String(err);
       console.error('AI report error:', msg);
@@ -217,12 +238,12 @@ export default function Reports() {
 
       {/* Export buttons */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <button onClick={() => exportCSV(periodTx, categories, accounts, period)}
+        <button onClick={() => exportPDF(periodTx, categories, accounts, period)}
           className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] hover:border-brand/20 transition-all group">
           <Download className="w-5 h-5 text-white/72 group-hover:text-brand transition-colors" />
           <div className="text-left">
-            <p className="text-sm font-bold text-white">Export CSV</p>
-            <p className="text-xs text-white/65">Download as spreadsheet</p>
+            <p className="text-sm font-bold text-white">Export PDF</p>
+            <p className="text-xs text-white/65">Download beautiful PDF statement</p>
           </div>
         </button>
         <button onClick={generateAIReport} disabled={loadingAI}

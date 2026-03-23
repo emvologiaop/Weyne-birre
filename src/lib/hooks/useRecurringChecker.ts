@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { collection, addDoc, doc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, serverTimestamp, runTransaction, collection } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../../components/AuthProvider';
 import { useRecurringTransactions } from './useFinanceData';
@@ -51,26 +51,38 @@ export function useRecurringChecker() {
         while (nextDue <= today) {
           const finalAmount = rec.type === 'expense' ? -Math.abs(rec.amount) : Math.abs(rec.amount);
           try {
-            await addDoc(collection(db, 'transactions'), {
-              userId: user.uid,
-              accountId: rec.accountId,
-              categoryId: rec.categoryId || 'uncategorized',
-              amount: finalAmount,
-              date: nextDue.toISOString(),
-              description: rec.description,
-              type: rec.type,
-              status: 'cleared',
-              tags: ['recurring'],
-              recurringId: rec.id,
-              isRecurring: true,
+            await runTransaction(db, async (transaction) => {
+              const accountRef = doc(db, 'accounts', rec.accountId);
+              const accountSnap = await transaction.get(accountRef);
+              
+              const newTxRef = doc(collection(db, 'transactions'));
+              transaction.set(newTxRef, {
+                userId: user.uid,
+                accountId: rec.accountId,
+                categoryId: rec.categoryId || 'uncategorized',
+                amount: finalAmount,
+                date: nextDue.toISOString(),
+                description: rec.description,
+                type: rec.type,
+                status: 'cleared',
+                tags: ['recurring'],
+                recurringId: rec.id,
+                isRecurring: true,
+              });
+
+              if (accountSnap.exists()) {
+                const currentBalance = accountSnap.data().balance || 0;
+                transaction.update(accountRef, { balance: currentBalance + finalAmount });
+              }
             });
-            if (rec.accountId) {
-              await updateDoc(doc(db, 'accounts', rec.accountId), { balance: increment(finalAmount) });
-            }
+
             toast.success(`Recurring: ${rec.description}`, {
               description: `${rec.type === 'expense' ? 'Debited' : 'Credited'} Br ${rec.amount.toLocaleString()}`,
             });
-          } catch (e) { console.error('Recurring tx error:', e); }
+          } catch (e) {
+            console.error('Recurring tx error:', e);
+            break; // Stop processing this recurring tx on error
+          }
 
           nextDue = getNextDate(nextDue, rec.interval);
           if (rec.endDate && nextDue > new Date(rec.endDate)) break;

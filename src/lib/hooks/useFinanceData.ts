@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, orderBy, doc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, orderBy, limit, doc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../../components/AuthProvider';
 import { handleFirestoreError, OperationType } from '../firestore-errors';
@@ -25,14 +25,19 @@ export function useAccounts() {
   return { accounts, loading };
 }
 
-export function useTransactions() {
+export function useTransactions(limitCount: number = 200) {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
-    const q = query(collection(db, 'transactions'), where('userId', '==', user.uid), orderBy('date', 'desc'));
+    const q = query(
+      collection(db, 'transactions'),
+      where('userId', '==', user.uid),
+      orderBy('date', 'desc'),
+      limit(limitCount)
+    );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setTransactions(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       setLoading(false);
@@ -107,6 +112,27 @@ export function useGoals() {
   }, [user]);
 
   return { goals, loading };
+}
+
+export function useDebts() {
+  const { user } = useAuth();
+  const [debts, setDebts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    const q = query(collection(db, 'debts'), where('userId', '==', user.uid));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setDebts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'debts');
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, [user]);
+
+  return { debts, loading };
 }
 
 export function useSubscriptions() {

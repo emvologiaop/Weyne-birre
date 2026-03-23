@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Receipt, Wallet, PieChart, Settings, LogOut, Tags,
   Scan, CreditCard, Trophy, Menu, X, Sparkles, TrendingUp, Upload,
-  ArrowLeftRight, RefreshCw, FileBarChart2, AlertTriangle,
+  ArrowLeftRight, RefreshCw, FileBarChart2, AlertTriangle, Users
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../AuthProvider';
@@ -16,6 +16,7 @@ import { useAchievementTracker } from '../../lib/hooks/useAchievementTracker';
 import { useRecurringChecker } from '../../lib/hooks/useRecurringChecker';
 import { useSubscriptionChecker } from '../../lib/hooks/useSubscriptionChecker';
 import { useKeyboardShortcuts } from '../../lib/hooks/useKeyboardShortcuts';
+import { useBudgetAlerts } from '../../lib/hooks/useBudgetAlerts';
 import { motion, AnimatePresence } from 'motion/react';
 
 const navItems = [
@@ -25,6 +26,7 @@ const navItems = [
   { name: 'Budgets',       href: '/budgets',      icon: PieChart },
   { name: 'Net Worth',     href: '/net-worth',    icon: TrendingUp },
   { name: 'Subscriptions', href: '/subscriptions',icon: CreditCard },
+  { name: 'Debts',         href: '/debts',        icon: Users },
   { name: 'Receipts',      href: '/receipts',     icon: Scan },
   { name: 'Reports',       href: '/reports',      icon: FileBarChart2 },
   { name: 'AI Advisor',    href: '/ai-advisor',   icon: Sparkles },
@@ -93,6 +95,7 @@ export default function DashboardLayout() {
   useSubscriptionChecker();
   useRecurringChecker();
   useKeyboardShortcuts({ onNewTransfer: () => setTransferOpen(true) });
+  useBudgetAlerts();
 
   const currentPage = navItems.find(item =>
     item.href === '/'
