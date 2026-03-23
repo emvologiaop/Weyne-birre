@@ -73,7 +73,8 @@ export default function Reports() {
   const income = periodTx.filter(t => t.type === 'income').reduce((s, t) => s + Math.abs(t.amount), 0);
   const expenses = periodTx.filter(t => t.type === 'expense').reduce((s, t) => s + Math.abs(t.amount), 0);
   const net = income - expenses;
-  const savingsRate = income > 0 ? ((net / income) * 100).toFixed(1) : '0';
+  const savingsRate = income > 0 ? (net / income) * 100 : 0;
+  const savingsRateDisplay = savingsRate.toFixed(1);
 
   // Top categories
   const catSpend = useMemo(() => {
@@ -81,10 +82,16 @@ export default function Reports() {
     periodTx.filter(t => t.type === 'expense').forEach(t => {
       map[t.categoryId] = (map[t.categoryId] || 0) + Math.abs(t.amount);
     });
+    const totalExpenses = expenses || 0;
     return Object.entries(map)
-      .map(([id, amount]) => ({ name: categories.find(c => c.id === id)?.name ?? 'Other', amount, color: categories.find(c => c.id === id)?.color ?? '#94a3b8' }))
+      .map(([id, amount]) => ({
+        name: categories.find(c => c.id === id)?.name ?? 'Other',
+        amount,
+        color: categories.find(c => c.id === id)?.color ?? '#94a3b8',
+        percent: totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0,
+      }))
       .sort((a, b) => b.amount - a.amount).slice(0, 5);
-  }, [periodTx, categories]);
+  }, [periodTx, categories, expenses]);
 
   const generateAIReport = async () => {
     setLoadingAI(true);
@@ -95,7 +102,7 @@ export default function Reports() {
         totalIncome: income,
         totalExpenses: expenses,
         netSavings: net,
-        savingsRate: `${savingsRate}%`,
+        savingsRate: `${savingsRateDisplay}%`,
         totalBalance: accounts.reduce((s, a) => s + (a.balance || 0), 0),
         topExpenseCategories: catSpend.map(c => `${c.name}: ETB ${c.amount.toLocaleString()}`),
         transactionCount: periodTx.length,
@@ -164,7 +171,7 @@ export default function Reports() {
               <stat.icon className="w-6 h-6" />
             </div>
             <p className="text-[11px] font-bold text-white/65 uppercase tracking-widest mb-2">{stat.label}</p>
-            <p className={cn('text-3xl font-display font-bold tabular-nums', stat.color)}>{formatCurrencyCompact(Math.abs(stat.value))}</p>
+            <p className={cn('text-3xl font-display font-bold tabular-nums', stat.color)}>{formatCurrencyCompact(stat.value)}</p>
           </motion.div>
         ))}
       </div>
@@ -173,13 +180,13 @@ export default function Reports() {
       <div className="p-6 rounded-2xl bg-white/[0.01] border border-white/[0.03] flex items-center justify-between">
         <div>
           <p className="text-sm font-bold text-white/72">Savings Rate</p>
-          <p className={cn('text-4xl font-display font-bold mt-1', parseFloat(savingsRate) >= 20 ? 'text-brand' : parseFloat(savingsRate) >= 0 ? 'text-amber-400' : 'text-rose-400')}>
-            {savingsRate}%
+          <p className={cn('text-4xl font-display font-bold mt-1', savingsRate >= 20 ? 'text-brand' : savingsRate >= 0 ? 'text-amber-400' : 'text-rose-400')}>
+            {savingsRateDisplay}%
           </p>
         </div>
         <div className="w-40 bg-white/5 rounded-full h-3 overflow-hidden">
-          <div className={cn('h-full rounded-full transition-all duration-1000', parseFloat(savingsRate) >= 20 ? 'bg-brand' : parseFloat(savingsRate) >= 0 ? 'bg-amber-400' : 'bg-rose-400')}
-            style={{ width: `${Math.min(100, Math.max(0, parseFloat(savingsRate)))}%` }} />
+          <div className={cn('h-full rounded-full transition-all duration-1000', savingsRate >= 20 ? 'bg-brand' : savingsRate >= 0 ? 'bg-amber-400' : 'bg-rose-400')}
+            style={{ width: `${Math.min(100, Math.max(0, savingsRate))}%` }} />
         </div>
       </div>
 
@@ -193,8 +200,14 @@ export default function Reports() {
                 <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
                 <span className="text-sm text-white/84 flex-1">{cat.name}</span>
                 <span className="text-sm font-bold text-white tabular-nums">{formatCurrencyShort(cat.amount)}</span>
+                <span className="text-xs font-bold text-white/65 w-14 text-right tabular-nums">
+                  {cat.percent.toFixed(1)}%
+                </span>
                 <div className="w-24 bg-white/5 rounded-full h-1.5 overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${(cat.amount / expenses) * 100}%`, backgroundColor: cat.color }} />
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${Math.min(100, Math.max(0, cat.percent))}%`, backgroundColor: cat.color }}
+                  />
                 </div>
               </div>
             ))}

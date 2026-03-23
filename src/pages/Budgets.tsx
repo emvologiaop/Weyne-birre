@@ -167,9 +167,11 @@ export default function Budgets() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {budgets.map((budget, i) => {
               const spent = getCategorySpent(budget.categoryId, budget.period);
-              const percentage = budget.amount > 0 ? Math.min((spent / budget.amount) * 100, 100) : (spent > 0 ? 100 : 0);
+              const rawPercentage = budget.amount > 0 ? (spent / budget.amount) * 100 : (spent > 0 ? 100 : 0);
+              const clampedPercentage = Math.min(100, Math.max(0, rawPercentage));
+              const percentageLabel = clampedPercentage.toFixed(1);
               const isOver = spent > budget.amount;
-              const isWarning = percentage >= 85 && !isOver;
+              const isWarning = clampedPercentage >= 85 && !isOver;
               // Fire browser notification when budget hits 85% or goes over (once per render via ref)
 
               return (
@@ -237,7 +239,7 @@ export default function Budgets() {
                       <div className="relative h-3 w-full bg-white/[0.02] rounded-full overflow-hidden border border-white/[0.05] shadow-inner">
                         <motion.div 
                           initial={{ width: 0 }}
-                          animate={{ width: `${percentage}%` }}
+                          animate={{ width: `${clampedPercentage}%` }}
                           transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
                           className={cn(
                             "h-full rounded-full transition-all duration-700 shadow-[0_0_20px_rgba(0,0,0,0.5)]",
@@ -251,7 +253,7 @@ export default function Budgets() {
                           "text-[11px] font-bold uppercase tracking-[0.3em]",
                           isOver ? 'text-rose-400' : isWarning ? 'text-amber-500' : 'text-brand/60'
                         )}>
-                          {Math.round(percentage)}%
+                          {percentageLabel}%
                         </p>
                       </div>
                     </div>
@@ -291,8 +293,10 @@ export default function Budgets() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {goals.map((goal, i) => {
-              const percentage = goal.targetAmount > 0 ? Math.min((goal.currentAmount / goal.targetAmount) * 100, 100) : 0;
-              const isCompleted = percentage >= 100;
+              const rawPercentage = goal.targetAmount > 0 ? (goal.currentAmount / goal.targetAmount) * 100 : 0;
+              const clampedPercentage = Math.min(100, Math.max(0, rawPercentage));
+              const percentageLabel = clampedPercentage.toFixed(1);
+              const isCompleted = clampedPercentage >= 100;
 
               return (
                 <motion.div 
@@ -359,7 +363,7 @@ export default function Budgets() {
                       <div className="relative h-3 w-full bg-white/[0.02] rounded-full overflow-hidden border border-white/[0.05] shadow-inner">
                         <motion.div 
                           initial={{ width: 0 }}
-                          animate={{ width: `${percentage}%` }}
+                          animate={{ width: `${clampedPercentage}%` }}
                           transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
                           className={cn(
                             "h-full rounded-full transition-all duration-700 shadow-[0_0_20px_rgba(0,0,0,0.5)]",
@@ -373,7 +377,7 @@ export default function Budgets() {
                           "text-[11px] font-bold uppercase tracking-[0.3em]",
                           isCompleted ? 'text-brand' : 'text-blue-400/60'
                         )}>
-                          {Math.round(percentage)}%
+                          {percentageLabel}%
                         </p>
                       </div>
                     </div>
