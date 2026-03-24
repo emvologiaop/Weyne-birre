@@ -7,8 +7,6 @@ import { Link } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-const API_URL = import.meta.env.VITE_API_URL || '';
-
 
 export default function AIAdvisorPage() {
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([
@@ -51,7 +49,7 @@ export default function AIAdvisorPage() {
         - Categories: ${categories.map(c => c.name).join(', ')}
       `;
 
-      const response = await fetch(`${API_URL}/api/ai/advisor`, {
+      const response = await fetch('/api/ai/advisor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ context, message: userMessage })
