@@ -7,11 +7,11 @@
     "dev": "vite --port=3000 --host=0.0.0.0",
     "dev:all": "npx concurrently \"npm run dev\" \"npm run server\"",
     "build": "vite build",
-    "build:server": "tsc server/index.ts --outDir dist-server --esModuleInterop",
+    "build:server": "tsc -p tsconfig.server.json",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist dist-server",
     "lint": "tsc --noEmit",
     "start": "node dist-server/index.js",
     "server": "ts-node server/index.ts"
