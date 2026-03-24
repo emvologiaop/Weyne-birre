@@ -54,19 +54,33 @@ export function AIAdvisor() {
         body: JSON.stringify({ context, message: userMessage })
       });
 
+      const contentType = response.headers.get('content-type') || '';
+      const rawBody = await response.text();
+      let data: { text?: string; error?: string } | null = null;
+
+      if (rawBody) {
+        if (contentType.includes('application/json')) {
+          try {
+            data = JSON.parse(rawBody);
+          } catch {
+            data = null;
+          }
+        }
+      }
+
       if (!response.ok) {
         let errorMessage = `HTTP Error ${response.status}`;
-        try {
-          const errorData = await response.json();
-          if (errorData?.error) {
-            errorMessage = String(errorData.error);
-          }
-        } catch {
-          // Ignore JSON parsing failures and keep the HTTP error status
+        if (data?.error) {
+          errorMessage = String(data.error);
+        } else if (rawBody.trim().startsWith('<')) {
+          errorMessage = 'AI endpoint returned HTML instead of JSON. Verify /api proxy or backend deployment.';
         }
         throw new Error(errorMessage);
       }
-      const data = await response.json();
+
+      if (!data || !data.text) {
+        throw new Error('AI endpoint returned a non-JSON response. Verify backend route configuration.');
+      }
 
       setMessages(prev => [...prev, { role: 'assistant', content: data.text || "I'm sorry, I couldn't generate a response." }]);
     } catch (error) {

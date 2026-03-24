@@ -9,8 +9,6 @@ import remarkGfm from 'remark-gfm';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const API_URL = import.meta.env.VITE_API_URL || '';
-
 
 type ReportPeriod = 'week' | 'month' | 'year';
 
@@ -136,9 +134,31 @@ export default function Reports() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ context })
       });
-      
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data = await response.json();
+
+      const contentType = response.headers.get('content-type') || '';
+      const rawBody = await response.text();
+      let data: { text?: string; error?: string } | null = null;
+
+      if (rawBody && contentType.includes('application/json')) {
+        try {
+          data = JSON.parse(rawBody);
+        } catch {
+          data = null;
+        }
+      }
+
+      if (!response.ok) {
+        if (data?.error) throw new Error(String(data.error));
+        if (rawBody.trim().startsWith('<')) {
+          throw new Error('AI report endpoint returned HTML instead of JSON. Verify /api backend route.');
+        }
+        throw new Error(`Network response was not ok (${response.status})`);
+      }
+
+      if (!data) {
+        throw new Error('AI report endpoint returned a non-JSON response.');
+      }
+
       setAiReport(data.text ?? '');
     } catch (err: any) {
       const msg = err?.message || String(err);
