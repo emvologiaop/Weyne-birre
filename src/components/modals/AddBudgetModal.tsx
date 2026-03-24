@@ -6,6 +6,7 @@ import { db } from '../../lib/firebase';
 import { useAuth } from '../AuthProvider';
 import { useCategories } from '../../lib/hooks/useFinanceData';
 import { handleFirestoreError, OperationType } from '../../lib/firestore-errors';
+import { toast } from 'sonner';
 
 interface AddBudgetModalProps {
   isOpen: boolean;
@@ -27,7 +28,10 @@ export function AddBudgetModal({ isOpen, onClose }: AddBudgetModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      setError('You must be signed in to create a budget.');
+      return;
+    }
     setLoading(true);
     setError('');
 
@@ -41,12 +45,14 @@ export function AddBudgetModal({ isOpen, onClose }: AddBudgetModalProps) {
       });
       setFormData({ categoryId: '', amount: '', period: 'monthly', startDate: new Date().toISOString().split('T')[0] });
       setError('');
+      toast.success('Budget created successfully');
       onClose();
     } catch (err) {
       try {
         handleFirestoreError(err, OperationType.CREATE, 'budgets');
       } catch (e: any) {
         setError(e.message);
+        toast.error('Failed to create budget');
       }
     } finally {
       setLoading(false);

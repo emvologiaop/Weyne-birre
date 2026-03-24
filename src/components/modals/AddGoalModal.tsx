@@ -5,6 +5,7 @@ import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../AuthProvider';
 import { handleFirestoreError, OperationType } from '../../lib/firestore-errors';
+import { toast } from 'sonner';
 
 interface AddGoalModalProps {
   isOpen: boolean;
@@ -25,12 +26,20 @@ export function AddGoalModal({ isOpen, onClose }: AddGoalModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      setError('You must be signed in to create a goal.');
+      return;
+    }
     setLoading(true);
     setError('');
 
     const target = parseFloat(formData.targetAmount) || 0;
     const current = parseFloat(formData.currentAmount) || 0;
+    if (target <= 0) {
+      setError('Target amount must be greater than zero.');
+      setLoading(false);
+      return;
+    }
     if (current > target) {
       setError('Amount saved so far cannot be more than the target amount.');
       setLoading(false);
@@ -46,14 +55,17 @@ export function AddGoalModal({ isOpen, onClose }: AddGoalModalProps) {
         color: '#10B981',
         icon: 'Target',
       });
-      setFormData({ name: '', targetAmount: '', currentAmount: '0', targetDate: new Date().toISOString().split('T')[0] });
+      const nextYearDate = (() => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().split('T')[0]; })();
+      setFormData({ name: '', targetAmount: '', currentAmount: '0', targetDate: nextYearDate });
       setError('');
+      toast.success('Goal created successfully');
       onClose();
     } catch (err) {
       try {
         handleFirestoreError(err, OperationType.CREATE, 'goals');
       } catch (e: any) {
         setError(e.message);
+        toast.error('Failed to create goal');
       }
     } finally {
       setLoading(false);
@@ -104,6 +116,7 @@ export function AddGoalModal({ isOpen, onClose }: AddGoalModalProps) {
                     <input
                       type="number"
                       step="0.01"
+                      min="0.01"
                       required
                       value={formData.targetAmount}
                       onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}

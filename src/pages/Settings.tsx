@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { User, Bell, Shield, Palette, Globe, Save, Loader2, Database, RefreshCw, Download, Smartphone, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useUserProfile, useCategories, useAccounts } from "../lib/hooks/useFinanceData";
-import { doc, updateDoc, collection, addDoc } from "firebase/firestore";
+import { doc, setDoc, collection, addDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../components/AuthProvider";
 import { handleFirestoreError, OperationType } from "../lib/firestore-errors";
@@ -114,13 +114,19 @@ export default function Settings() {
   };
 
   const handleSave = async () => {
-    if (!user || !profile) return;
+    if (!user) {
+      toast.error("You must be signed in to save settings");
+      return;
+    }
     
     setIsSaving(true);
     try {
       const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
-        name: formData.name,
+      await setDoc(userRef, {
+        uid: user.uid,
+        email: user.email || profile?.email || '',
+        role: profile?.role || 'user',
+        name: formData.name || profile?.name || user.displayName || 'User',
         username: formData.username,
         gender: formData.gender,
         monthlyIncomeGoal: formData.monthlyIncomeGoal,
@@ -129,7 +135,8 @@ export default function Settings() {
         theme: formData.theme,
         emailNotifications: formData.emailNotifications,
         budgetAlerts: formData.budgetAlerts,
-      });
+        profileCompleted: profile?.profileCompleted !== false,
+      }, { merge: true });
       toast.success("Settings saved successfully");
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, 'users');
