@@ -9,7 +9,7 @@ import remarkGfm from 'remark-gfm';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 
 type ReportPeriod = 'week' | 'month' | 'year';
