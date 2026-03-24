@@ -57,14 +57,14 @@ export function AIAdvisor() {
       });
 
       if (!response.ok) {
-        let errorMessage = 'Unable to reach AI service right now.';
+        let errorMessage = `HTTP Error ${response.status}`;
         try {
           const errorData = await response.json();
           if (errorData?.error) {
             errorMessage = String(errorData.error);
           }
         } catch {
-          // Ignore JSON parsing failures and keep the default message.
+          // Ignore JSON parsing failures and keep the HTTP error status
         }
         throw new Error(errorMessage);
       }
@@ -74,7 +74,7 @@ export function AIAdvisor() {
     } catch (error) {
       console.error('AI Error:', error);
       const errorMessage = error instanceof Error ? error.message : "I'm sorry, I encountered an error. Please try again later.";
-      setMessages(prev => [...prev, { role: 'assistant', content: errorMessage }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: `**Error:** ${errorMessage}` }]);
     } finally {
       setLoading(false);
     }
