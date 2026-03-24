@@ -144,7 +144,21 @@ service cloud.firestore {
     // ===============================================================
 
     function isValidUser(data) {
-      let allowedFields = ['uid', 'name', 'email', 'role', 'currency', 'theme', 'monthlyIncomeGoal', 'netWorthTarget'];
+      let allowedFields = [
+        'uid',
+        'name',
+        'email',
+        'role',
+        'currency',
+        'theme',
+        'monthlyIncomeGoal',
+        'netWorthTarget',
+        'username',
+        'gender',
+        'emailNotifications',
+        'budgetAlerts',
+        'profileCompleted'
+      ];
       return hasOnlyAllowedFields(allowedFields) &&
              hasRequiredFields(['uid', 'name', 'email', 'role']) &&
              data.uid is string && data.uid.size() > 0 && data.uid.size() <= 128 &&
@@ -154,7 +168,12 @@ service cloud.firestore {
              (!('currency' in data) || (data.currency is string && data.currency.size() <= 10)) &&
              (!('theme' in data) || (data.theme is string && data.theme.size() <= 20)) &&
              (!('monthlyIncomeGoal' in data) || data.monthlyIncomeGoal is number) &&
-             (!('netWorthTarget' in data) || data.netWorthTarget is number);
+             (!('netWorthTarget' in data) || data.netWorthTarget is number) &&
+             (!('username' in data) || (data.username is string && data.username.size() <= 64)) &&
+             (!('gender' in data) || (data.gender is string && data.gender.size() <= 20)) &&
+             (!('emailNotifications' in data) || data.emailNotifications is bool) &&
+             (!('budgetAlerts' in data) || data.budgetAlerts is bool) &&
+             (!('profileCompleted' in data) || data.profileCompleted is bool);
     }
 
     function isValidAccount(data) {
