@@ -8,7 +8,7 @@ export interface ReceiptData {
 }
 
 export async function processReceipt(base64Image: string, mimeType: string): Promise<ReceiptData> {
-  const response = await fetch(`${API_URL}/api/ai/receipt`, {
+const response = await fetch('/api/ai/receipt', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ base64Image, mimeType })

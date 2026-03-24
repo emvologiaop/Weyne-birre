@@ -2,12 +2,25 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { GoogleGenAI, Type } from '@google/genai';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config({ path: '../.env.local' });
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
+
+// Define __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve the static React files from 'dist' directory in production
+app.use(express.static(path.join(__dirname, '../dist')));
+
+app.get('/api/health', (req, res) => {
+  res.send('Birr Tracker API Server is running');
+});
 
 function createAiClient() {
   const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
@@ -133,6 +146,11 @@ app.post('/api/ai/receipt', async (req, res) => {
     const message = error instanceof Error ? error.message : 'Failed to scan receipt.';
     res.status(500).json({ error: message });
   }
+});
+
+// Any other GET request that doesn't hit /api/ should return the React index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist', 'index.html'));
 });
 
 app.listen(port, () => {

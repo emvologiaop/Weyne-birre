@@ -131,7 +131,7 @@ export default function Reports() {
         transactionCount: periodTx.length,
         budgetsCount: budgets.length,
       };
-      const response = await fetch(`${API_URL}/api/ai/report`, {
+      const response = await fetch('/api/ai/report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ context })
