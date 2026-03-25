@@ -6,6 +6,21 @@ import { formatCurrencyShort } from "../lib/utils";
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+function normalizeAiMarkdown(text: string): string {
+  if (!text) return '';
+
+  let normalized = text.trim();
+  normalized = normalized.replace(/^```(?:markdown|md)?\s*/i, '').replace(/\s*```$/, '');
+
+  return normalized
+    .replace(/\\r\\n/g, '\n')
+    .replace(/\\n/g, '\n')
+    .replace(/\\t/g, '\t')
+    .replace(/\\\*/g, '*')
+    .replace(/\\#/g, '#')
+    .replace(/\\-/g, '-');
+}
+
 
 export function AIAdvisor() {
   const [isOpen, setIsOpen] = useState(false);
@@ -82,7 +97,10 @@ export function AIAdvisor() {
         throw new Error('AI endpoint returned a non-JSON response. Verify backend route configuration.');
       }
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.text || "I'm sorry, I couldn't generate a response." }]);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: normalizeAiMarkdown(data.text || "I'm sorry, I couldn't generate a response.")
+      }]);
     } catch (error) {
       console.error('AI Error:', error);
       const errorMessage = error instanceof Error ? error.message : "I'm sorry, I encountered an error. Please try again later.";

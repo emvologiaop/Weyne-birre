@@ -84,6 +84,23 @@ function exportTextReport(reportText: string, period: string) {
   URL.revokeObjectURL(url);
 }
 
+function normalizeAiMarkdown(text: string): string {
+  if (!text) return '';
+
+  let normalized = text.trim();
+
+  // Some model responses arrive escaped or wrapped in markdown fences.
+  normalized = normalized.replace(/^```(?:markdown|md)?\s*/i, '').replace(/\s*```$/, '');
+
+  return normalized
+    .replace(/\\r\\n/g, '\n')
+    .replace(/\\n/g, '\n')
+    .replace(/\\t/g, '\t')
+    .replace(/\\\*/g, '*')
+    .replace(/\\#/g, '#')
+    .replace(/\\-/g, '-');
+}
+
 export default function Reports() {
   const { transactions } = useTransactions();
   const { accounts } = useAccounts();
@@ -169,7 +186,7 @@ export default function Reports() {
         throw new Error('AI report endpoint returned a non-JSON response.');
       }
 
-      setAiReport(data.text ?? '');
+      setAiReport(normalizeAiMarkdown(data.text ?? ''));
     } catch (err: any) {
       const msg = err?.message || String(err);
       console.error('AI report error:', msg);

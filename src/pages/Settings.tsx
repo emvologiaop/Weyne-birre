@@ -413,27 +413,8 @@ export default function Settings() {
                             key={t}
                             onClick={() => {
                               setFormData(prev => ({ ...prev, theme: t as any }));
-                              // Fire the global theme event so ThemeProvider picks it up instantly
-                              const fakeProfile = { theme: t };
-                              const root = document.documentElement;
-                              const resolved = t === 'system'
-                                ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-                                : t;
-                              root.setAttribute('data-theme', resolved);
-                              root.classList.toggle('light', resolved === 'light');
-                              root.classList.toggle('dark', resolved === 'dark');
-                              if (resolved === 'light') {
-                                document.body.style.backgroundColor = '#f0f2f5';
-                                document.body.style.color = '#0f0f1a';
-                                // Inject light style if not present
-                                if (!document.getElementById('birr-tracker-light-theme')) {
-                                  window.dispatchEvent(new CustomEvent('apply-theme', { detail: 'light' }));
-                                }
-                              } else {
-                                document.body.style.backgroundColor = '#050505';
-                                document.body.style.color = '#f2f2f2';
-                                document.getElementById('birr-tracker-light-theme')?.remove();
-                              }
+                              // Let ThemeProvider handle all DOM/theme side effects in one place.
+                              window.dispatchEvent(new CustomEvent('apply-theme', { detail: t }));
                             }}
                             className={cn(
                               "flex-1 sm:flex-none px-8 py-3 rounded-[16px] text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500 capitalize",
