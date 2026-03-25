@@ -28,7 +28,7 @@ Birr Tracker helps users track income, expenses, accounts, budgets, subscription
 - Data/query state: TanStack Query
 - Backend services: Firebase Auth + Firestore
 - UI/UX: Tailwind CSS, Framer Motion, Recharts, Sonner
-- AI integration: Google GenAI SDK
+- AI integration: Mistral AI SDK
 - PWA: vite-plugin-pwa
 
 ## Project Structure
@@ -60,7 +60,7 @@ npm install
 Create a file named .env.local in the project root:
 
 ```env
-VITE_GEMINI_API_KEY=your_google_gemini_api_key
+VITE_MISTRAL_API_KEY=your_mistral_api_key
 ```
 
 ### 3) Verify Firebase configuration
@@ -205,7 +205,7 @@ npm run build
 ## Troubleshooting
 
 - Blank AI responses:
-   - Verify VITE_GEMINI_API_KEY is set and valid.
+   - Verify VITE_MISTRAL_API_KEY is set and valid.
 - Firebase permission errors:
    - Check Firestore security rules and authenticated user context.
 - PWA not updating:

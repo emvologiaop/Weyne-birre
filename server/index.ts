@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { GoogleGenAI, Type } from '@google/genai';
+import { Mistral } from '@mistralai/mistralai';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -23,12 +23,12 @@ app.get('/api/health', (req, res) => {
 });
 
 function createAiClient() {
-  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+  const apiKey = process.env.MISTRAL_API_KEY || process.env.VITE_MISTRAL_API_KEY;
   if (!apiKey) {
     return null;
   }
 
-  return new GoogleGenAI({ apiKey });
+  return new Mistral({ apiKey });
 }
 
 app.use(cors());
@@ -38,26 +38,30 @@ app.post('/api/ai/advisor', async (req, res) => {
   try {
     const { context, message } = req.body;
     const ai = createAiClient();
-    
+
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
     if (!ai) {
-      return res.status(503).json({ error: 'AI service is not configured. Set GEMINI_API_KEY in the server environment.' });
+      return res.status(503).json({ error: 'AI service is not configured. Set MISTRAL_API_KEY in the server environment.' });
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      config: {
-        systemInstruction: "You are a professional financial advisor for an app called 'Birr Tracker'. Always provide structured, easy-to-read advice. Use bold text for key figures and important points. Use bullet points for lists. Be encouraging and professional.",
-      },
-      contents: [
-        { role: 'user', parts: [{ text: `Context: ${context}. Question: ${message}` }] }
+    const response = await ai.chat.complete({
+      model: "mistral-large-latest",
+      messages: [
+        {
+          role: 'system',
+          content: "You are a professional financial advisor for an app called 'Birr Tracker'. Always provide structured, easy-to-read advice. Use bold text for key figures and important points. Use bullet points for lists. Be encouraging and professional."
+        },
+        {
+          role: 'user',
+          content: `Context: ${context}. Question: ${message}`
+        }
       ]
     });
 
-    res.json({ text: response.text });
+    res.json({ text: response.choices?.[0]?.message?.content || '' });
   } catch (error) {
     console.error('AI Advisor Error:', error);
     const message = error instanceof Error ? error.message : 'Failed to generate AI response.';
@@ -75,21 +79,27 @@ app.post('/api/ai/report', async (req, res) => {
     }
 
     if (!ai) {
-      return res.status(503).json({ error: 'AI service is not configured. Set GEMINI_API_KEY in the server environment.' });
+      return res.status(503).json({ error: 'AI service is not configured. Set MISTRAL_API_KEY in the server environment.' });
     }
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      config: {
-        systemInstruction: `You are a friendly personal finance advisor for 'Birr Tracker', an Ethiopian personal finance app. 
-          All amounts are in Ethiopian Birr (ETB). Generate a clear, practical, encouraging financial report in plain English. 
-          Use Markdown formatting. Include: 1) Executive summary (2-3 sentences), 2) Key highlights (what went well), 
-          3) Areas to improve, 4) Specific actionable tips for next period. Keep it under 400 words.`,
-      },
-      contents: [{ role: 'user', parts: [{ text: `Generate a financial report for: ${JSON.stringify(context, null, 2)}` }] }],
+    const response = await ai.chat.complete({
+      model: 'mistral-large-latest',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a friendly personal finance advisor for 'Birr Tracker', an Ethiopian personal finance app.
+          All amounts are in Ethiopian Birr (ETB). Generate a clear, practical, encouraging financial report in plain English.
+          Use Markdown formatting. Include: 1) Executive summary (2-3 sentences), 2) Key highlights (what went well),
+          3) Areas to improve, 4) Specific actionable tips for next period. Keep it under 400 words.`
+        },
+        {
+          role: 'user',
+          content: `Generate a financial report for: ${JSON.stringify(context, null, 2)}`
+        }
+      ]
     });
 
-    res.json({ text: response.text });
+    res.json({ text: response.choices?.[0]?.message?.content || '' });
   } catch (error) {
     console.error('AI Report Error:', error);
     const message = error instanceof Error ? error.message : 'Failed to generate AI report.';
@@ -107,40 +117,32 @@ app.post('/api/ai/receipt', async (req, res) => {
     }
 
     if (!ai) {
-      return res.status(503).json({ error: 'AI service is not configured. Set GEMINI_API_KEY in the server environment.' });
+      return res.status(503).json({ error: 'AI service is not configured. Set MISTRAL_API_KEY in the server environment.' });
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: {
-        parts: [
-          {
-            inlineData: {
-              data: base64Image,
-              mimeType: mimeType,
+    const response = await ai.chat.complete({
+      model: "pixtral-large-latest",
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image_url',
+              imageUrl: `data:${mimeType};base64,${base64Image}`
             },
-          },
-          {
-            text: "Extract the merchant name, total amount, date (in YYYY-MM-DD format), and a suggested category from this receipt.",
-          },
-        ],
-      },
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            merchant: { type: Type.STRING },
-            amount: { type: Type.NUMBER },
-            date: { type: Type.STRING },
-            category: { type: Type.STRING },
-          },
-          required: ["merchant", "amount", "date", "category"],
-        },
-      },
+            {
+              type: 'text',
+              text: "Extract the merchant name, total amount, date (in YYYY-MM-DD format), and a suggested category from this receipt. Return the result as a JSON object with keys: merchant (string), amount (number), date (string), and category (string)."
+            }
+          ]
+        }
+      ],
+      responseFormat: { type: 'json_object' }
     });
 
-    res.json(JSON.parse(response.text || "{}"));
+    const content = response.choices?.[0]?.message?.content;
+    const jsonContent = typeof content === 'string' ? content : '';
+    res.json(JSON.parse(jsonContent || "{}"));
   } catch (error) {
     console.error('Receipt Scan Error:', error);
     const message = error instanceof Error ? error.message : 'Failed to scan receipt.';
