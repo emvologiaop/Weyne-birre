@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
           theme_color: '#10b981',
           background_color: '#050505',
           display: 'standalone',
-          orientation: 'portrait-primary',
+          display_override: ['window-controls-overlay', 'standalone'],
           start_url: '/',
           scope: '/',
           categories: ['finance', 'productivity'],
