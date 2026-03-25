@@ -74,6 +74,16 @@ function exportPDF(transactions: any[], categories: any[], accounts: any[], peri
   doc.save(`birr-tracker-${period}-report.pdf`);
 }
 
+function exportTextReport(reportText: string, period: string) {
+  const blob = new Blob([reportText], { type: 'text/markdown;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `birr-tracker-ai-report-${period}-${new Date().toISOString().split('T')[0]}.md`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function Reports() {
   const { transactions } = useTransactions();
   const { accounts } = useAccounts();
